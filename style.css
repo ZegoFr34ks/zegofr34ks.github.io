@@ -59,7 +59,7 @@ header ul li a{
   position: relative;
   width: 100%;
   height: 100vh;
-  background: url(bg.jpg); /* ###Need to import image### */
+  background: url(Pictures/ggow.png);
   background-size: cover;
 }
 header.sticky .logo,
