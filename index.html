@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="description" content="ZegoFr34ks' Own Personal Website (WIP)">
@@ -9,15 +9,29 @@
     <link rel="stylesheet" href="style.css">
   </head>
   <body style="background-color: black">
-    <!--Body-->
     <header>
+      <a href="#" class="logo">Logo</a>
+      <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Services</a></li>
+        <li><a href="#">Portfolio</a></li>
+        <li><a href="#">Team</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
       <nav>
         <a href="page2.html"><small>Page 2</small></a>
         <a href="page3.html"><small>Page 3</small></a>
         <a href="page4.html"><small>Page 4</small></a>
       </nav>
     </header>
-
+    <section class="banner"></section>
+    <script type="text/javascript">
+      window.addEventListener("scroll", function(){
+        var header = document.querySelector("header");
+        header.classList.toggle("sticky", window.scrollY > 0);
+      })
+    </script>
     <main>
       <h1>HEADER1</h1>
       <hr/>
