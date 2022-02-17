@@ -79,7 +79,12 @@ header.sticky ul li a{
   overflow: hidden;
 }
 .bloc video{
+  transform: translate(-50%, -50%);
   position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  margin: auto;
   min-width: 100%;
   min-height: 100%;
 }
