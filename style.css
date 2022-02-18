@@ -93,7 +93,6 @@ header.sticky ul li a{
 /*div parallax*/
 
 div{
-  display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
@@ -102,9 +101,6 @@ div{
   height: 100vh;
 }
 div:nth-child(2){
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
   background-image: url(Pictures/ggod.jpg);
   background-attachment: fixed;
   background-size: cover;
@@ -112,4 +108,109 @@ div:nth-child(2){
 }
 div:nth-child(3){
   background: black;
+}
+
+/* card */
+
+card{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #161623;
+}
+
+card::before{
+  content: "";
+  position: absolute;
+  top: 100;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(#f00, #f0f);
+  clip-path: circle(50% at right 70%);
+}
+card::after{
+  content: "";
+  position: absolute;
+  top: 100;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(#2196f3, #e91e63);
+  clip-path: circle(40% at 10% 10%);
+}
+.container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 1200px;
+  flex-wrap: wrap;
+  z-index: 1;
+}
+.container .card{
+  position: relative;
+  width: 280px;
+  height: 400px;
+  margin: 30px;
+  box-shadow: 20px 20px 50px rgba(0, 0, 0, 0.5);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
+  border-left: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(5px);
+}
+.container .card .content{
+  padding: 20px;
+  text-align: center;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: 0.5s;
+}
+.container .card:hover .content{
+  transform: translateY(0px);
+  opacity: 1;
+}
+.container .card .content h2{
+  position: absolute;
+  top: 410px;
+  right: 15px;
+  font-size: 8em;
+  color: rgba(255, 255, 255, 0.05);
+  pointer-events: none;
+}
+.container .card .content h3{
+  position: absolute;
+  top: 600px;
+  right: 55px;
+  font-size: 1.8em;
+  color: #fff;
+  z-index: 1;
+}
+.container .card .content p{
+  position: absolute;
+  top: 650px;
+  right: 70px;
+  font-size: 1em;
+  color: #fff;
+  z-index: 300;
+}
+.container .card .content a{
+  position: relative;
+  top: 700px;
+  right: 0;
+  display: inline-block;
+  padding: 8px 20px;
+  margin-top: 15px;
+  background: #fff;
+  color: #000;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: 500;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
