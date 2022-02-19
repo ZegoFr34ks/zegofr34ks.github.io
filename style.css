@@ -90,6 +90,100 @@ header.sticky ul li a{
   min-height: 100%;
 }
 
+/* buttons */
+
+.buttonbox{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+  min-height: 100vh;
+  background: #000;
+  flex-wrap: wrap;
+  background: linear-gradient(#000000, #161623, #161623);
+}
+.buttonbox a{
+  position: relative;
+  display: inline-block;
+  padding: 15px 30px;
+  border: 2px solid #0f0;
+  margin: 40px;
+  text-transform: uppercase;
+  font-weight: 600;
+  text-decoration: none;
+  letter-spacing: 2px;
+  color: #fff;
+  -webkit-box-reflect: below 0px linear-gradient(transparent, #0002);
+  transition: 0.25s;
+  transition-delay: 0s;
+}
+.buttonbox a:hover{
+  transition-delay: 0.75s;
+  color: #000;
+  box-shadow: 0 0 10px #0f0,
+              0 0 20px #0f0,
+              0 0 40px #0f0,
+              0 0 80px #0f0,
+              0 0 160px #0f0;
+}
+.buttonbox a span{
+  position: relative;
+  z-index: 100;
+}
+.buttonbox a:nth-child(2){
+  filter: hue-rotate(70deg);
+}
+.buttonbox a:nth-child(3){
+  filter: hue-rotate(180deg);
+}
+.buttonbox a:nth-child(4){
+  filter: hue-rotate(260deg);
+}
+.buttonbox a::before{
+  content: "";
+  position: absolute;
+  left: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 2px;
+  background: #0f0;
+  box-shadow: 5px -8px 0 #0f0,
+              5px 8px 0 #0f0;
+  transition: width 0.25s, left 0.25s, height 0.25s, box-shadow 0.25s;
+  transition-delay: 0.5s, 0.25s, 0s, 0s;
+}
+.buttonbox a:hover::before{
+  width: 60%;
+  height: 105%;
+  left: -2px;
+  box-shadow: 5px 0 0 #0f0,
+              5px 0 0 #0f0;
+  transition-delay: 0s, 0.25s, 0.5s, 0.5s;
+}
+.buttonbox a::after{
+  content: "";
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 2px;
+  background: #0f0;
+  box-shadow: -5px -8px 0 #0f0,
+              -5px 8px 0 #0f0;
+  transition: width 0.25s, right 0.25s, height 0.25s, box-shadow 0.25s;
+  transition-delay: 0.5s, 0.25s, 0s, 0s;
+}
+.buttonbox a:hover::after{
+  width: 60%;
+  height: 105%;
+  right: -2px;
+  box-shadow: -5px 0 0 #0f0,
+              -5px 0 0 #0f0;
+  transition-delay: 0s, 0.25s, 0.5s, 0.5s;
+}
+
 /*div parallax*/
 
 div{
@@ -117,7 +211,7 @@ card{
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: #161623;
+  background: linear-gradient( #161623, #161623, #000000);
 }
 
 card::before{

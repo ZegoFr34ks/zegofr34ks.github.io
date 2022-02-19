@@ -10,22 +10,19 @@
     <link rel="stylesheet" href="style.css">
   </head>
   <body style="background-color: black">
-    <header>
-      <a href="index.html" class="logo">ZegoFr34ks</a>
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="#">About</a></li>
-        <li><a href="#">Services</a></li>
-        <li><a href="#">Portfolio</a></li>
-        <li><a href="#">Team</a></li>
-        <li><a href="#">Contact</a></li>
-      </ul>
-      <nav>
-        <a href="page2.html"><small>Page 2</small></a>
-        <a href="page3.html"><small>Page 3</small></a>
-        <a href="page4.html"><small>Page 4</small></a>
-      </nav>
-    </header>
+    <nav>
+      <header>
+        <a href="index.html" class="logo">ZegoFr34ks</a>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="page2.html">About</a></li>
+          <li><a href="page3.html">Services</a></li>
+          <li><a href="page4.html">Portfolio</a></li>
+          <li><a href="#">Team</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </header>
+    </nav>
     <section class="banner"></section>
     <script type="text/javascript">
       window.addEventListener("scroll", function(){
@@ -37,18 +34,11 @@
       <video src="Videos/TDBG.mp4" autoplay muted loop>LOADING</video>
     </div>
     <main>
-      <div id="parallax">
-        <h1 style="color: white">HEADER1</h1>
-        <a href="https://hello.vrchat.com" target="_blank">
-          <img width="600" src="Pictures/VRCHAT1.png" alt="Error: Image Not Found"/>
-        </a>
-        <br/>
-        <br/>
-        <p><big>para</big><small>graph</small>
-          <b>1</b>
-        </p>
-        <p style="color: red">Daily <i>updates</i>!</p>
-        <div style="color: blue">This Site Is Still Under Developement (CSS and JS coming soon!)</div>
+      <div id="parallax" class="buttonbox">
+        <a href="page2.html"><span>About</span></a>
+        <a href="page3.html"><span>Services</span></a>
+        <a href="page4.html"><span>Portfolio</span></a>
+        <a href="#"><span>Contact</span></a>
       </div>
       <div>
 
@@ -60,7 +50,7 @@
               <h2>ZF</h2>
               <h3>ZegoFr34ks</h3>
               <p>Who Is This Guy?</p>
-              <a href="#">Read More</a>
+              <a href="page2.html">Read More</a>
             </div>
           </div>
         </div>
@@ -76,7 +66,7 @@
     </main>
 
     <footer>
-      <span style="color: white">v.0.1981</span><span><a href="#" target="_blank">Click Me!</a></span>
+      <span style="color: white">v.0.2</span><span><a href="#" target="_blank">Click Me!</a></span>
     </footer>
   </body>
 </html>
