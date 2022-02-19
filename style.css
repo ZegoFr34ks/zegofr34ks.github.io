@@ -123,7 +123,7 @@ card{
 card::before{
   content: "";
   position: absolute;
-  top: 100;
+  top: 300;
   left: 0;
   width: 100%;
   height: 100%;
@@ -133,7 +133,7 @@ card::before{
 card::after{
   content: "";
   position: absolute;
-  top: 100;
+  top: 600;
   left: 0;
   width: 100%;
   height: 100%;
@@ -166,44 +166,37 @@ card::after{
   backdrop-filter: blur(5px);
 }
 .container .card .content{
+  line-height: 50px;
+  height: 150px;
+  position: absolute;
   padding: 20px;
   text-align: center;
-  transform: translateY(100px);
   opacity: 0;
   transition: 0.5s;
 }
 .container .card:hover .content{
-  transform: translateY(0px);
   opacity: 1;
 }
 .container .card .content h2{
   position: absolute;
-  top: 410px;
-  right: 15px;
+  top: -90px;
+  right: 10px;
   font-size: 8em;
   color: rgba(255, 255, 255, 0.05);
   pointer-events: none;
 }
 .container .card .content h3{
-  position: absolute;
-  top: 600px;
-  right: 55px;
   font-size: 1.8em;
   color: #fff;
   z-index: 1;
 }
 .container .card .content p{
-  position: absolute;
-  top: 650px;
-  right: 70px;
   font-size: 1em;
   color: #fff;
-  z-index: 300;
+  font-weight: 300;
 }
 .container .card .content a{
   position: relative;
-  top: 700px;
-  right: 0;
   display: inline-block;
   padding: 8px 20px;
   margin-top: 15px;
