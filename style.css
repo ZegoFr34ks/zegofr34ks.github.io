@@ -123,6 +123,7 @@ card{
 card::before{
   content: "";
   position: absolute;
+  display: flex;
   top: 300;
   left: 0;
   width: 100%;
