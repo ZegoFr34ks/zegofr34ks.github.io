@@ -195,7 +195,7 @@ div{
   height: 100vh;
 }
 div:nth-child(2){
-  background-image: url(Pictures/ggod.jpg);
+  background-image: url(Pictures/ggod.png);
   background-attachment: fixed;
   background-size: cover;
   height: 500px;
