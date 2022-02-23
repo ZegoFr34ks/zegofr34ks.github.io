@@ -1,22 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <meta charset="utc-8">
+    <meta charset="utf-8">
+    <meta name="description" content="ZegoFr34ks' Own Personal Website (WIP)">
     <meta name="author" content="ZegoFr34ks">
     <meta name="viewport" content="width=device-width, initial-scale=0.6">
-    <title>Page 2</title>
+    <link rel = "icon" href = "Pictures/waifuicon.jpg" type = "image/x-icon">
+    <title>About</title>
+    <link rel="stylesheet" href="style2.css">
   </head>
-  <body>
-    <header>
-      <nav>
-        <a href="index.html"><small>Home</small></a>
-        <a href="page3.html"><small>Page 3</small></a>
-        <a href="page4.html"><small>Page 4</small></a>
-      </nav>
-      <h1>Page 2<h1>
-      <hr>
-    </header>
-
+  <body style="background-color: black">
+    <nav>
+      <header>
+        <a href="index.html" class="logo">ZegoFr34ks</a>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="page2.html">About</a></li>
+          <li><a href="page3.html">Services</a></li>
+          <li><a href="page4.html">Portfolio</a></li>
+          <li><a href="#">Team</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </header>
+    </nav>
+    <section class="banner"></section>
+    <script type="text/javascript">
+      window.addEventListener("scroll", function(){
+        var header = document.querySelector("header");
+        header.classList.toggle("sticky", window.scrollY > 0);
+      })
+    </script>
     <main>
       <img src="Pictures/sasuke.jpg" alt="Error: Image Couldn't Be Loaded!"/>
     </main>
