@@ -78,7 +78,7 @@ header.sticky ul li a{
   justify-content: center;
   align-items: center;
   margin: auto;
-  min-height: 100vh;
+  min-height: 50vh;
   background: #000;
   flex-wrap: wrap;
   background: linear-gradient(#000000, #161623, #161623);
