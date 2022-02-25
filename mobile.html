@@ -7,10 +7,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=0.6">
     <link rel = "icon" href = "Pictures/waifuicon.png" type = "image/x-icon">
     <title>ZegoFr34ks' Home</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="stylem.css">
+    <script type="text/javascript">
+        if (screen.width <= 699) {
+        document.location = "mobile.html";
+        }
+    </script>
   </head>
   <body style="background-color: black">
-    <h1 style="color: white">Mobile Device Detected!</h1>
-    <p style="color: white">You were redirected to the mobile version of this site</p>
+    <nav>
+      <header>
+        <a href="index.html" class="logo">ZegoFr34ks</a>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="page2.html">About</a></li>
+          <li><a href="page3.html">Services</a></li>
+          <li><a href="page4.html">Portfolio</a></li>
+          <li><a href="#">Team</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </header>
+    </nav>
+    <section class="banner"></section>
+    <script type="text/javascript">
+      window.addEventListener("scroll", function(){
+        var header = document.querySelector("header");
+        header.classList.toggle("sticky", window.scrollY > 0);
+      })
+    </script>
+    <div>
+      <img src="#">
+    </div>
+    <main>
+      <h1 style="color: white;">Mobile Device Detected!</h1>
+      <p style="color: white;">You were redirected to the mobile version of this site</p>
+      <div id="parallax" class="buttonbox">
+        <a href="page2.html"><span>About</span></a>
+        <a href="page3.html"><span>Services</span></a>
+        <a href="page4.html"><span>Portfolio</span></a>
+        <a href="#"><span>Contact</span></a>
+      </div>
+      <div>
+
+      </div>
+    </main>
   </body>
 </html>
