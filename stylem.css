@@ -168,7 +168,14 @@ header.sticky ul li a{
 /* Custom space between the buttons */
 
 #parralax{
-  margin: 10%;
+  margin: 10px;
+}
+
+/* Secret Keys */
+
+#secret{
+  opacity: 0;
+  cursor: pointer;
 }
 
 /*div parallax*/
