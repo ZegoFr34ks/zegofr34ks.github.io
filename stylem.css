@@ -165,6 +165,12 @@ header.sticky ul li a{
   transition-delay: 0s;
 }
 
+/* Custom space between the buttons */
+
+#parralax{
+  margin: 10%;
+}
+
 /*div parallax*/
 
 div{
