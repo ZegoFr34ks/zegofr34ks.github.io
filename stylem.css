@@ -136,7 +136,7 @@ header.sticky ul li a{
 }
 .buttonbox a:hover::before{
   width: 60%;
-  height: 100%;
+  height: 105%;
   left: -2px;
   box-shadow: 5px 0 0 #0f0,
               5px 0 0 #0f0;
@@ -158,7 +158,7 @@ header.sticky ul li a{
 }
 .buttonbox a:hover::after{
   width: 50%;
-  height: 100%;
+  height: 105%;
   right: -2px;
   box-shadow: -5px 0 0 #0f0,
               -5px 0 0 #0f0;
