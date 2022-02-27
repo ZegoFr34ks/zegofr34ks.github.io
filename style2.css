@@ -10,7 +10,7 @@
 }
 body{
   background: #000;
-  min-height: 100vh;
+  min-height: 200vh;
   background-image: url(Pictures/BGI.png);
   background-size: cover;
   background-attachment: fixed;
@@ -112,6 +112,7 @@ section h2{
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 1000px;
 }
 .widget .container{
   display: flex;
