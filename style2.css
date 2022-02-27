@@ -10,7 +10,7 @@
 }
 body{
   background: #000;
-  min height: 200vh;
+  min-height: 200vh;
 }
 header{
   position: fixed;
