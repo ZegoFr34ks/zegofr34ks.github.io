@@ -13,6 +13,7 @@
     <link rel = "icon" href = "Pictures/waifuicon.png" type = "image/x-icon">
     <title>ZegoFr34ks' Home</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   </head>
   <body style="background-color: black">
     <nav>
@@ -69,7 +70,12 @@
         </script>
       </card>
     </main>
-
+    <div class="loader-wrapper">
+      <span class="loader"><span class="loader-inner"></span></span>
+    </div>
+    <script>
+      $("document").ready($(".loader-wrapper").fadeOut("slow"));
+    </script>
     <footer>
       <span style="color: white">v.0.22</span><span><a href="#" target="_blank">Click Me!</a></span>
     </footer>
