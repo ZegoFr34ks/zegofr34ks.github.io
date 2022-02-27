@@ -1,60 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <meta charset="utc-8">
+    <meta charset="utf-8">
+    <meta name="description" content="ZegoFr34ks' Own Personal Website (WIP)">
     <meta name="author" content="ZegoFr34ks">
     <meta name="viewport" content="width=device-width, initial-scale=0.6">
+    <link rel = "icon" href = "Pictures/waifuicon.png" type = "image/x-icon">
+    <title>About</title>
+    <link rel="stylesheet" href="style.css">
   </head>
-  <body>
-    <header>
-      <nav>
-        <a href="index.html"><small>Home</small></a>
-        <a href="page2.html"><small>Page 2</small></a>
-        <a href="page4.html"><small>Page 4</small></a>
-      </nav>
-    </header>
-
-    <main>
-      <video width="700" src="Videos/BackGroundEditRed.mp4"
-      poster="https://vandemoortele.com/sites/default/files/styles/square_product/public/74df554575a140827cac3193fced8591951ed7e1.jpg?itok=3sFTPR2L"
-      autoplay loop controls>Video Failed To Load!</video>
-
-      <iframe width="700" height="393,75" src="https://www.youtube.com/embed/J9tTt2QBRgE?autoplay=1;&mute=1"
-      title="YouTube video player" frameborder="0"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-      allowfullscreen>Couldn't Load Video From Youtube!</iframe>
-    </main>
-
-    <footer>
-      <p>THIS PAGE IS STILL IN DEVELOPMENT!</p>
-    </footer>
+  <body style="background-color: black">
+    <nav>
+      <header>
+        <a href="index.html" class="logo">ZegoFr34ks</a>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="page3.html">Portfolio</a></li>
+          <li><a href="page4.html">Contact</a></li>
+        </ul>
+      </header>
+    </nav>
+    <section class="banner"></section>
+    <script type="text/javascript">
+      window.addEventListener("scroll", function(){
+        var header = document.querySelector("header");
+        header.classList.toggle("sticky", window.scrollY > 0);
+      })
+    </script>
   </body>
 </html>
-
-<!-- (copy - paste)
-
-width="560" height="315"
-
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utc-8">
-    <meta name="author" content="ZegoFr34ks">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  </head>
-  <body>
-    <header>
-
-    </header>
-
-    <main>
-
-    </main>
-
-    <footer>
-
-    </footer>
-  </body>
-</html>
-
--->

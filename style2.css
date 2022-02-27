@@ -10,12 +10,14 @@
 }
 body{
   background: #000;
-  min-height: 200vh;
+  min-height: 100vh;
   background-image: url(Pictures/BGI.png);
   background-size: cover;
   background-attachment: fixed;
-  backdrop-filter: blur(40px);
 }
+
+/* header */
+
 header{
   position: fixed;
   top: 0;
