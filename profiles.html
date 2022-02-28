@@ -8,6 +8,7 @@
     <link rel = "icon" href = "Pictures/waifuicon.png" type = "image/x-icon">
     <title>Profiles</title>
     <link rel="stylesheet" href="styleprofiles.css">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
   </head>
   <body>
     <nav>
@@ -35,11 +36,28 @@
                 <img src="Pictures/Gifs/pfp.gif">
               </div>
               <div class="contentBx">
-                <h2 id="copy">ZegoFr34ks#0857</h2>
+                <h2>ZegoFr34ks#0857</h2>
                 <div class="desc">
                   <h4>This is my main Discord account, which I use daily for all sorts of things</h4>
                 </div>
-                <a href="#">Copy(WIP)</a>
+                <button>Copy</button>
+
+                <script type="text/javascript">
+
+                    $(document).ready(function () {
+                        $("button").click(function (event) {
+                            event.preventDefault();
+                            CopyToClipboard("ZegoFr34ks#0857");
+                        });
+                    });
+
+                    function CopyToClipboard(value) {
+                        var $temp = $("<input>");
+                        $("body").append($temp);
+                        $temp.val(value).select();
+                        document.execCommand("copy");
+                        $temp.remove();}
+                </script>
               </div>
             </div>
 
@@ -52,7 +70,24 @@
                 <div class="desc">
                   <h4>This is my Alt account, which I use to troll or to send myself files</h4>
                 </div>
-                <a href="#">Copy(WIP)</a>
+                <button>Copy</button>
+
+                <script type="text/javascript">
+
+                    $(document).ready(function () {
+                        $("button").click(function (event) {
+                            event.preventDefault();
+                            CopyToClipboard("💖Bella💖#9535");
+                        });
+                    });
+
+                    function CopyToClipboard(value) {
+                        var $temp = $("<input>");
+                        $("body").append($temp);
+                        $temp.val(value).select();
+                        document.execCommand("copy");
+                        $temp.remove();}
+                </script>
               </div>
             </div>
 
@@ -65,7 +100,24 @@
                 <div class="desc">
                   <h4>This is an account I use for developer purposes, i.e. for testing bots, webhooks, ...</h4>
                 </div>
-                <a href="#">Copy(WIP)</a>
+                <button>Copy</button>
+
+                <script type="text/javascript">
+
+                    $(document).ready(function () {
+                        $("button").click(function (event) {
+                            event.preventDefault();
+                            CopyToClipboard("Azryx#4925");
+                        });
+                    });
+
+                    function CopyToClipboard(value) {
+                        var $temp = $("<input>");
+                        $("body").append($temp);
+                        $temp.val(value).select();
+                        document.execCommand("copy");
+                        $temp.remove();}
+                </script>
               </div>
             </div>
           </div>

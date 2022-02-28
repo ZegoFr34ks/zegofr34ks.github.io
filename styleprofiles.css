@@ -191,7 +191,8 @@ header{
     letter-spacing: 2px;
     margin-right: 10px;
 }
-.container .card .contentBx a{
+.container .card .contentBx button{
+    border: none;
     display: inline-block;
     padding: 10px 20px;
     background: #fff;
@@ -204,8 +205,14 @@ header{
     transform: translateY(50px);
     transition: 0.5s;
 }
-.container .card:hover .contentBx a{
+.container .card:hover .contentBx button{
     opacity: 1;
     transform: translateY(0px);
     transition-delay: 0.5s;
+}
+.container .card .contentBx button:active{
+    background-color: #333;
+    color: #fff;
+    transition-delay: 0s;
+    transition: 0s;
 }
