@@ -81,6 +81,16 @@ h1 {
   transform: translateX(-50%) translateY(-50%);
   user-select: none;
 }
+.panel p{
+  cursor: default;
+  left: 50%;
+  line-height: 1;
+  position: absolute;
+  text-align: center;
+  top: 58.5%;
+  transform: translateX(-50%) translateY(-50%);
+  user-select: none;
+}
 .panel[data-x-pos="-2"] {
   left: -200%;
 }
