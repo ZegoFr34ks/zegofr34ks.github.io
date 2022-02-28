@@ -27,6 +27,13 @@ h1 {
   font-size: 20vmin;
   margin: 0;
 }
+iframe{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
 .panel-wrap {
   perspective: 2000px;
   transition: transform 0.3s cubic-bezier(0.55, 0, 0.1, 1);
