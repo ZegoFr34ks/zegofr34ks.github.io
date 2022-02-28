@@ -129,6 +129,32 @@ header{
 
 /* Profiles containers */
 
+.divdesc1{
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    top: 110%;
+    left: 0;
+    zoom: 2;
+}
+.divdesc1 img{
+    padding: 10px 10px;
+    width: 80px;
+    height: auto;
+}
+.divdesc1 h1{
+    padding: 0 10px;
+    font-weight: 800;
+}
+.divdesc1 h4{
+    position: relative;
+    padding: 0 10px;
+    font-weight: 200;
+    top: 80px;
+    left: -227px;
+}
 .container{
     position: relative;
     top: 800px;
