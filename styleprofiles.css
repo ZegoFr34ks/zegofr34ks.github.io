@@ -11,7 +11,7 @@ body{
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #000;
+    background: #333;
     min-height: 100vh;
 }
 
@@ -99,14 +99,14 @@ header{
     left: 0;
     width: 100%;
     height: 100%;
-    background: #9bdc28;
+    background: #8b28dc;
     clip-path: circle(150px at 80% 20%);
     transition: 0.5s ease-in-out;
 }
-.container .card:before:nth-child(2){
+.container .card:nth-child(2):before{
     background: #f55396;
 }
-.container .card:before:nth-child(3){
+.container .card:nth-child(3):before{
     background: #ff0000;
 }
 .container .card:hover:before{
