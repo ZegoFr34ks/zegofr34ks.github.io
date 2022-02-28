@@ -11,25 +11,36 @@
   </head>
   <body>
     <nav>
-      <header>
-        <a href="index.html" class="logo">ZegoFr34ks</a>
-        <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a href="about.html">About</a></li>
-          <li><a href="page3.html">Portfolio</a></li>
-          <li><a href="page4.html">Contact</a></li>
-        </ul>
-      </header>
+        <header>
+          <a href="index.html" class="logo">ZegoFr34ks</a>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="page3.html">Portfolio</a></li>
+            <li><a href="page4.html">Contact</a></li>
+          </ul>
+        </header>
+      </nav>
+      <section class="banner"></section>
+      <script type="text/javascript">
+        window.addEventListener("scroll", function(){
+          var header = document.querySelector("header");
+          header.classList.toggle("sticky", window.scrollY > 0);
+        })
+      </script>
     </nav>
-    <section class="banner"></section>
-    <script type="text/javascript">
-      window.addEventListener("scroll", function(){
-        var header = document.querySelector("header");
-        header.classList.toggle("sticky", window.scrollY > 0);
-      })
-    </script>
-    <main>
-        
-    </main>
+    <div class="main">
+        <div class="page">
+            <div class="kirito">
+                <img src="#Pictures/Weeb/kirito0.png">
+                <img src="#Pictures/Weeb/kirito1.png">
+                <img src="#Pictures/Weeb/kirito2.png">
+                <img src="#Pictures/Weeb/kirito3.png">
+            </div>
+            <div class="#">
+                <img src="Pictures/Weeb/#">
+            </div>
+        </div>
+    </div>
   </body>
 </html>
