@@ -313,7 +313,8 @@ header{
 
 footer{
     position: absolute;
+    display: flex;
     color: #fff;
-    bottom: -1060px;
-    left: 0%;
+    bottom: 0;
+    left: 0;
 }
