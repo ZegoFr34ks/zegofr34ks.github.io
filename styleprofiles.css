@@ -129,31 +129,43 @@ header{
 
 /* Profiles containers */
 
-.divdesc1{
+.divdesc1:before{
     position: absolute;
+}
+.divdesc1{
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
     color: #fff;
-    top: 110%;
+    top: 100px;
     left: 0;
+    width: 50%;
     zoom: 2;
 }
 .divdesc1 img{
+    position: relative;
     padding: 10px 10px;
     width: 80px;
     height: auto;
 }
 .divdesc1 h1{
+    position: relative;
     padding: 0 10px;
     font-weight: 800;
+    width: 400px;
 }
 .divdesc1 h4{
     position: relative;
     padding: 0 10px;
     font-weight: 200;
-    top: 80px;
-    left: -227px;
+    height: 10px;
+    width: 100%;
+    top: 0;
+    left: 0;
+}
+.div1{
+    position: absolute;
 }
 .container{
     position: relative;
@@ -296,6 +308,8 @@ header{
     transition-delay: 0s;
     transition: 0s;
 }
+
+/* footer */
 
 footer{
     position: absolute;
