@@ -298,8 +298,8 @@ header{
 }
 
 footer{
+    position: absolute;
     color: #fff;
-    bottom: 0%;
+    bottom: -1060px;
     left: 0%;
-    position: fixed;
 }
