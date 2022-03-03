@@ -172,7 +172,7 @@ header.sticky ul li a{
   display: inline-block;
   padding: 15px 30px;
   border: 2px solid #0f0;
-  margin: 40px;
+  margin: 140px;
   text-transform: uppercase;
   font-weight: 600;
   text-decoration: none;
@@ -181,6 +181,8 @@ header.sticky ul li a{
   -webkit-box-reflect: below 0px linear-gradient(transparent, #0002);
   transition: 0.25s;
   transition-delay: 0s;
+  width: 10%;
+  height: 10%;
 }
 .buttonbox a:hover{
   transition-delay: 0.75s;
