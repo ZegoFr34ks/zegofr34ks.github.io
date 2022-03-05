@@ -77,20 +77,56 @@ header{
 
 
 @-webkit-keyframes animate {
-  0%, 100% {
-    filter: hue-rotate(0deg);
+  0%, 100%{
+    background: #ffadad;
   }
-  50% {
-    filter: hue-rotate(360deg);
+  12.5%{
+    background: #ffd6a5;
+  }
+  25%{
+    background: #fdffb6;
+  }
+  37.5%{
+    background: #caffbf;
+  }
+  50%{
+    background: #9bf6ff;
+  }
+  62.5%{
+    background: #a0c4ff;
+  }
+  75%{
+    background: #bdb2ff;
+  }
+  87.5%{
+    background: #ffc6ff;
   }
 }
 
 @keyframes animate {
-  0%, 100% {
-    filter: hue-rotate(0deg);
+  0%, 100%{
+    background: #ffadad;
   }
-  50% {
-    filter: hue-rotate(360deg);
+  12.5%{
+    background: #ffd6a5;
+  }
+  25%{
+    background: #fdffb6;
+  }
+  37.5%{
+    background: #caffbf;
+  }
+  50%{
+    background: #9bf6ff;
+  }
+  62.5%{
+    background: #a0c4ff;
+  }
+  75%{
+    background: #bdb2ff;
+  }
+  87.5%{
+    background: #ffc6ff;
   }
 }
 
@@ -145,7 +181,7 @@ header{
   width: 3.75rem;
   height: 3.75rem;
   transform-style: preserve-3d;
-  background: linear-gradient(to left, #008aff, #00ffe7);
+  background: #ffadad;
   -webkit-animation: animate 5s linear infinite;
           animation: animate 5s linear infinite;
 }
@@ -159,7 +195,7 @@ header{
 .triangle:nth-child(1) {
   width: 3.75rem;
   top: -33%;
-  background: #f1ecfb;
+  background: white;
   -webkit-clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
           clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
   transform-origin: 50% 100%;
@@ -167,7 +203,7 @@ header{
 }
 .triangle:nth-child(2) {
   width: 3.75rem;
-  background: #f1ecfb;
+  background: white;
   -webkit-clip-path: polygon(50% 100%, 0 0, 100% 0);
           clip-path: polygon(50% 100%, 0 0, 100% 0);
   transform-origin: 50% 0%;
