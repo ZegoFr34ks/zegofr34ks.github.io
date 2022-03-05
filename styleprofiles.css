@@ -465,6 +465,91 @@ header{
     opacity: 0.6;
 }
 
+/* Steam */
+
+.divdesc3{
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    top: 1200px;
+    left: 0;
+    width: 50%;
+    zoom: 2;
+}
+.divdesc3 img{
+    position: relative;
+    padding: 10px 10px;
+    width: 80px;
+    height: auto;
+}
+.divdesc3 h1{
+    position: relative;
+    padding: 0 10px;
+    font-weight: 800;
+    width: 400px;
+}
+.divdesc3 h4{
+    position: relative;
+    padding: 0 10px;
+    font-weight: 200;
+    height: 10px;
+    width: 100%;
+    top: 0;
+    left: 0;
+}
+.box{
+    height: 250px;
+    width: 250px;
+    position: relative;
+    top: 2900px;
+    border-radius: 5px;
+    box-shadow: 0 20px 35px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+.box:hover{
+    cursor: pointer;
+}
+.box:active{
+    transform: translateY(4px)
+}
+.box:before{
+    content: "";
+    height: 150% ;
+    width: 150%;
+    position: absolute;
+    background: conic-gradient(
+        #fd004c,
+        #fe9000,
+        #fff020,
+        #3edf4b,
+        #3363ff,
+        #b102b7,
+        #fd004c
+    );
+    left: -25%;
+    top: -25%;
+    animation: spin 2s infinite linear;
+}
+@keyframes spin {
+    100%{
+        transform: rotate(-360deg);
+    }
+}
+.box img{
+    position: absolute;
+    height: 93%;
+    width: 93%;
+    top: 3.5%;
+    left: 3.5%;
+    border-radius: 5px;
+    display: grid;
+    place-items: center;
+    object-fit: cover;
+}
+
+
 /* footer */
 
 footer{
