@@ -29,113 +29,150 @@
         header.classList.toggle("sticky", window.scrollY > 0);
       })
     </script>
-      <section>
-        <img class="bc" src="Pictures/Gifs/cg.gif">
-        <div class="icontainer">
-          
-          <div class="ibox">
-            <span style="--i:1;"><a>All</a> my <a>Profiles</a></span>
-            <span style="--i:2;"><a>All</a> my <a>Profiles</a></span>
-            <span style="--i:3;"><a>All</a> my <a>Profiles</a></span>
-            <span style="--i:4;"><a>All</a> my <a>Profiles</a></span>
-            <span style="--i:5;"><a>All</a> my <a>Profiles</a></span>
-            <span style="--i:6;"><a>All</a> my <a>Profiles</a></span>
-            <span style="--i:7;"><a>All</a> my <a>Profiles</a></span>
-            <span style="--i:8;"><a>All</a> my <a>Profiles</a></span>
-            <span style="--i:9;"><a>All</a> my <a>Profiles</a></span>
-            <span style="--i:10;"><a>All</a> my <a>Profiles</a></span>
-            <span style="--i:11;"><a>All</a> my <a>Profiles</a></span>
-            <span style="--i:12;"><a>All</a> my <a>Profiles</a></span>
-            <span style="--i:13;"><a>All</a> my <a>Profiles</a></span>
-            <span style="--i:14;"><a>All</a> my <a>Profiles</a></span>
-            <span style="--i:15;"><a>All</a> my <a>Profiles</a></span>
-            <span style="--i:16;"><a>All</a> my <a>Profiles</a></span>
-          </div>
+    <section>
+      <img class="bc" src="Pictures/Gifs/cg.gif">
+      <div class="icontainer">
+        <div class="ibox">
+          <span style="--i:1;"><a>All</a> my <a>Profiles</a></span>
+          <span style="--i:2;"><a>All</a> my <a>Profiles</a></span>
+          <span style="--i:3;"><a>All</a> my <a>Profiles</a></span>
+          <span style="--i:4;"><a>All</a> my <a>Profiles</a></span>
+          <span style="--i:5;"><a>All</a> my <a>Profiles</a></span>
+          <span style="--i:6;"><a>All</a> my <a>Profiles</a></span>
+          <span style="--i:7;"><a>All</a> my <a>Profiles</a></span>
+          <span style="--i:8;"><a>All</a> my <a>Profiles</a></span>
+          <span style="--i:9;"><a>All</a> my <a>Profiles</a></span>
+          <span style="--i:10;"><a>All</a> my <a>Profiles</a></span>
+          <span style="--i:11;"><a>All</a> my <a>Profiles</a></span>
+          <span style="--i:12;"><a>All</a> my <a>Profiles</a></span>
+          <span style="--i:13;"><a>All</a> my <a>Profiles</a></span>
+          <span style="--i:14;"><a>All</a> my <a>Profiles</a></span>
+          <span style="--i:15;"><a>All</a> my <a>Profiles</a></span>
+          <span style="--i:16;"><a>All</a> my <a>Profiles</a></span>
         </div>
-      </section>
-        <div class="divdesc1">
-            <img src="Pictures/discord.png">
-          <div>
-            <h1>Discord</h1>
-            <h4>Discord is the easiest way to talk over voice, video, and text. Talk, chat, hang out, and stay close with your friends and communities.</h4>
-          </div>
+      </div>
+    </section>
+    <section class="pcontainer" id="Discord">
+      <div class="divdesc1">
+        <img src="Pictures/discord.png">
+        <div>
+          <h1>Discord</h1>
+          <h4>Discord is the easiest way to talk over voice, video, and text. Talk, chat, hang out, and stay close with your friends and communities.</h4>
         </div>
-        <div class="div1">
-          <div class="container">
-            <div class="card">
-              <div class="imgBx">
-                <img src="Pictures/Gifs/pfp.gif">
+      </div>
+      <div class="div1">
+        <div class="container">
+          <div class="card">
+            <div class="imgBx">
+              <img src="Pictures/Gifs/pfp.gif">
+            </div>
+            <div class="contentBx">
+              <h2 id="copy1">ZegoFr34ks#0857</h2>
+              <div class="desc">
+                <h4>This is my main Discord account, which I use daily for all sorts of things</h4>
               </div>
-              <div class="contentBx">
-                <h2 id="copy1">ZegoFr34ks#0857</h2>
-                <div class="desc">
-                  <h4>This is my main Discord account, which I use daily for all sorts of things</h4>
-                </div>
-                <button id="copyButton1">Copy</button>
+              <button id="copyButton1">Copy</button>
 
-                <script type="text/javascript">
-                  function copy(copyId){
-                    var $inp=$("<input>");
-                    $("body").append($inp);
-                    $inp.val($(""+copyId).text()).select();
-                    document.execCommand("copy");
-                    $inp.remove();
-                    $(".alert").fadeIn(500,
-                        function(){$(".alert").fadeOut();
-                    });
-                  }
-                  $(document).ready(function(){
-                    $("#copyButton1").click(
-                      function(){
-                      copy('#copy1');
-                    });
-                    $("#copyButton2").click(
-                      function(){
-                      copy('#copy2');
-                    });
-                    $("#copyButton3").click(
-                      function(){
-                      copy('#copy3');
-                    });
+              <script type="text/javascript">
+                function copy(copyId){
+                  var $inp=$("<input>");
+                  $("body").append($inp);
+                  $inp.val($(""+copyId).text()).select();
+                  document.execCommand("copy");
+                  $inp.remove();
+                  $(".alert").fadeIn(500,
+                      function(){$(".alert").fadeOut();
                   });
-                </script>
-              </div>
+                }
+                $(document).ready(function(){
+                  $("#copyButton1").click(
+                    function(){
+                    copy('#copy1');
+                  });
+                  $("#copyButton2").click(
+                    function(){
+                    copy('#copy2');
+                  });
+                  $("#copyButton3").click(
+                    function(){
+                    copy('#copy3');
+                  });
+                  $("#copyButton4").click(
+                    function(){
+                    copy('#copy4');
+                  });
+                });
+              </script>
             </div>
+          </div>
 
-            <div class="card">
-              <div class="imgBx">
-                <img src="Pictures/02.png">
-              </div>
-              <div class="contentBx">
-                <h2 id="copy2">💖Bella💖#9535</h2>
-                <div class="desc">
-                  <h4>This is my Alt account, which I use to troll or to send myself files</h4>
-                </div>
-                <button id="copyButton2">Copy</button>
-
-                <script type="text/javascript">
-                </script>
-              </div>
+          <div class="card">
+            <div class="imgBx">
+              <img src="Pictures/02.png">
             </div>
-
-            <div class="card">
-              <div class="imgBx">
-                <img src="Pictures/azryx.png">
+            <div class="contentBx">
+              <h2 id="copy2">💖Bella💖#9535</h2>
+              <div class="desc">
+                <h4>This is my Alt account, which I use to troll or to send myself files</h4>
               </div>
-              <div class="contentBx">
-                <h2 id="copy3">Azryx#4925</h2>
-                <div class="desc">
-                  <h4>This is an account I use for developer purposes, i.e. for testing bots, webhooks, ...</h4>
-                </div>
-                <button id="copyButton3">Copy</button>
+              <button id="copyButton2">Copy</button>
 
-                <script type="text/javascript">
+              <script type="text/javascript">
+              </script>
+            </div>
+          </div>
 
-                </script>
+          <div class="card">
+            <div class="imgBx">
+              <img src="Pictures/azryx.png">
+            </div>
+            <div class="contentBx">
+              <h2 id="copy3">Azryx#4925</h2>
+              <div class="desc">
+                <h4>This is an account I use for developer purposes, i.e. for testing bots, webhooks, ...</h4>
               </div>
+              <button id="copyButton3">Copy</button>
+
+              <script type="text/javascript">
+
+              </script>
             </div>
           </div>
         </div>
+      </div>
+    </section>
+    <section class="pcontainer" id="Spotify">
+      <div class="divdesc2">
+        <img src="Pictures/spotify.png">
+        <div>
+          <h1>Spotify</h1>
+          <h4>A digital music, podcast, and video service that gives you access to millions of songs and other content from creators all over the world.</h4>
+        </div>
+      </div>
+      <div class="div1">
+        <div class="vcard">
+          <div class="header">
+            <div class="wave_bg">
+              <div class="wave-01"></div>
+              <div class="wave-02"></div>
+              <div class="wave-03"></div>
+            </div>
+            <div class="profile_pic_content">
+              <img class="profile_pic" src="Pictures/draco.png">
+            </div>
+          </div>
+          <div class="card_content">
+            <div class="name">
+              <h4 id="copy4">ZegoFr34ks</h4>
+            </div>
+            <div class="info">
+              <h5>This is my Spotify account, <br> you can copy my username below.</h5>
+            </div>
+            <button id="copyButton4">Copy</button>
+          </div>
+        </div>
+      </div>
+    </section>
   </body>
   <footer>
     <p>THIS SITE IS STILL IN DEVELOPEMENT!</p>
