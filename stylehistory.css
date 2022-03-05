@@ -75,6 +75,25 @@ header{
 
 /* triangle from Mauricio Allende  https://codepen.io/mallendeo/pen/zdJKKp (changed) */
 
+
+@-webkit-keyframes animate {
+  0%, 100% {
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    filter: hue-rotate(360deg);
+  }
+}
+
+@keyframes animate {
+  0%, 100% {
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    filter: hue-rotate(360deg);
+  }
+}
+
 @-webkit-keyframes rotate {
   from {
     transform: rotateX(120deg) rotateZ(0deg);
@@ -131,20 +150,12 @@ header{
           animation: animate 5s linear infinite;
 }
 
-@keyframes animate {
-  0%, 100% {
-    filter: hue-rotate(0deg);
-  }
-  50% {
-    filter: hue-rotate(360deg);
-  }
-}
-
 .triangle {
   position: absolute;
   width: 5rem;
   height: 5rem;
 }
+
 .triangle:nth-child(1) {
   width: 3.75rem;
   top: -33%;
