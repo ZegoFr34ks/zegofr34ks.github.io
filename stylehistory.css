@@ -72,3 +72,110 @@ header{
   header.sticky ul li a{
     color: #000;
   }
+
+/* triangle from Mauricio Allende  https://codepen.io/mallendeo/pen/zdJKKp (changed) */
+
+@-webkit-keyframes rotate {
+  from {
+    transform: rotateX(120deg) rotateZ(0deg);
+  }
+  50% {
+    transform: rotateX(120deg) rotateZ(180deg);
+  }
+  to {
+    transform: rotateX(120deg) rotateZ(360deg);
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotateX(120deg) rotateZ(0deg);
+  }
+  50% {
+    transform: rotateX(120deg) rotateZ(180deg);
+  }
+  to {
+    transform: rotateX(120deg) rotateZ(360deg);
+  }
+}
+.wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 500px;
+  left: 50%;
+
+  margin-bottom: 0;
+  transform-style: preserve-3d;
+  width: 3.75rem;
+  height: 3.75rem;
+  transform-origin: 1.875rem 1.875rem;
+  transform: rotateX(120deg) rotateZ(45deg);
+  -webkit-animation: rotate 4s linear infinite;
+          animation: rotate 4s linear infinite;
+}
+
+.pyramid {
+  position: absolute;
+  perspective: 500px;
+  transform-style: preserve-3d;
+}
+
+.square {
+  width: 3.75rem;
+  height: 3.75rem;
+  transform-style: preserve-3d;
+  background: linear-gradient(to left, #008aff, #00ffe7);
+  -webkit-animation: animate 5s linear infinite;
+          animation: animate 5s linear infinite;
+}
+
+@keyframes animate {
+  0%, 100% {
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    filter: hue-rotate(360deg);
+  }
+}
+
+.triangle {
+  position: absolute;
+  width: 5rem;
+  height: 5rem;
+}
+.triangle:nth-child(1) {
+  width: 3.75rem;
+  top: -33%;
+  background: #f1ecfb;
+  -webkit-clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+          clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  transform-origin: 50% 100%;
+  transform: rotateX(-68deg);
+}
+.triangle:nth-child(2) {
+  width: 3.75rem;
+  background: #f1ecfb;
+  -webkit-clip-path: polygon(50% 100%, 0 0, 100% 0);
+          clip-path: polygon(50% 100%, 0 0, 100% 0);
+  transform-origin: 50% 0%;
+  transform: rotateX(68deg);
+}
+.triangle:nth-child(3) {
+  height: 3.75rem;
+  left: -33%;
+  background: white;
+  transform-origin: 100% 50%;
+  -webkit-clip-path: polygon(100% 100%, 0 50%, 100% 0);
+          clip-path: polygon(100% 100%, 0 50%, 100% 0);
+  transform: rotateY(68deg);
+}
+.triangle:nth-child(4) {
+  height: 3.75rem;
+  background: white;
+  transform-origin: 0% 50%;
+  -webkit-clip-path: polygon(0 100%, 100% 50%, 0 0);
+          clip-path: polygon(0 100%, 100% 50%, 0 0);
+  transform: rotateY(-68deg);
+}
