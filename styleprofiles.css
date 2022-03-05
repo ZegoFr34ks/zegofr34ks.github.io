@@ -404,13 +404,13 @@ header{
     }
 }
 .profile_pic_content{
-    width: 130px;
-    height: 130px;
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
     position: absolute;
     left: 50%;
     transform: translate(-50%, -50%);
-    top: 80%;
+    top: 70%;
     text-align: center;
 }
 .profile_pic{
@@ -427,12 +427,13 @@ header{
 }
 .card_content{
     position: relative;
-    top: 7%;
+    top: 10%;
     text-align: center;
+    transform: scale(1.2);
 }
 .name{
     color: #dab6fc;
-    font-weight: 700;
+    font-weight: 900;
     font-size: 1.4em;
 }
 .info{
@@ -445,7 +446,7 @@ header{
     display: block;
     text-decoration: none;
     width: 50%;
-    margin-top: 40px;
+    margin-top: 20px;
     margin-left: 25%;
     background: linear-gradient(to top right, #1ed761, #117b31);
     padding: 10px 20px;
