@@ -8,7 +8,7 @@
     <link rel = "icon" href = "Pictures/waifuicon.png" type = "image/x-icon">
     <title>Profiles</title>
     <link rel="stylesheet" href="styleprofiles.css">
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   </head>
   <body>
     <nav>
@@ -67,27 +67,37 @@
                 <img src="Pictures/Gifs/pfp.gif">
               </div>
               <div class="contentBx">
-                <h2>ZegoFr34ks#0857</h2>
+                <h2 id="copy1">ZegoFr34ks#0857</h2>
                 <div class="desc">
                   <h4>This is my main Discord account, which I use daily for all sorts of things</h4>
                 </div>
-                <button>Copy</button>
+                <button id="copyButton1">Copy</button>
 
                 <script type="text/javascript">
-
-                    $(document).ready(function () {
-                        $("button").click(function (event) {
-                            event.preventDefault();
-                            CopyToClipboard("ZegoFr34ks#0857");
-                        });
+                  function copy(copyId){
+                    var $inp=$("<input>");
+                    $("body").append($inp);
+                    $inp.val($(""+copyId).text()).select();
+                    document.execCommand("copy");
+                    $inp.remove();
+                    $(".alert").fadeIn(500,
+                        function(){$(".alert").fadeOut();
                     });
-
-                    function CopyToClipboard(value) {
-                        var $temp = $("<input>");
-                        $("body").append($temp);
-                        $temp.val(value).select();
-                        document.execCommand("copy");
-                        $temp.remove();}
+                  }
+                  $(document).ready(function(){
+                    $("#copyButton1").click(
+                      function(){
+                      copy('#copy1');
+                    });
+                    $("#copyButton2").click(
+                      function(){
+                      copy('#copy2');
+                    });
+                    $("#copyButton3").click(
+                      function(){
+                      copy('#copy3');
+                    });
+                  });
                 </script>
               </div>
             </div>
@@ -97,27 +107,13 @@
                 <img src="Pictures/02.png">
               </div>
               <div class="contentBx">
-                <h2 id="copy">💖Bella💖#9535</h2>
+                <h2 id="copy2">💖Bella💖#9535</h2>
                 <div class="desc">
                   <h4>This is my Alt account, which I use to troll or to send myself files</h4>
                 </div>
-                <button>Copy</button>
+                <button id="copyButton2">Copy</button>
 
                 <script type="text/javascript">
-
-                    $(document).ready(function () {
-                        $("button").click(function (event) {
-                            event.preventDefault();
-                            CopyToClipboard("💖Bella💖#9535");
-                        });
-                    });
-
-                    function CopyToClipboard(value) {
-                        var $temp = $("<input>");
-                        $("body").append($temp);
-                        $temp.val(value).select();
-                        document.execCommand("copy");
-                        $temp.remove();}
                 </script>
               </div>
             </div>
@@ -127,27 +123,14 @@
                 <img src="Pictures/azryx.png">
               </div>
               <div class="contentBx">
-                <h2 id="copy">Azryx#4925</h2>
+                <h2 id="copy3">Azryx#4925</h2>
                 <div class="desc">
                   <h4>This is an account I use for developer purposes, i.e. for testing bots, webhooks, ...</h4>
                 </div>
-                <button>Copy</button>
+                <button id="copyButton3">Copy</button>
 
                 <script type="text/javascript">
 
-                    $(document).ready(function () {
-                        $("button").click(function (event) {
-                            event.preventDefault();
-                            CopyToClipboard("Azryx#4925");
-                        });
-                    });
-
-                    function CopyToClipboard(value) {
-                        var $temp = $("<input>");
-                        $("body").append($temp);
-                        $temp.val(value).select();
-                        document.execCommand("copy");
-                        $temp.remove();}
                 </script>
               </div>
             </div>
