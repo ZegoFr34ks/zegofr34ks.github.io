@@ -441,7 +441,7 @@ header{
     padding: 40px 10px;
     opacity: 0.8;
 }
-#copyButton4{
+.spotbutton{
     display: block;
     text-decoration: none;
     width: 50%;
@@ -456,11 +456,11 @@ header{
     opacity: 1;
     transition: all 0.1s;
 }
-#copyButton4:hover{
+.spotbutton:hover{
     box-shadow: 0px 8px 20px rgba(0,0,0,39%);
     cursor: pointer;
 }
-#copyButton4:active{
+.spotbutton:active{
     transform: translateY(4px);
     opacity: 0.6;
 }
