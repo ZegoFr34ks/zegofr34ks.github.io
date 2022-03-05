@@ -239,7 +239,7 @@ header{
     width: 60%;
 }
 .container .card:nth-child(3) .imgBx img{
-    width: 315%;
+    width: 355%;
     left: 22%;
     clip-path: circle(13% at 59% 50%);
 }
