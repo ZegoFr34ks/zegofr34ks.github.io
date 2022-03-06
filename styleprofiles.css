@@ -86,6 +86,7 @@ header{
     display: flex;
     justify-content: center;
     align-items: center;
+    zoom: 90%;
 }
 .icontainer .ibox{
     transform-style: preserve-3d;
@@ -134,7 +135,7 @@ header{
     display: flex;
     align-items: center;
     justify-content: center;
-    zoom: 0.9;
+    zoom: 0.8;
 }
 .divdesc1{
     position: relative;
