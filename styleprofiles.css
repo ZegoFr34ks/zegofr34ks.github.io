@@ -551,6 +551,108 @@ header{
     object-fit: cover;
 }
 
+/* Youtube */
+
+.divdesc4{
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    top: 1650px;
+    left: 0;
+    width: 50%;
+    zoom: 2;
+}
+.divdesc4 img{
+    position: relative;
+    padding: 10px 10px;
+    width: 80px;
+    height: auto;
+}
+.divdesc4 h1{
+    position: relative;
+    padding: 0 10px;
+    font-weight: 800;
+    width: 400px;
+}
+.divdesc4 h4{
+    position: relative;
+    padding: 0 10px;
+    font-weight: 200;
+    height: 10px;
+    width: 100%;
+    top: 0;
+    left: 0;
+}
+@property --rotate{
+    syntax: "<angle>";
+    initial-value: 132deg;
+    inherits: false;
+}
+.cardy{
+    background: #191c29;
+    width: calc(65vh / 1.5);
+    height: 65vh;
+    padding: 3px;
+    position: relative;
+    top: 3850px;
+    border-radius: 6px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    display: flex;
+    font-size: 1.5em;
+    color: rgb(88 199 250 / 0%);
+    cursor: pointer;
+    font-family: poppins;
+}
+.cardy:hover{
+    color: rgb(88 199 250 / 100%);
+    transition: color 1s;
+}
+.cardy:hover:before, .cardy:hover:after {
+    animation: none;
+    opacity: 0;
+}
+.cardy::before{
+    content: "";
+    width: 104%;
+    height: 102%;
+    border-radius: 8px;
+    background-image: linear-gradient(var(--rotate), #5ddcff, #3c67e3 43%, #4e00c2);
+    position: absolute;
+    z-index: -1;
+    top: -1%;
+    left: -2%;
+    animation: spin 2.5s linear infinite;
+}
+.cardy::after{
+    position: absolute;
+    content: "";
+    top: calc(65vh / 6);
+    left: 0;
+    right: 0;
+    z-index: -1;
+    height: 100%;
+    width: 100%;
+    margin: 0 auto;
+    transform: scale(0.8);
+    filter: blur(calc(65vh / 6));
+    background-image: linear-gradient(var(--rotate), #5ddcff, #3c67e3 43%, #4e00c2);
+    opacity: 1;
+    transition: opacity .5s;
+    animation: spin 2.5s linear infinite;
+}
+@keyframes spin{
+    0% {
+        --rotate: 0deg;
+    }
+    100% {
+        --rotate: 360deg;
+    }
+}
+
 
 /* footer */
 
