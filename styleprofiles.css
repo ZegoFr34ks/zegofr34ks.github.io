@@ -591,7 +591,7 @@ header{
     inherits: false;
 }
 .cardy{
-    background: #191c29;
+    background: #1d1d1d;
     width: calc(800px / 1.5);
     height: 800px;
     padding: 3px;
@@ -603,13 +603,52 @@ header{
     text-align: center;
     display: flex;
     font-size: 1.5em;
-    color: rgb(88 199 250 / 0%);
     cursor: pointer;
     font-family: poppins;
 }
-.cardy:hover{
-    color: rgb(88 199 250 / 100%);
+.cardy .cardyContentBefore{
+    color: rgb(255 10 10 / 100%);
+    opacity: 100%;
+}
+.cardy .cardyContentAfter{
+    color: rgb(88 199 250 / 0%);
+}
+.cardy:hover .cardyContentBefore{
+    color: rgb(88 199 250 / 0%);
+    opacity: 0%;
+}
+.cardy:hover .cardyContentAfter{
+    color: rgb(255 10 10 / 100%);
     transition: color 1s;
+}
+.cardy .cardyContentBefore img{
+    position: absolute;
+    height: 15%;
+    width: 23%;
+    top: 5%;
+    left: 11%;
+    border-radius: 50%;
+    border: solid 4px;
+    border-color: rgb(41, 37, 56);
+    display: grid;
+    place-items: center;
+    object-fit: cover;
+}
+.cardy .cardyContentBefore .cardyName{
+    position: absolute;
+    top: 9%;
+    left: 45%;
+    display: grid;
+    place-items: center;
+    object-fit: cover;
+}
+.cardy .cardyContentBefore h5{
+    position: absolute;
+    top: 48%;
+    left: 40%;
+    display: grid;
+    place-items: center;
+    object-fit: cover;
 }
 .cardy:hover:before, .cardy:hover:after {
     animation: none;
@@ -620,7 +659,7 @@ header{
     width: 104%;
     height: 102%;
     border-radius: 8px;
-    background-image: linear-gradient(var(--rotate), #5ddcff, #3c67e3 43%, #4e00c2);
+    background-image: linear-gradient(var(--rotate), #ff002b, #c00021 43%, #a0001c);
     position: absolute;
     z-index: -1;
     top: -1%;
@@ -639,7 +678,7 @@ header{
     margin: 0 auto;
     transform: scale(0.8);
     filter: blur(calc(65vh / 6));
-    background-image: linear-gradient(var(--rotate), #5ddcff, #3c67e3 43%, #4e00c2);
+    background-image: linear-gradient(var(--rotate), #ff002b, #c00021 43%, #a0001c);
     opacity: 1;
     transition: opacity .5s;
     animation: spin 2.5s linear infinite;
