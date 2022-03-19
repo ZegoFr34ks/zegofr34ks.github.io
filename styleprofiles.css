@@ -646,7 +646,7 @@ header{
 .cardy .cardyContentBefore h5{
     position: absolute;
     top: 48%;
-    left: 40%;
+    left: 0%;
     font-weight: 200;
     display: grid;
     place-items: center;
