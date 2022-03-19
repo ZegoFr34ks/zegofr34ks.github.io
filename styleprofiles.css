@@ -592,11 +592,11 @@ header{
 }
 .cardy{
     background: #191c29;
-    width: calc(65vh / 1.5);
-    height: 65vh;
+    width: calc(800px / 1.5);
+    height: 800px;
     padding: 3px;
     position: relative;
-    top: 3850px;
+    top: 4050px;
     border-radius: 6px;
     justify-content: center;
     align-items: center;
@@ -630,7 +630,7 @@ header{
 .cardy::after{
     position: absolute;
     content: "";
-    top: calc(65vh / 6);
+    top: 0;
     left: 0;
     right: 0;
     z-index: -1;
