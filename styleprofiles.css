@@ -591,7 +591,7 @@ header{
     inherits: false;
 }
 .cardy{
-    background: #1d1d1d;
+    background: #1f1e1e;
     width: calc(800px / 1.5);
     height: 800px;
     padding: 3px;
@@ -607,7 +607,7 @@ header{
     font-family: poppins;
 }
 .cardy .cardyContentBefore{
-    color: rgb(255 10 10 / 100%);
+    color: rgb(255 255 255 / 100%);
     opacity: 100%;
 }
 .cardy .cardyContentAfter{
@@ -618,7 +618,7 @@ header{
     opacity: 0%;
 }
 .cardy:hover .cardyContentAfter{
-    color: rgb(255 10 10 / 100%);
+    color: rgb(255 255 255 / 100%);
     transition: color 1s;
 }
 .cardy .cardyContentBefore img{
@@ -641,11 +641,13 @@ header{
     display: grid;
     place-items: center;
     object-fit: cover;
+    font-weight: 700;
 }
 .cardy .cardyContentBefore h5{
     position: absolute;
     top: 48%;
     left: 40%;
+    font-weight: 200;
     display: grid;
     place-items: center;
     object-fit: cover;
@@ -659,7 +661,7 @@ header{
     width: 104%;
     height: 102%;
     border-radius: 8px;
-    background-image: linear-gradient(var(--rotate), #ff002b, #c00021 43%, #a0001c);
+    background-image: linear-gradient(var(--rotate), #ff002b, #a0001c 43%, #800016);
     position: absolute;
     z-index: -1;
     top: -1%;
@@ -677,8 +679,8 @@ header{
     width: 100%;
     margin: 0 auto;
     transform: scale(0.8);
-    filter: blur(calc(65vh / 6));
-    background-image: linear-gradient(var(--rotate), #ff002b, #c00021 43%, #a0001c);
+    filter: blur(calc(800px / 6));
+    background-image: linear-gradient(var(--rotate), #ff0000, #ff002b 43%, #800016);
     opacity: 1;
     transition: opacity .5s;
     animation: spin 2.5s linear infinite;
