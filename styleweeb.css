@@ -8,11 +8,9 @@
   font-family: "Poppins", sans-serif;
 }
 body{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #333;
-    min-height: 200vh;
+  display: flex;
+  background: #333;
+  min-height: 200vh;
 }
 
 /* header */
@@ -65,4 +63,29 @@ header{
   header.sticky .logo,
   header.sticky ul li a{
     color: #000;
+}
+/* pages */
+
+.main{
+  top: 0;
+  height: 100%;
+  width: 100%;
+}
+.main .page{
+  height: 1000px;
+  background: #666;
+}
+
+/* transition tkirito */
+
+.main .transition{
+  height: 500px;
+  padding: 50px 0px;
+}
+.main .transition .tkirito{
+  min-height: 100%;
+  position: fixed;
+  top: 0;
+  left: -20%;
+  z-index: -999;
 }
