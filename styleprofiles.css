@@ -621,7 +621,7 @@ header{
     color: rgb(255 255 255 / 100%);
     transition: color 1s;
 }
-.cardy .cardyContentBefore img{
+.cardy .cardyContentBefore img:nth-child(1){
     position: absolute;
     height: 15%;
     width: 23%;
@@ -630,6 +630,20 @@ header{
     border-radius: 50%;
     border: solid 4px;
     border-color: rgb(41, 37, 56);
+    display: grid;
+    place-items: center;
+    object-fit: cover;
+}
+.cardy .cardyContentBefore .ytbbtn{
+    position: absolute;
+    height: 13%;
+    width: 20%;
+    top: 38%;
+    left: 40%;
+    filter: saturate(85%);
+    border-radius: 50%;
+    border: solid 2.5px;
+    border-color: #fff;
     display: grid;
     place-items: center;
     object-fit: cover;
@@ -645,9 +659,10 @@ header{
 }
 .cardy .cardyContentBefore h5{
     position: absolute;
-    top: 48%;
+    top: 70%;
     left: 0%;
     font-weight: 200;
+    margin: 0 50px;
     display: grid;
     place-items: center;
     object-fit: cover;
