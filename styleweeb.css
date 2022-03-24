@@ -101,6 +101,11 @@ header{
     zoom: 1;
   }
 }
+@media only screen and (min-height: 1000px) {
+  .kirito {
+    zoom: 1.15;
+  }
+}
 .kirito #kirito0{
   position: absolute;
   object-fit: none;
