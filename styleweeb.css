@@ -82,8 +82,24 @@ header{
   position: relative;
   top: 20%;
   height: 100%;
-  width: auto;
+  width: 100%;
   background-color: #000;
+  
+}
+@media only screen and (min-height: 500px){
+  .kirito {
+    zoom: .5;
+  }
+}
+@media only screen and (min-height: 600px) {
+  .kirito {
+    zoom: .75;        
+  }
+}
+@media only screen and (min-height: 900px) {
+  .kirito {
+    zoom: 1;
+  }
 }
 .kirito #kirito0{
   position: absolute;
