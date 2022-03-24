@@ -64,6 +64,7 @@ header{
   header.sticky ul li a{
     color: #000;
 }
+
 /* pages */
 
 .main{
@@ -76,6 +77,13 @@ header{
   background: #666;
 }
 
+/* kirito */
+
+.kirito #kirito1{
+  position: relative;
+  
+}
+
 /* transition tkirito */
 
 .main .transition{
@@ -86,6 +94,6 @@ header{
   min-height: 100%;
   position: fixed;
   top: 0;
-  left: -20%;
+  left: 0;
   z-index: -999;
 }
