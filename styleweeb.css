@@ -73,16 +73,16 @@ header{
   width: 100%;
 }
 .main .page{
-  height: 1000px;
+  height: 100vh;
   background: #000;
 }
 
 /* kirito */
 .kirito{
   position: relative;
-  top: 200px;
+  top: 20%;
   height: 100%;
-  width: 100%;
+  width: auto;
   background-color: #000;
 }
 .kirito #kirito0{
