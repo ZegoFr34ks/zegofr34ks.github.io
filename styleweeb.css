@@ -78,11 +78,41 @@ header{
 }
 
 /* kirito */
-
-.kirito #kirito1{
+.kirito{
   position: relative;
-  
+  top: 200px;
 }
+.kirito #kirito0{
+  position: absolute;
+  object-fit: none;
+  object-position: 38% 30%;
+  height: 1000px;
+  width: 1000px;
+  transform: scale(0.25);
+  top: -285px;
+  left: 150px;
+}
+.kirito #kirito1{
+  position: absolute;
+  object-fit: none;
+  object-position: 52% 0;
+  height: 1000px;
+  width: 200px;
+  transform: scale(0.65);
+  top: -210px;
+  left: 178px;
+}
+.kirito #kirito2{
+  position: absolute;
+  object-fit: none;
+  object-position: 58% 0;
+  height: 800px;
+  width: 550px;
+  transform: scale(0.35);
+  top: 160px;
+  left: 35px;
+}
+
 
 /* transition tkirito */
 
