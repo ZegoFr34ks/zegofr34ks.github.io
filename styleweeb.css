@@ -74,13 +74,16 @@ header{
 }
 .main .page{
   height: 1000px;
-  background: #666;
+  background: #000;
 }
 
 /* kirito */
 .kirito{
   position: relative;
   top: 200px;
+  height: 100%;
+  width: 100%;
+  background-color: #000;
 }
 .kirito #kirito0{
   position: absolute;
@@ -91,6 +94,7 @@ header{
   transform: scale(0.25);
   top: -285px;
   left: 150px;
+  z-index: 10;
 }
 .kirito #kirito1{
   position: absolute;
@@ -101,6 +105,7 @@ header{
   transform: scale(0.65);
   top: -210px;
   left: 178px;
+  z-index: 10;
 }
 .kirito #kirito2{
   position: absolute;
@@ -111,8 +116,47 @@ header{
   transform: scale(0.35);
   top: 160px;
   left: 35px;
+  z-index: 10;
 }
-
+.kirito #kstyle0{
+  position: absolute;
+  height: 300px;
+  width: auto;
+  transform: rotate(180deg);
+  top: 400px;
+  left: 500px;
+  z-index: 1;
+}
+.kirito #kstyle1{
+  position: absolute;
+  height: 199px;
+  width: 600px;
+  object-fit: none;
+  object-position: 0 0;
+  top: 180px;
+  left: 250px;
+  z-index: 1;
+}
+.kirito #kstyle2{
+  position: absolute;
+  height: 1000px;
+  width: 100px;
+  object-fit: none;
+  object-position: 15% 0;
+  top: 0;
+  left: 110px;
+  z-index: 1;
+}
+.kirito #kname{
+  position: absolute;
+  color: #fff;
+  letter-spacing: 0.4em;
+  font-weight: 800;
+  font-size: 100px;
+  top: -50px;
+  left: 325px;
+  z-index: 11;
+}
 
 /* transition tkirito */
 
