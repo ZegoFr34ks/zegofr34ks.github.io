@@ -345,7 +345,7 @@ header.sticky ul li a{
   min-height: 100vh;
   background: #000;
   flex-wrap: wrap;
-  background: linear-gradient(#000000, #161623, #161623);
+  background: linear-gradient(#161623, #161623, #000000);
 }
 .buttonbox a{
   position: relative;
@@ -441,6 +441,12 @@ header.sticky ul li a{
 }
 #main:nth-child(2){
   background-image: url(Pictures/ggod.png);
+  background-attachment: fixed;
+  background-size: cover;
+  height: 500px;
+}
+#main:nth-child(4){
+  background-image: url(Pictures/seemil.png);
   background-attachment: fixed;
   background-size: cover;
   height: 500px;
