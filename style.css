@@ -323,6 +323,7 @@ header.sticky ul li a{
   display: flex;
   justify-content: center;
   align-items: center;
+  text-align: center;
   margin: auto;
   min-height: 100vh;
   background: #000;
@@ -343,8 +344,6 @@ header.sticky ul li a{
   -webkit-box-reflect: below 0px linear-gradient(transparent, #0002);
   transition: 0.25s;
   transition-delay: 0s;
-  width: 10%;
-  height: 10%;
 }
 .buttonbox a:hover{
   transition-delay: 0.75s;
