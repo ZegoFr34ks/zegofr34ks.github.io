@@ -267,6 +267,23 @@ header.sticky ul li a{
   height: 100%;
   background: #232323;
   padding: 18px;
+  border-radius: 0 0 0.5rem 0.5rem;
+  zoom: 1;
+}
+@media only screen and (min-height: 500px){
+  .body {
+    zoom: .5;
+  }
+}
+@media only screen and (min-height: 600px) {
+  .body {
+    zoom: .7;        
+  }
+}
+@media only screen and (min-height: 900px) {
+  .body {
+    zoom: 1;
+  }
 }
 .body pre {
   height: 100%;
