@@ -195,6 +195,128 @@ header.sticky ul li a{
   50%  { opacity: 1;  }
   100% { transform:translate(0,10px) rotate(45deg); opacity: 0; }
 }
+
+/* updatelog */
+
+.updatelog {
+  background: #25313e;
+  color: #fff;
+  font-family: "Proxima Nova", "Helvetica Neue", helvetica, arial, sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 1.5;
+  padding-top: 2rem;
+}
+
+.updatelog h1 {
+  color: #506479;
+  font-size: 2.4rem;
+  text-align: center;
+  letter-spacing: 0.3rem;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  line-height: 1;
+}
+
+.updatelog p {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.window {
+  width: 80%;
+  height: 60%;
+  margin: 0 auto 2rem;
+  box-shadow: 0 0.25rem 0.5rem #12181e;
+  border-radius: 0 0 0.1rem 0.1rem;
+}
+
+.bar {
+  background: #191919;
+  height: 36px;
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.btn::before, .btn::after, .btn {
+  width: 12px;
+  height: 12px;
+  border-radius: 100%;
+  display: block;
+}
+
+.btn {
+  background: #f6b73e;
+  position: relative;
+  margin-left: 38px;
+  top: 12px;
+}
+.btn::before, .btn::after {
+  content: " ";
+  position: absolute;
+}
+.btn::before {
+  background: #f55551;
+  margin-left: -20px;
+}
+.btn::after {
+  background: #32c146;
+  margin-left: 20px;
+}
+
+.body {
+  height: 100%;
+  background: #232323;
+  padding: 18px;
+}
+.body pre {
+  height: 100%;
+  padding-left: 18px;
+}
+.body pre div {
+  margin-bottom: 7px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+}
+.body .pulse {
+  -webkit-animation: pulse 1s ease-in-out infinite;
+  -moz-animation: pulse 1s ease-in-out infinite;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@-webkit-keyframes pulse {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@-moz-keyframes pulse {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes pulse {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 /* buttons */
 
 .buttonbox{
@@ -293,7 +415,7 @@ header.sticky ul li a{
 
 /*div parallax*/
 
-div{
+#main{
   align-items: center;
   justify-content: center;
   font-weight: bold;
@@ -301,14 +423,11 @@ div{
   width: 100%;
   height: 100vh;
 }
-div:nth-child(2){
+#main:nth-child(2){
   background-image: url(Pictures/ggod.png);
   background-attachment: fixed;
   background-size: cover;
   height: 500px;
-}
-div:nth-child(3){
-  background: black;
 }
 
 /* card */
