@@ -28,33 +28,6 @@
         header.classList.toggle("sticky", window.scrollY > 0);
       })
     </script>
-
-    <div class="container">
-      <form onsubmit="sendEmail(); reset(); return false;">
-        <h3>GET IN TOUCH</h3>
-        <input type="text" id="name" placeholder="Your Name" required>
-        <input type="email" id="email" placeholder="Your Email" required>
-        <input type="text" id="phone" placeholder="Your Phone number" required>
-        <textarea id="message" rows="4" placeholder="How can we help you?"></textarea>
-        <button type="submit">SEND</button>
-      </form>
-    </div>
-    <script src="https://smtpjs.com/v3/smtp.js"></script>
-    <script>
-      function sendEmail(){
-        Email.send({
-        Host : "smtp.gmail.com",
-        Username : "forspamcontent@gmail.com",
-        Password : "password",
-        To : 'contact.kavzego@gmail.com',
-        From : document.getElementById("email").value,
-        Subject : "New Contact Form Enquiry",
-        Body : "And this is the body"
-    }).then(
-      message => alert(message)
-    );
-      }
-    </script>
   </body>
   <footer>
     <p>THIS PAGE IS STILL IN DEVELOPMENT!</p>
