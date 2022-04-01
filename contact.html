@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="ZegoFr34ks' Own Personal Website (WIP)">
+    <meta name="author" content="ZegoFr34ks">
+    <meta name="viewport" content="width=device-width, initial-scale=0.6">
+    <link rel = "icon" href = "Pictures/waifuicon.png" type = "image/x-icon">
+    <title>About</title>
+    <link rel="stylesheet" href="stylecontact.css">
+  </head>
+  <body>
+    <nav>
+      <header>
+        <a href="index.html" class="logo">ZegoFr34ks</a>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="page3.html">Portfolio</a></li>
+          <li><a href="page4.html">Contact</a></li>
+        </ul>
+      </header>
+    </nav>
+    <section class="banner"></section>
+    <script type="text/javascript">
+      window.addEventListener("scroll", function(){
+        var header = document.querySelector("header");
+        header.classList.toggle("sticky", window.scrollY > 0);
+      })
+    </script>
+
+    <div class="container">
+      <form onsubmit="sendEmail(); reset(); return false;">
+        <h3>GET IN TOUCH</h3>
+        <input type="text" id="name" placeholder="Your Name" required>
+        <input type="email" id="email" placeholder="Your Email" required>
+        <input type="text" id="phone" placeholder="Your Phone number" required>
+        <textarea id="message" rows="4" placeholder="How can we help you?"></textarea>
+        <button type="submit">SEND</button>
+      </form>
+    </div>
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
+    <script>
+      function sendEmail(){
+        Email.send({
+        Host : "smtp.gmail.com",
+        Username : "forspamcontent@gmail.com",
+        Password : "password",
+        To : 'contact.kavzego@gmail.com',
+        From : document.getElementById("email").value,
+        Subject : "New Contact Form Enquiry",
+        Body : "And this is the body"
+    }).then(
+      message => alert(message)
+    );
+      }
+    </script>
+  </body>
+  <footer>
+    <p>THIS PAGE IS STILL IN DEVELOPMENT!</p>
+  </footer>
+</html>
