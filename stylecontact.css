@@ -7,6 +7,7 @@
   padding: 0;
   box-sizing: border-box;
   font-family: "Poppins", sans-serif;
+  box-sizing: border-box;
 }
 body{
   background: #000;
@@ -73,3 +74,233 @@ header.sticky ul li a{
   color: #000;
 }
 
+/* card */
+
+.wrapper {
+  position: absolute;
+  margin: -171px 0 0 -327.5px;
+  left: 50%;
+  top: 50%;
+  height: 342px;
+  width: 655px;
+}
+
+.card {
+  width: 655px;
+  height: 342px;
+  border-radius: 5px;
+  position: absolute;
+  box-shadow: -20px 30px 116px 0 rgba(92, 15, 15, 0.54);
+  overflow: hidden;
+  z-index: 4;
+}
+#myVideo {
+  position: absolute;
+  top: -55%;
+  left: -40%;
+}
+.card__orangeShine, .card__greenShine {
+  position: absolute;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.card__orangeShine {
+  background-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/279756/orange_shine.png);
+  right: -150px;
+  top: -90px;
+  bottom: 50px;
+  z-index: 2;
+  width: 570px;
+  height: 500px;
+}
+.card__greenShine {
+  background-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/279756/green_shine.png);
+  left: -55%;
+  top: 10%;
+  bottom: 0;
+  z-index: 1;
+  width: 600px;
+}
+.card__year {
+  text-align: center;
+  color: #fff;
+  line-height: 75px;
+  padding: 50px 0;
+  -webkit-text-stroke: 0.5px #000;
+  position: relative;
+  z-index: 4;
+}
+.card__year #MyEmail {
+  position: absolute;
+  top: 0;
+  left: 30%;
+  color: #fff;
+  stroke: 1px #000;
+  font-size: 25px;
+  line-height: 50px;
+  padding: 50px 0;
+  font-weight: 600;
+}
+.card__year #Email{
+  position: absolute;
+  color: #fff;
+  top: 20%;
+  left: 30%;
+  font-size: 15px;
+  line-height: 50px;
+  padding: 50px 0;
+  font-weight: 300;
+}
+.card__thankyou {
+  font-family: "Oswald", sans-serif;
+  position: absolute;
+  text-transform: uppercase;
+  font-weight: 100;
+  left: 10%;
+  bottom: 15%;
+  z-index: 2;
+  color: #fff;
+  letter-spacing: 5px;
+  line-height: 17px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+.card__circle {
+  position: absolute;
+  border-radius: 50%;
+  background-color: #fff;
+  background-image: linear-gradient(-239deg, #3B4576 0%, #242A48 59%);
+  box-shadow: -10px -15px 90px 0 #191C41;
+  z-index: 5;
+}
+.card__circle {
+  background-image: url(Pictures/email.png);
+  background-position: 50px;
+  background-size: 50%;
+  background-repeat: no-repeat;
+  filter: hue-rotate(90deg);
+  right: 63px;
+  bottom: 34px;
+  width: 190px;
+  height: 190px;
+}
+.card__outer-year {
+  font-family: "Orbitron";
+}
+.card__outer-year span {
+  position: absolute;
+  color: #fff;
+  font-size: 16px;
+  z-index: 4;
+}
+.card__outer-year span:nth-child(1):after, .card__outer-year span:nth-child(4):after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  border-bottom: 2px solid #fff;
+}
+.card__outer-year span:nth-child(1) {
+  top: 35px;
+  left: 35px;
+}
+.card__outer-year span:nth-child(2) {
+  left: none;
+  top: 35px;
+  right: 35px;
+}
+.card__outer-year span:nth-child(3) {
+  top: none;
+  bottom: 35px;
+  left: 35px;
+}
+.card__outer-year span:nth-child(4) {
+  top: none;
+  left: none;
+  right: 35px;
+  bottom: 35px;
+}
+.card__comet {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  background-color: #fff;
+  border-radius: 100%;
+}
+.card__cometOuter {
+  position: absolute;
+  top: 20%;
+  left: 2%;
+}
+.card__comet--second {
+  right: -30px;
+  top: -15px;
+  transform: scale(0.6);
+}
+.card__comet:before, .card__comet:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.2) 27%, rgba(255, 255, 255, 0) 100%);
+  border-radius: 20px;
+  transform: rotate(-45deg);
+}
+.card__comet:before {
+  width: 18px;
+  height: 70px;
+  transform-origin: -2px 13px;
+}
+.card__comet:after {
+  width: 12px;
+  height: 80px;
+  transform-origin: 0px 8px;
+}
+
+/* Background */
+
+.stars, .twinkling, .clouds {
+  position: absolute;
+  display: block;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.stars {
+  z-index: 0;
+  background: #000 url("https://image.ibb.co/mjnygo/stars.png") repeat top center;
+}
+
+.twinkling {
+  z-index: 1;
+  background: transparent url("https://image.ibb.co/ir1DE8/twinkling.png") repeat top center;
+  animation: move-twink-back 200s linear infinite;
+}
+
+.clouds {
+  z-index: 2;
+  background: transparent url("https://image.ibb.co/bT4N7T/clouds.png") repeat top center;
+  animation: move-clouds-back 200s linear infinite;
+}
+
+@keyframes move-twink-back {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -10000px 5000px;
+  }
+}
+@keyframes move-clouds-back {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 10000px 0;
+  }
+}

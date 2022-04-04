@@ -1,3 +1,0 @@
-/*
-CSS ONLY Profile Card
-*/
