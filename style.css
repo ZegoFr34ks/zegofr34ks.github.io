@@ -263,6 +263,10 @@ header.sticky ul li a{
   margin-left: 20px;
 }
 
+.updatelog a:-webkit-any-link {
+  text-decoration: none;
+}
+
 .body {
   height: 100%;
   background: #232323;
