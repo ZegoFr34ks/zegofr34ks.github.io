@@ -71,7 +71,7 @@ header.sticky ul li a{
   color: #000;
 }
 
-/* Body  --credit to https://codepen.io/Saramazal/pen/LYyywNb-- */
+/* Body  --credit to https://codepen.io/Saramazal/pen/LYyywNb-- + modified code */
 .nav,
 .slider {
 display: flex;
@@ -102,7 +102,7 @@ color: #ff0266;
 }
 
 .slider h2 {
-font-size: 2vw;
+font-size: 1vw;
 letter-spacing: 0.3rem;
 font-family: "ROBOTO", sans-serif;
 font-weight: 300;
@@ -110,7 +110,7 @@ color: #faebd7;
 z-index: 4;
 }
 h3.span {
-font-size: 2vw;
+font-size: 1vw;
 letter-spacing: 0.15rem;
 font-family: "ROBOTO", sans-serif;
 font-weight: 300;
@@ -120,7 +120,7 @@ z-index: 4;
 span:hover {
 color: #ff0266;
 font-weight: 500;
-font-size: 2.2vw;
+font-size: 1.2vw;
 }
 
 a {
@@ -197,7 +197,7 @@ z-index: auto;
 
 .nav h2,
 .slider h2 {
-    font-size: 3vw;
+    font-size: 2vw;
 }
 
 .nav-tab {
