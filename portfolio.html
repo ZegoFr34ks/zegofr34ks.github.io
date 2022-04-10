@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="ZegoFr34ks' Own Personal Website (WIP)">
+    <meta name="author" content="ZegoFr34ks">
+    <meta name="viewport" content="width=device-width, initial-scale=0.6">
+    <link rel = "icon" href = "Pictures/waifuicon.png" type = "image/x-icon">
+    <title>About</title>
+    <link rel="stylesheet" href="styleportfolio.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particlesjs/2.2.3/particles.min.js"></script>
+  </head>
+  <body style="background-color: black">
+    <nav>
+      <header>
+        <a href="index.html" class="logo">ZegoFr34ks</a>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="portfolio.html">Portfolio</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </header>
+    </nav>
+    <section class="banner"></section>
+    <script type="text/javascript">
+      window.addEventListener("scroll", function(){
+        var header = document.querySelector("header");
+        header.classList.toggle("sticky", window.scrollY > 0);
+      })
+    </script>
+
+    <section class="nav">
+      <h1>MY PORTFOLIO</h1>
+      <h3 class="span loader">
+        <span class='m'>S</span>
+        <span class='m'>H</span>
+        <span class='m'>A</span>
+        <span class='m'>R</span>
+        <span class='m'>E</span>
+        <span class='m'>&nbsp;</span>
+        <span class='m'>K</span>
+        <span class='m'>N</span>
+        <span class='m'>O</span>
+        <span class='m'>W</span>
+        <span class='m'>L</span>
+        <span class='m'>E</span>
+        <span class='m'>D</span>
+        <span class='m'>G</span>
+        <span class='m'>E</span>
+        <span class='m'>&nbsp;</span>
+        <span class='m'>/</span>
+        <span class='m'>&nbsp;</span>
+        <span class='m'>K</span>
+        <span class='m'>E</span>
+        <span class='m'>E</span>
+        <span class='m'>P</span>
+        <span class='m'>&nbsp;</span>
+        <span class='m'>C</span>
+        <span class='m'>R</span>
+        <span class='m'>E</span>
+        <span class='m'>A</span>
+        <span class='m'>T</span>
+        <span class='m'>I</span>
+        <span class='m'>N</span>
+        <span class='m'>G</span>
+      </h3>
+      <div class="nav-container">
+        <a class="nav-tab" href="#tab-pwa">PWA</a>
+        <a class="nav-tab" href="#tab-graphql">GraphQL</a>
+        <a class="nav-tab" href="#tab-next">NEXT</a>
+        <a class="nav-tab" href="#tab-typescript">TYPESCRIPT</a>
+        <a class="nav-tab" href="#tab-deno">DENO</a>
+        <span class="nav-tab-slider"></span>
+      </div>
+    </section>
+
+    <main class="main">
+      <section class="slider" id="tab-pwa">
+        <h1>PWA</h1>
+        <h2>the best of both worlds...</h2>
+      </section>
+      <section class="slider" id="tab-graphql">
+        <h1>GraphQL</h1>
+        <h2>a query language for APIs</h2>
+      </section>
+      <section class="slider" id="tab-next">
+        <h1>NEXT</h1>
+        <h2>framework
+          for Production</h2>
+      </section>
+      <section class="slider" id="tab-typescript">
+        <h1>TYPESCRIPT</h1>
+        <h2>giving you better tooling at any scale</h2>
+      </section>
+      <section class="slider" id="tab-deno">
+        <h1>DENO</h1>
+        <h2>a modern runtime </h2>
+      </section>
+    </main>
+    <canvas class="background"></canvas>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js'></script><script src="Javascripts/scriptportfolio.js"></script>
+  </body>
+</html>
