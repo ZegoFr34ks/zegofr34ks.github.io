@@ -93,6 +93,8 @@ header.sticky ul li a{
 }
 
 .swiper-slide img{
+  max-width: 80%;
+  max-height: 80%;
   width: auto;
   height: auto;
   position: absolute;
