@@ -8,7 +8,8 @@
   font-family: "Poppins", sans-serif;
 }
 body{
-  background-image: url("stargal.jpg");
+  background: #222;
+  background-image: url("PortfolioData/stargal.jpg");
   background-size: 100vw 100vh;
   background-attachment: fixed;
   min-height: 200vh;
@@ -119,7 +120,7 @@ header.sticky ul li a{
 
 .title {
   text-transform: uppercase;
-	background: linear-gradient(to right, #30cfd0 0%, #330867 100%);
+	background: linear-gradient(to right, #30cfd0 0%, #6c1ad1 100%);
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
   font-size: 8vw;
@@ -129,7 +130,7 @@ header.sticky ul li a{
 .text {
   margin: 2% 20% 0;
   text-align: center;
-	background: linear-gradient(to right, #30cfd0 0%, #330867 100%);
+	background: linear-gradient(to right, #30cfd0 0%, #6c1ad1 100%);
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
   font-size: 2vw;
