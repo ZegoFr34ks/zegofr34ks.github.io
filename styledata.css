@@ -13,7 +13,6 @@ body{
   background-size: 100vw 100vh;
   background-attachment: fixed;
   min-height: 200vh;
-  backdrop-filter: blur(10px);
 }
 
 /* header */
@@ -120,6 +119,13 @@ header.sticky ul li a{
   top: 100px;
 }
 
+.description p{
+  margin-bottom: 7%;
+  letter-spacing: normal;
+  font-size: 2.2em;
+  font-weight: 400;
+}
+
 .title {
   text-transform: uppercase;
 	background: linear-gradient(to right, #30cfd0 0%, #6c1ad1 100%);
@@ -143,7 +149,6 @@ header.sticky ul li a{
 
 .center {
   position: absolute;
-  margin-top: 3%;
   left: 50%;
   transform: translate(-50%);
 }
