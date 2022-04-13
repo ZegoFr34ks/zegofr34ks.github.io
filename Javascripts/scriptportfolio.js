@@ -120,16 +120,6 @@ class NavigationPage {
     }
   }
 
-  setSliderCss() {
-    let width = 0;
-    let left = 0;
-    if (this.currentTab) {
-      width = this.currentTab.css("width");
-      left = this.currentTab.offset().left;
-    }
-    $(".nav-tab-slider").css("width", width);
-    $(".nav-tab-slider").css("left", left);
-  }
 }
 
 new NavigationPage();
