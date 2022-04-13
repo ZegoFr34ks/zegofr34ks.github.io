@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="ZegoFr34ks' Own Personal Website (WIP)">
+    <meta name="author" content="ZegoFr34ks">
+    <meta name="viewport" content="width=device-width, initial-scale=0.6">
+    <link rel = "icon" href = "Pictures/waifuicon.png" type = "image/x-icon">
+    <title>Data</title>
+    <link rel="stylesheet" href="styledata.css">
+    <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css"/>
+    
+  </head>
+    <nav>
+      <header>
+        <a href="index.html" class="logo">ZegoFr34ks</a>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="portfolio.html">Portfolio</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </header>
+    </nav>
+    <section class="banner"></section>
+    <script type="text/javascript">
+      window.addEventListener("scroll", function(){
+        var header = document.querySelector("header");
+        header.classList.toggle("sticky", window.scrollY > 0);
+      })
+    </script>
+
+    <div class="container">
+        <div class="swiper">
+            <!-- Additional required wrapper -->
+            <div class="swiper-wrapper">
+              <!-- Slides -->
+              <div class="swiper-slide"><a href="PortfolioData/w1.png"><img src="PortfolioData/w1.png"></a></div>
+              <div class="swiper-slide"><a href="PortfolioData/w2.png"><img src="PortfolioData/w2.png"></a></div>
+            </div>
+            <!-- If we need pagination -->
+            <div class="swiper-pagination"></div>
+          
+            <!-- If we need navigation buttons -->
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next"></div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
+    <script>
+        const swiper = new Swiper('.swiper', {
+            autoplay: {
+                delay: 3000,
+                disableOnInteraction: false,
+            },
+        loop: true,
+      
+        pagination: {
+          el: '.swiper-pagination',
+          clickable: true,
+        },
+      
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        },
+      
+      });</script>
+      <div class="description">
+          <h2 class="title">Description:</h2>
+          <p class="text">It's the website you are on right now! I coded it in Microsoft Visual Code, using HTML/CSS/JS. The main reason for this site is for me to learn those three language but precisely HTML and CSS. I first only wanted to keep it simple but I was amazed by how much you can do with these languages and so I decided to make more and more complex, meaning it has a lot of effects, too many even! That's why this site isn't that userfriendly maybe but at least it's cool ;).</p>
+          <div class="center">
+            <a class="aref" href="PortfolioData/かあいねこ.zip" download>
+                <div class="download-btn">
+                    <div class="top">
+                        <i class="fa fa-cloud-download"></i> 5/!³#?
+                    </div>
+                    <div class="bottom">
+                        Type: <i class="fa fa-file-zip-o"></i> Zip
+                    </div>
+                </div>
+            </a>
+          </div>
+      </div>
+  </body>
+</html>
