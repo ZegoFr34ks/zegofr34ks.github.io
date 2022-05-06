@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="ZegoFr34ks' Own Personal Website (WIP)">
+    <meta name="author" content="ZegoFr34ks">
+    <meta name="viewport" content="width=device-width, initial-scale=0.6">
+    <link rel = "icon" href = "Pictures/waifuicon.png" type = "image/x-icon">
+    <title>Data</title>
+    <link rel="stylesheet" href="styledata.css">
+    <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css"/>
+    
+  </head>
+    <nav>
+      <header>
+        <a href="index.html" class="logo">ZegoFr34ks</a>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="portfolio.html">Portfolio</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </header>
+    </nav>
+    <section class="banner"></section>
+    <script type="text/javascript">
+      window.addEventListener("scroll", function(){
+        var header = document.querySelector("header");
+        header.classList.toggle("sticky", window.scrollY > 0);
+      })
+    </script>
+
+    <div class="container">
+        <div class="swiper">
+            <!-- Additional required wrapper -->
+            <div class="swiper-wrapper">
+              <!-- Slides -->
+              <div class="swiper-slide"><a href="PortfolioData/e1.mp4"><img style="width:900px; filter: blur(5px);" src="PortfolioData/e1template.png"><img style="width:80px" src="PortfolioData/playbutton.png"></a></div>
+              <div class="swiper-slide"><a href="PortfolioData/e2.mp4"><img src="PortfolioData/e2template.png"><img style="width:80px" src="PortfolioData/playbutton.png"></a></div>
+            </div>
+            <!-- If we need pagination -->
+            <div class="swiper-pagination"></div>
+          
+            <!-- If we need navigation buttons -->
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next"></div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
+    <script>
+        const swiper = new Swiper('.swiper', {
+            autoplay: {
+                delay: 3000,
+                disableOnInteraction: false,
+            },
+        loop: true,
+      
+        pagination: {
+          el: '.swiper-pagination',
+          clickable: true,
+        },
+      
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        },
+      
+      });</script>
+      <div class="description">
+          <h2 class="title">Description:</h2>
+          <p class="text">Here you got a collection of some of my Edits I made. You can download them below + you'll have some extra edits I made. The first one was my first AMV that I've ever made.</p>
+          <div class="center">
+            <a class="aref" href="PortfolioData/Edits.zip" download>
+                <div class="download-btn">
+                    <div class="top">
+                        <i class="fa fa-cloud-download"></i> Download File
+                    </div>
+                    <div class="bottom">
+                        Type: <i class="fa fa-file-zip-o"></i> Zip
+                    </div>
+                </div>
+            </a>
+          </div>
+      </div>
+  </body>
+</html>
