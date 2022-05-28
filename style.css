@@ -444,13 +444,14 @@ header.sticky ul li a{
   height: 100vh;
 }
 #main:nth-child(2){
-  background-image: url(Pictures/banner2.jpg);
+  background-image: url(Pictures/banner1.gif);
+  filter: blur(0px);
   background-attachment: fixed;
   background-size: cover;
   height: 500px;
 }
 #main:nth-child(4){
-  background-image: url(Pictures/banner1.jpg);
+  background-image: url(Pictures/banner2.gif);
   background-attachment: fixed;
   background-size: cover;
   height: 500px;
