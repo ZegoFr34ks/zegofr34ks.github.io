@@ -78,6 +78,7 @@ header{
     height: 100%;
     top: 0;
     left: 0;
+    object-fit: none;
 }
 .icontainer{
     position: absolute;
@@ -96,6 +97,7 @@ header{
     opacity: 0.45;
     -webkit-filter: invert(100%);
     filter: invert(100%);
+    cursor: pointer;
 }
 @keyframes animate{
     0%{

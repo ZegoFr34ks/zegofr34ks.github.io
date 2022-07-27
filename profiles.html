@@ -30,8 +30,8 @@
       })
     </script>
     <section>
-      <img class="bc" src="Pictures/Gifs/cg.gif">
-      <div class="icontainer">
+      <video autoplay loop muted src="Videos/Swerved It (web).mp4" class="bc" id="my_video">LOADING</video>
+      <div class="icontainer" id="sound_button">
         <div class="ibox">
           <span style="--i:1;"><a>All</a> my <a>Profiles</a></span>
           <span style="--i:2;"><a>All</a> my <a>Profiles</a></span>
@@ -51,6 +51,22 @@
           <span style="--i:16;"><a>All</a> my <a>Profiles</a></span>
         </div>
       </div>
+      <script>
+        var video = document.getElementById("my_video");
+        video.muted = true;
+        function mute() {
+        if (video.muted === false) {
+        video.muted = true;
+        }
+        else {
+        video.muted =
+        false;
+        }
+        }
+        document
+        .getElementById("sound_button")
+        .addEventListener("click", mute);
+      </script>
       <div class="scroll-down"></div>
     </section>
     <section class="pcontainer" id="Discord">
