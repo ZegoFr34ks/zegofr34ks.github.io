@@ -1,0 +1,72 @@
+@import url("https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap");
+
+
+body {
+ background: #111;
+ font-family: "Poppins", sans-serif;
+ margin: 0;
+ height: 100vh;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ gap: 11rem;
+ background: #000
+}
+
+.content{
+    animation: bg 0.3704s ease infinite;
+    height: 100vh;
+    width: 100vw;
+}
+
+@keyframes REMOVETHISbg {
+    0% {
+        background-color: #000;
+    }
+    50% {
+        background-color: #1c1127;
+
+    }
+    100% {
+        background-color: #000;
+        z-index: -100;
+
+    }
+}
+  
+
+.area {
+  text-align: center;
+  font-size: 6.5em;
+  color: #fff;
+  letter-spacing: -7px;
+  font-weight: 700;
+  height: -8000px;
+  text-transform: uppercase;
+  animation: blur 0.3704s ease-out infinite;
+  text-shadow: 0px 0px 5px #fff, 0px 0px 7px #fff;
+}
+
+@keyframes blur {
+  from {
+    text-shadow:0px 0px 10px #fff,
+      0px 0px 10px #fff, 
+      0px 0px 25px #fff,
+      0px 0px 25px #fff,
+      0px 0px 25px #fff,
+      0px 0px 25px #fff,
+      0px 0px 25px #fff,
+      0px 0px 25px #fff,
+      0px 0px 50px #fff,
+      0px 0px 50px #fff,
+      0px 0px 50px #7B96B8,
+      0px 0px 150px #7B96B8,
+      0px 10px 100px #7B96B8,
+      0px 10px 100px #7B96B8,
+      0px 10px 100px #7B96B8,
+      0px 10px 100px #7B96B8,
+      0px -10px 100px #7B96B8,
+      0px -10px 100px #7B96B8;
+  }
+}
+
