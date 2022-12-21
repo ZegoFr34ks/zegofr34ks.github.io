@@ -84,6 +84,7 @@ div.toggleinfo{
   margin-top: 200px;
   margin-bottom: 50px;
   margin-left: 250px;
+  opacity: 0; /* temp */
 }
 #toggle{
   position: relative;
