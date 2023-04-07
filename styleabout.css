@@ -10,10 +10,11 @@
 }
 body{
   background: #000;
-  min-height: 100vh;
+  min-height: 200vh;
   background-image: url(Pictures/BGI.png);
   background-size: cover;
   background-attachment: fixed;
+  overflow-x: hidden;
 }
 
 /* loading screen */
@@ -134,8 +135,8 @@ section h2{
     /* parralax background */
 
 .space1{
-  width: 100%;
-  height: auto;
+  width: 100vw;
+  height: 100vh;
 }
 section .scroll-down {
 	position: absolute;
