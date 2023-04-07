@@ -74,6 +74,7 @@ header{
     color: #000;
   }
 
+/* button */
 
 .pushable {
   position: relative;
@@ -81,6 +82,7 @@ header{
   background: transparent;
   padding: 0;
   cursor: pointer;
+  left: 0;
   outline-offset: 4px;
   transition: filter 250ms;
 }
@@ -98,7 +100,7 @@ header{
     transform
     600ms
     cubic-bezier(.3, .7, .4, 1);
-filter: blur(4px);
+  filter: blur(4px);
 }
 .edge {
   position: absolute;
@@ -157,4 +159,18 @@ filter: blur(4px);
 }
 .pushable:focus:not(:focus-visible) {
   outline: none;
+}
+
+.hidden {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.visible {
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+}
+
+#bio-container {
+  color: white
 }

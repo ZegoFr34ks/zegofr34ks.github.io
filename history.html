@@ -28,14 +28,30 @@
         header.classList.toggle("sticky", window.scrollY > 0);
       })
     </script>
-    <div style='height: 100vh; display: flex; align-items: center; justify-content: center;'>
-      <button class="pushable">
-      <span class="shadow"></span>
-      <span class="edge"></span>
-      <span class="front">
-        Push me
-      </span>
-    </button>
+    <div style='height: 100vh; display: flex; align-items: center; justify-content: center; flex-direction: column;'>
+      <button class="pushable" onclick="showBio()">
+        <span class="shadow"></span>
+        <span class="edge"></span>
+        <span class="front">
+          Push me
+        </span>
+      </button>
+      <div id="bio-container">
+        <p id="bio" class="hidden">This is the biography.</p>
+      </div>
     </div>
+    <script>
+      function showBio() {
+      var bioContainer = document.getElementById("bio-container");
+      var bio = document.getElementById("bio");
+
+      bio.classList.remove("hidden");
+      bio.classList.add("visible");
+      bioContainer.classList.add("visible");
+
+      var button = document.querySelector("button");
+      button.style.display = "none";
+    };
+    </script>
   </body>
 </html>
