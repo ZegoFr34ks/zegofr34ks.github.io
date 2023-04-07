@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="styleabout.css">
   </head>
   <body>
+    <div id="loader">
+      <div class="spinner"></div>
+    </div>
     <nav>
       <header>
         <a href="index.html" class="logo">ZegoFr34ks</a>
@@ -110,5 +113,11 @@
     <footer>
       <span style="color: white">v.0.45</span><span><a href="https://github.com/ZegoFr34ks/zegofr34ks.github.io" target="_blank">Click Me!</a></span>
     </footer>
+    <script>
+      window.addEventListener('load', function () {
+        const loader = document.getElementById('loader');
+        loader.style.display = 'none';
+      });
+    </script>
   </body>
 </html>
