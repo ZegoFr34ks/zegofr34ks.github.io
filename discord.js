@@ -17,4 +17,4 @@ function updateProfilePicture() {
         .catch(console.error);
 }
 
-setInterval(updateProfilePicture, 1000); // Run every 30 seconds
+setInterval(updateProfilePicture, 1000); // Run every 1 seconds
