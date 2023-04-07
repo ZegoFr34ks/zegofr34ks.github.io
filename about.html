@@ -119,5 +119,35 @@
         loader.style.display = 'none';
       });
     </script>
+    <script>
+      let isAutoScrolling = false;
+
+      // Detect mouse wheel scrolling
+      window.addEventListener('wheel', function(e) {
+        if (!isAutoScrolling) {
+          // Disable user input while automatic scrolling is in progress
+          isAutoScrolling = true;
+          // Check if scrolling up or down
+          if (e.deltaY < 0) {
+            // Scroll to the top of the page
+            window.scrollTo({
+              top: 0,
+              behavior: 'smooth'
+            });
+          } else if (e.deltaY > 0) {
+            // Scroll to the bottom of the page
+            window.scrollTo({
+              top: document.documentElement.scrollHeight,
+              behavior: 'smooth'
+            });
+          }
+          // Re-enable user input after a short delay
+          setTimeout(function() {
+            isAutoScrolling = false;
+          }, 100); // adjust delay as needed
+        }
+      });
+
+    </script>
   </body>
 </html>
