@@ -476,7 +476,7 @@ section .scroll-down {
     transform: scale(1.2);
 }
 .name{
-    color: #dab6fc;
+    color: #1ed761;
     font-weight: 900;
     font-size: 1.4em;
 }
