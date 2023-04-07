@@ -8,6 +8,7 @@
   box-sizing: border-box;
   font-family: "Poppins", sans-serif;
   box-sizing: border-box;
+
 }
 body{
   background: #000;
@@ -337,7 +338,7 @@ header.sticky ul li a{
   height: 100%;
   width: 1500px;
   max-width: 100%;
-  padding: 10rem;
+  margin: 15rem;
   text-transform: uppercase;
 }
 
