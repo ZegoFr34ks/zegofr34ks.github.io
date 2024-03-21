@@ -243,6 +243,7 @@
     align-items: flex-end;
     padding: 20px 40px;
     box-sizing: border-box;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 .bottom-content::before {
@@ -268,6 +269,9 @@
     color: #000;
     position: relative;
     z-index: 1;
+    white-space: nowrap; /* Prevent link text from wrapping */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Display ... when text overflows */
 }
 
 .version, .creator {
