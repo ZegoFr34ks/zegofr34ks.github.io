@@ -8,11 +8,17 @@
     <link rel="icon" href="Ref/Pictures/webicon.png" type="image/x-icon">
     <title>HUB</title>
     <link rel="stylesheet" href="index.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
     <div class="loader-wrapper">
         <span class="loader"><span class="loader-inner"></span></span>
     </div>
+    <script>
+        $(window).on("load",function(){
+          $(".loader-wrapper").fadeOut("slow");
+        });
+      </script>
     <nav>
         <header>
             <a href="index.html" class="logo">ZegoFr34ks</a>
@@ -25,6 +31,12 @@
         </header>
     </nav>
     <section class="banner">
+        <script type="text/javascript">
+            window.addEventListener("scroll", function(){
+              var header = document.querySelector("header");
+              header.classList.toggle("sticky", window.scrollY > 0);
+            })
+        </script>
         <div class="bloc">
             <video src="Ref/Videos/indexbg.mp4" autoplay muted loop>LOADING</video>
             <div class="scroll-down"></div>
