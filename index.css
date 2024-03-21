@@ -154,7 +154,7 @@
       margin: 0 auto; /* Center the logo */
     }
   }
-  
+
   /*Video BG*/
   
   .bloc{
@@ -213,3 +213,24 @@
     50%  { opacity: 1;  }
     100% { transform:translate(0,10px) rotate(45deg); opacity: 0; }
   }
+
+  /* Styles for the bottom section */
+.bottom-section {
+    background-color: #f2f2f2;
+    height: 33vh; /* Adjust height as needed */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+}
+
+.bottom-left, .bottom-right {
+    margin-bottom: 10px;
+}
+
+.bottom-center {
+    margin-bottom: 10px;
+    display: block;
+}
