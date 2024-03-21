@@ -1,21 +1,44 @@
 document.addEventListener("DOMContentLoaded", function() {
     const sections = document.querySelectorAll("section");
-    const navLinks = document.querySelectorAll("header ul li a");
 
-    navLinks.forEach((link, index) => {
-        link.addEventListener("click", function(event) {
-            event.preventDefault();
+    let scrolling = false;
+    let scrollTimeout;
 
-            const targetSection = sections[index];
-            scrollToSection(targetSection);
+    function centerMostCenteredSection() {
+        const viewportCenter = window.innerHeight / 2;
+        let closestSection = null;
+        let minDistance = Infinity;
+
+        sections.forEach(section => {
+            const sectionCenter = section.getBoundingClientRect().top + section.offsetHeight / 2;
+            const distance = Math.abs(viewportCenter - sectionCenter);
+
+            if (distance < minDistance) {
+                closestSection = section;
+                minDistance = distance;
+            }
         });
-    });
+
+        scrollToSection(closestSection);
+    }
 
     function scrollToSection(section) {
+        const targetOffset = section.offsetTop - (window.innerHeight - section.offsetHeight) / 2;
         window.scroll({
             behavior: "smooth",
-            left: 0,
-            top: section.offsetTop
+            top: targetOffset
         });
     }
+
+    window.addEventListener("scroll", function() {
+        scrolling = true;
+        clearTimeout(scrollTimeout);
+
+        scrollTimeout = setTimeout(function() {
+            if (scrolling) {
+                scrolling = false;
+                centerMostCenteredSection();
+            }
+        }, 100);
+    });
 });
