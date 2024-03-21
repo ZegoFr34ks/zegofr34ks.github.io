@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script type="text/javascript">
+        if (screen.width <= 699) {
+        document.location = "mobile.html";
+        }
+    </script>
+    <meta charset="utf-8">
+    <meta name="description" content="ZegoFr34ks' Own Personal Website (WIP)">
+    <meta name="author" content="ZegoFr34ks">
+    <meta name="viewport" content="width=device-width, initial-scale=0.6">
+    <link rel = "icon" href = "Pictures/waifuicon.png" type = "image/x-icon">
+    <title>ZegoFr34ks' Home</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <div class="loader-wrapper">
+      <span class="loader"><span class="loader-inner"></span></span>
+    </div>
+    <script>
+      $(window).on("load",function(){
+        $(".loader-wrapper").fadeOut("slow");
+      });
+    </script>
+    <nav>
+      <header>
+        <a href="index.html" class="logo">ZegoFr34ks</a>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="portfolio.html">Portfolio</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </header>
+    </nav>
+    <section class="banner"></section>
+    <script type="text/javascript">
+      window.addEventListener("scroll", function(){
+        var header = document.querySelector("header");
+        header.classList.toggle("sticky", window.scrollY > 0);
+      })
+    </script>
+    <div class="bloc">
+      <video src="Videos/TDBG.mp4" autoplay muted loop>LOADING</video>
+      <div class="scroll-down"></div>
+    </div>
+    <main>
+      <div id="main" class="updatelog">
+        <h1>Update Log</h1>
+        <p>Here you can see the newest updates! and check out the source code ;)</p>
+        <div class="window">
+          <div class="bar">
+            <div class="btn"></div>
+          </div>
+          <div class="body">
+            <pre>
+              <div><a style="color: #454545;">#Update Log:</a></div><div>C/: <a style="color: #f6ff75;">def </a><a style="color: #46ff35;">Source&Updates()</a>{ <a style="color: #454545;">#Check out the link to see what's new and the source code</a></div><div><a style="color: #6ff5ff;">            Github_link</a> = [ <a style="color: #a950f1;" href="https://github.com/ZegoFr34ks/zegofr34ks.github.io">Github </a><a style="color: #454545;"> /* Source */</a> ]</div><div>      }</div><div><a style="color: #f6ff75;">      def </a><a style="color: #ff221b;">WIP()</a>{</div><div><a style="color: #6ff5ff;">            wip_list</a> = [ <a style="color: #2aecf3;">Lots of stuff still coming!</a> ]<div>      }</div><div><a style="color: #f6ff75;">      def </a><a style="color: #ffd035;">RecentlyUpdated()</a>{</div><div><a style="color: #6ff5ff;">            recent_list</a> = [ <a style="color: #3ba311;"> New About>More</a> ]<div>      }</div></div>
+              <div>$ <a style="color: #cccccc;">Updates <del>Coming Soon</del> This website will update again once I have the time. (expect a massive overhaul)</a><span class="pulse">_</span></div>
+            </pre>
+          </div>
+        </div>
+      </div>
+      <div id="main">
+
+      </div>
+      <div id="main" id="parallax" class="buttonbox">
+        <a href="about.html"><span>About</span></a>
+        <a href="portfolio.html"><span>Portfolio</span></a>
+        <a href="contact.html"><span>Contact</span></a>
+      </div>
+      <div id="main" class="parallaxdiv">
+
+      </div>
+      <card id="main">
+        <div class="container">
+          <div class="card">
+            <div class="content">
+              <h2>ZF</h2>
+              <h3>ZegoFr34ks</h3>
+              <p>Who Is This Guy?</p>
+              <a href="about.html">Read More</a>
+            </div>
+          </div>
+        </div>
+        <script type="text/javascript" src="Javascripts/vanilla-tilt.js"></script> <!-- script from micku7zu -->
+        <script>
+          VanillaTilt.init(document.querySelector(".card"),{
+          max: 25,
+          scale: 1.2,
+          speed: 400
+        });
+        </script>
+      </card>
+    </main>
+    <footer>
+      <span style="color: white">v.0.69</span><span><a href="https://github.com/ZegoFr34ks/zegofr34ks.github.io" target="_blank">Click Me!</a></span>
+    </footer>
+  </body>
+</html>
