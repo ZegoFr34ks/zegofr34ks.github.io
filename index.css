@@ -213,34 +213,33 @@
     100% { transform:translate(0,10px) rotate(45deg); opacity: 0; }
   }
 
-  /* Middle Section */
+/* Middle Section */
 .middle-section {
     height: 100vh;
     background-color: #000;
-  }
+}
   
-  /* Bottom Section */
-  .bottom-section {
-    height: 66.6vh; /* 2/3 of the viewport height */
+/* Bottom Section */
+.bottom-section {
+    height: 100vh;
     background-color: #f3f3f3; /* Light grey background */
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
     padding: 20px 40px;
     box-sizing: border-box;
-  }
-  
-  .bottom-content {
+}
+
+.bottom-content {
     display: flex;
     flex-direction: column;
-  }
-  
-  .bottom-content a {
+}
+
+.bottom-content a {
     margin-top: 10px;
     color: #000;
-  }
-  
-  .version {
+}
+
+.version, .creator {
     opacity: 0.5;
-  }
-  
+}
