@@ -248,10 +248,32 @@
   }
 
 
-/* Middle Section */
-.middle-section {
+  .middle-section {
     height: 100vh;
     background-color: #000;
+    overflow: hidden;
+    position: relative;
+}
+
+.star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #fff;
+    opacity: 0; /* Initially hide stars */
+    animation: twinkle 10s infinite linear;
+}
+
+@keyframes twinkle {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
 }
 
   
