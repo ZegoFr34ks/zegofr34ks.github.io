@@ -104,22 +104,19 @@
     transition: 0.6s;
   }
   header ul{
-    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
   }
   header ul li{
-    position: relative;
     list-style: none;
   }
   header ul li a{
-    position: relative;
     margin: 0 15px;
     text-decoration: none;
     color: #fff;
     letter-spacing: 2px;
-    font-weight: 500px;
+    font-weight: 500;
     transition: 0.6s;
   }
   /* ##readd this if you want an image as bg##
@@ -136,6 +133,27 @@
     color: #000;
   }
   
+  /* Add media query for smaller screens */
+@media only screen and (max-width: 768px) {
+    header ul li:not(:first-child) {
+      display: none; /* Hide all shortcuts except the first one (Home) */
+    }
+  }
+  
+  /* Add media query for even smaller screens (e.g., phones) */
+  @media only screen and (max-width: 480px) {
+    header ul {
+      justify-content: center; /* Center-align items */
+    }
+  
+    header ul li {
+      display: none; /* Hide all shortcuts */
+    }
+  
+    header .logo {
+      margin: 0 auto; /* Center the logo */
+    }
+  }
   
   /*Video BG*/
   
