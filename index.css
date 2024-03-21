@@ -143,6 +143,28 @@
     pointer-events: none; /* Ensure the pseudo-element doesn't interfere with mouse events */
 }
 
+.banner .bloc {
+    position: relative;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+}
+
+.banner .bloc video,
+.banner .bloc .bg-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 100%;
+    min-height: 100%;
+    object-fit: cover;
+}
+
+.banner .bloc .bg-image {
+    display: none;
+}
+
   
   /* Add media query for smaller screens */
 @media only screen and (max-width: 768px) {
