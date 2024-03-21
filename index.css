@@ -247,12 +247,39 @@
     100% { transform:translate(0,10px) rotate(45deg); opacity: 0; }
   }
 
-
-  .middle-section {
+/* middle section */
+.middle-section {
     height: 100vh;
     background-color: #000;
     overflow: hidden;
     position: relative;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.links {
+    display: flex;
+    flex-direction: column;
+    margin-left: 5%; /* Adjust as needed */
+}
+
+.link {
+    font-size: 36px; /* Adjust as needed */
+    font-weight: bold;
+    color: #fff;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: color 0.3s ease;
+}
+
+.link:hover {
+    color: #ffd700; /* Change text color on hover */
+    text-shadow: 0 0 20px #ffd700; /* Add glowing effect */
+}
+
+.middle-section .links .link {
+    text-decoration: none;
 }
 
 .star {
@@ -276,7 +303,9 @@
     }
 }
 
-  
+
+
+
 /* Bottom Section */
 .bottom-section {
     position: relative;
