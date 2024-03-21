@@ -2,29 +2,44 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="description" content="ZegoFr34ks' Own Personal Website (WIP)">
+    <meta name="author" content="ZegoFr34ks">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AZRYX</title>
+    <link rel = "icon" href = "Pictures/webicon.png" type = "image/x-icon">
+    <title>HUB</title>
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
-    <header>
-        <div class="title">AZRYX</div>
-        <nav>
-            <a href="#">Page 1</a>
-            <a href="#">Page 2</a>
-            <a href="#">Page 3</a>
-            <a href="#">Page 4</a>
-        </nav>
-    </header>
-    <main>
-        <div class="video-container">
-            <video autoplay muted loop>
-                <source src="background-video.mp4" type="video/mp4">
-            </video>
-            <div class="centered">AZRYX</div>
+    <div class="loader-wrapper">
+        <span class="loader"><span class="loader-inner"></span></span>
+    </div>
+    <script>
+        $(window).on("load",function(){
+        $(".loader-wrapper").fadeOut("slow");
+        });
+    </script>
+    <nav>
+        <header>
+            <a href="index.html" class="logo">ZegoFr34ks</a>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="portfolio.html">Portfolio</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+        </header>
+    </nav>
+    <section class="banner"></section>
+        <script type="text/javascript">
+            window.addEventListener("scroll", function(){
+            var header = document.querySelector("header");
+            header.classList.toggle("sticky", window.scrollY > 0);
+            })
+        </script>
+        <div class="bloc">
+            <video src="Videos/TDBG.mp4" autoplay muted loop>LOADING</video>
+            <div class="scroll-down"></div>
         </div>
-        <button id="light-mode-toggle">Toggle Light Mode</button>
-    </main>
     <script src="index.js"></script>
 </body>
 </html>
