@@ -293,9 +293,11 @@
   color: rgba(150, 150, 150, 0); /* Transparent initially */
   animation: fadeIn 0.5s forwards, flicker 2s infinite, shadowMove 3s infinite alternate; /* Fade and flicker in animation */
   overflow: hidden; /* Hide overflowing text */
-  white-space: nowrap; /* Prevent wrapping of text */
+  white-space: normal; /* Allow text to wrap */
+  word-break: break-word; /* Break word if necessary */
   z-index: 1; /* Ensure the description appears above other elements */
 }
+
 
 @keyframes fadeIn {
   from {

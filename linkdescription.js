@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function() {
             descriptionBox.textContent = description;
             
             // Check if the screen width is greater than 768px before displaying the description box
-            if (window.innerWidth > 480) {
+            if (window.innerWidth > 768) {
                 descriptionBox.style.display = 'block';
             }
         });
