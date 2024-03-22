@@ -271,6 +271,7 @@
     cursor: pointer;
     margin-bottom: 20px;
     transition: color 0.3s ease;
+    position: relative; /* Ensure proper stacking context */
 }
 
 .link:hover {
@@ -281,6 +282,56 @@
 .middle-section .links .link {
     text-decoration: none;
 }
+
+.description-box {
+  position: absolute;
+  top: 50%;
+  right: 5%; /* Adjust distance from right side */
+  transform: translateY(-50%);
+  max-width: 30%; /* Adjust maximum width of description */
+  padding: 10px;
+  color: rgba(150, 150, 150, 0); /* Transparent initially */
+  animation: fadeIn 0.5s forwards, flicker 2s infinite, shadowMove 3s infinite alternate; /* Fade and flicker in animation */
+  overflow: hidden; /* Hide overflowing text */
+  white-space: nowrap; /* Prevent wrapping of text */
+  z-index: 1; /* Ensure the description appears above other elements */
+}
+
+@keyframes fadeIn {
+  from {
+      color: rgba(150, 150, 150, 0); /* Transparent */
+      transform: scale(90%);
+  }
+  to {
+      color: rgba(150, 150, 150, 1); /* Grey */
+      transform: scale(100%);
+  }
+}
+
+@keyframes flicker {
+  0% {
+      opacity: 1; /* Initial opacity */
+  }
+  50% {
+      opacity: 0.8; /* Lower opacity */
+  }
+  100% {
+      opacity: 1; /* Return to initial opacity */
+  }
+}
+
+@keyframes shadowMove {
+  0% {
+      text-shadow: 0 0 2.5px rgba(255, 255, 255, 0.3), 0 0 5px rgba(255, 255, 255, 0.3); /* Initial text shadow */
+  }
+  50% {
+      text-shadow: 0 0 5px rgba(255, 255, 255, 0.6), 0 0 7.5px rgba(255, 255, 255, 0.4); /* Move shadow effect */
+  }
+  100% {
+      text-shadow: 0 0 2.5px rgba(255, 255, 255, 0.3), 0 0 5px rgba(255, 255, 255, 0.3); /* Return to initial shadow */
+  }
+}
+
 
 .star {
     position: absolute;
@@ -302,9 +353,6 @@
         opacity: 0;
     }
 }
-
-
-
 
 /* Bottom Section */
 .bottom-section {
