@@ -1,0 +1,429 @@
+/*Nav Bar*/
+@import url("https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap");
+
+*{
+  border-radius: 0;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+  box-sizing: border-box;
+
+}
+body{
+  background: #000;
+  min-height: 100vh;
+  box-sizing: border-box;
+  height: 100%;
+  background-color: #000000;
+  background-image: radial-gradient(#11581E, #041607), url("https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif");
+  background-repeat: no-repeat;
+  background-size: cover;
+  overflow: hidden;
+}
+
+  /* header */
+  
+  header{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: 0.6s;
+    padding: 40px 100px;
+    z-index: 100000;
+  }
+  header.sticky{
+    padding: 5px 100px;
+    background: #fff;
+  }
+  header .logo{
+    position: relative;
+    font-weight: 700;
+    color: #fff;
+    text-decoration: none;
+    font-size: 2em;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: 0.6s;
+  }
+  header ul{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  header ul li{
+    list-style: none;
+  }
+  header ul li a{
+    margin: 0 15px;
+    text-decoration: none;
+    color: #fff;
+    letter-spacing: 2px;
+    font-weight: 500;
+    transition: 0.6s;
+  }
+  /* ##readd this if you want an image as bg##
+  .banner{
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background: url(Pictures/ggow.png);
+    background-size: cover;
+  }
+  */
+  header.sticky .logo,
+  header.sticky ul li a{
+    color: #000;
+  }
+
+.banner::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50px; /* Adjust height as needed */
+    background: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+    pointer-events: none; /* Ensure the pseudo-element doesn't interfere with mouse events */
+}
+
+.banner .bloc {
+    position: relative;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+}
+
+.banner .bloc video,
+.banner .bloc .bg-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 100%;
+    min-height: 100%;
+    object-fit: cover;
+}
+
+.banner .bloc .bg-image {
+    display: none;
+}
+
+  
+  /* Add media query for smaller screens */
+@media only screen and (max-width: 768px) {
+    header ul li:not(:first-child) {
+      display: none; /* Hide all shortcuts except the first one (Home) */
+    }
+  }
+  
+  /* Add media query for even smaller screens (e.g., phones) */
+  @media only screen and (max-width: 480px) {
+    header ul {
+      justify-content: center; /* Center-align items */
+    }
+  
+    header ul li {
+      display: none; /* Hide all shortcuts */
+    }
+  
+    header .logo {
+      margin: 0 auto; /* Center the logo */
+    }
+  }
+/* card */
+.wrapper {
+    position: absolute;
+    margin: 10vh auto; /* Center the wrapper vertically */
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 90vw; /* Limit the maximum width */
+    width: 80%; /* Default width */
+    min-height: 20vh; /* Ensure minimum height */
+  }
+  
+  .card {
+    width: 100%; /* Fill the wrapper width */
+    height: 100%; /* Fill the wrapper height */
+    border-radius: 5px;
+    position: relative;
+    box-shadow: -2vw 3vw 9vw 0 rgba(92, 15, 15, 0.54);
+    overflow: hidden;
+    z-index: 4;
+  }
+  
+  .card__orangeShine, .card__greenShine {
+    position: absolute;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+  
+  .card__orangeShine {
+    background-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/279756/orange_shine.png);
+    right: -5vw; /* Adjust position based on screen size */
+    top: -5vh; /* Adjust position based on screen size */
+    bottom: 5vh; /* Adjust position based on screen size */
+    z-index: 2;
+    width: 110%; /* Adjust size based on screen size */
+    height: 110%; /* Adjust size based on screen size */
+  }
+  
+  .card__greenShine {
+    background-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/279756/green_shine.png);
+    left: -2.5vw; /* Adjust position based on screen size */
+    top: 2.5vh; /* Adjust position based on screen size */
+    bottom: 0; /* Adjust position based on screen size */
+    z-index: 1;
+    width: 100%; /* Fill the card width */
+    height: 100%; /* Fill the card height */
+  }
+  
+  .card__year {
+    text-align: center;
+    color: #fff;
+    line-height: 3.5vh; /* Adjust line height based on screen size */
+    padding: 2.5vh 0; /* Adjust padding based on screen size */
+    -webkit-text-stroke: 0.2vw #000; /* Adjust text stroke based on screen size */
+    position: relative;
+    z-index: 4;
+    font-size: 2vh; /* Adjust font size based on screen size */
+  }
+  
+  .card__year #MyEmail {
+    position: absolute;
+    top: 0;
+    left: 30%;
+    color: #fff;
+    stroke: 0.5px #000; /* Adjust stroke based on screen size */
+    font-size: 2.5vh; /* Adjust font size based on screen size */
+    line-height: 5vh; /* Adjust line height based on screen size */
+    padding: 2.5vh 0; /* Adjust padding based on screen size */
+    font-weight: 600;
+  }
+  
+  .card__year #Email {
+    position: absolute;
+    color: #fff;
+    top: 10%;
+    left: 30%;
+    font-size: 1.5vh; /* Adjust font size based on screen size */
+    line-height: 5vh; /* Adjust line height based on screen size */
+    padding: 2.5vh 0; /* Adjust padding based on screen size */
+    font-weight: 300;
+  }
+  
+  .card__thankyou {
+    font-family: "Oswald", sans-serif;
+    position: absolute;
+    text-transform: uppercase;
+    font-weight: 100;
+    left: 2vw;
+    bottom: 3vh;
+    z-index: 2;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.5vw;
+    line-height: 1.7vh;
+    font-size: 1.2vh;
+  }
+  
+  .card__circle {
+    position: absolute;
+    border-radius: 50%;
+    background-color: #fff;
+    background-image: linear-gradient(-239deg, #3B4576 0%, #242A48 59%);
+    box-shadow: -0.5vw -0.75vh 4.5vw 0 #191C41;
+    z-index: 5;
+    background-image: url(Pictures/email.png);
+    background-position: 5vw;
+    background-size: 5%;
+    background-repeat: no-repeat;
+    filter: hue-rotate(90deg);
+    right: 5vw;
+    bottom: 3vh;
+    width: 18vw; /* Adjust width based on screen size */
+    height: 18vw; /* Adjust height based on screen size */
+  }
+  
+  .card__outer-year {
+    font-family: "Orbitron";
+  }
+  
+  .card__outer-year span {
+    position: absolute;
+    color: #fff;
+    font-size: 1.6vh;
+    z-index: 4;
+  }
+  
+  .card__outer-year span:nth-child(1):after, .card__outer-year span:nth-child(4):after {
+    content: "";
+    position: absolute;
+    bottom: -0.2vh;
+    left: 0;
+    width: 100%;
+    border-bottom: 0.2vh solid #fff;
+  }
+  
+  .card__outer-year span:nth-child(1) {
+    top: 3.5vh;
+    left: 3.5vw;
+  }
+  
+  .card__outer-year span:nth-child(2) {
+    left: none;
+    top: 3.5vh;
+    right: 3.5vw;
+  }
+  
+  .card__outer-year span:nth-child(3) {
+    top: none;
+    bottom: 3.5vh;
+    left: 3.5vw;
+  }
+  
+  .card__outer-year span:nth-child(4) {
+    top: none;
+    left: none;
+    right: 3.5vw;
+    bottom: 3.5vh;
+  }
+  
+  .card__comet {
+    position: relative;
+    width: 0.8vw;
+    height: 0.8vw;
+    background-color: #fff;
+    border-radius: 100%;
+  }
+  
+  .card__cometOuter {
+    position: absolute;
+    top: 2vh;
+    left: 0.2vw;
+  }
+  
+  .card__comet--second {
+    right: -2vw;
+    top: -1vh;
+    transform: scale(0.6);
+  }
+  
+  .card__comet:before,
+  .card__comet:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.2) 27%, rgba(255, 255, 255, 0) 100%);
+    border-radius: 20px;
+    transform: rotate(-45deg);
+  }
+  
+.card__comet:before {
+  width: 1.8vw;
+  height: 7vh;
+  transform-origin: -0.2vw 1.3vh;
+}
+
+.card__comet:after {
+  width: 1.2vw;
+  height: 8vh;
+  transform-origin: 0 0.8vh;
+}
+
+/* Background */
+
+.page {
+  font-family: "Inconsolata", Helvetica, sans-serif;
+  font-size: 1.5vh;
+  color: rgba(128, 255, 128, 0.8);
+  text-shadow: 0 0 0.1vh #33ff33, 0 0 0.2vh rgba(255, 255, 255, 0.8);
+}
+
+.noise {
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: url("https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif");
+  background-repeat: no-repeat;
+  background-size: cover;
+  z-index: -1;
+  opacity: 0.02;
+}
+
+.overlay {
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0) 100%);
+  background-size: auto 0.4vh;
+  z-index: 1;
+}
+
+.overlay::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(0deg, transparent 0%, rgba(32, 128, 32, 0.2) 2%, rgba(32, 128, 32, 0.8) 3%, rgba(32, 128, 32, 0.2) 3%, transparent 100%);
+  background-repeat: no-repeat;
+  animation: scan 7.5s linear 0s infinite;
+}
+
+@keyframes scan {
+  0% {
+    background-position: 0 -100vh;
+  }
+  35%, 100% {
+    background-position: 0 100vh;
+  }
+}
+
+.terminal {
+  box-sizing: inherit;
+  position: absolute;
+  height: 100%;
+  width: 90vw;
+  max-width: 100%;
+  margin: 18vh 5vw;
+  text-transform: uppercase;
+}
+
+.output {
+  padding-top: 2vh;
+  color: rgba(128, 255, 128, 0.8);
+  text-shadow: 0 0 0.1vh rgba(51, 255, 51, 0.4), 0 0 0.2vh rgba(255, 255, 255, 0.8);
+}
+
+.output::before {
+  content: "> ";
+}
+
+.term {
+  color: #fff;
+  text-decoration: none;
+}
+
+.term::before {
+  content: "[";
+}
+
+.term::after {
+  content: "]";
+}
+
+.errorcode {
+  color: white;
+}
