@@ -115,14 +115,14 @@ header{
     cursor: pointer;
     transition: background-color 0.3s ease;
   }
-  
+
   /* Add these CSS rules to style active/inactive buttons */
-  .toggleinfo button.active {
+  .toggleinfo button.on {
     background-color: green;
     color: white;
   }
   
-  .toggleinfo button.inactive {
+  .toggleinfo button.off {
     background-color: red;
     color: white;
   }
