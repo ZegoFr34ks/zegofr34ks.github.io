@@ -101,36 +101,46 @@ header{
     }
   }
 
-  div.toggleinfo{
-    display: flex;
-    margin-top: 200px;
-    margin-bottom: 50px;
-    margin-left: 250px;
-  }
-  
-  .toggleinfo button {
-    margin-right: 10px;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
+/* Center the buttons horizontally and make them responsive */
+.toggleinfo {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  flex-wrap: wrap; /* Allow wrapping */
+  margin-top: 200px;
+  margin-bottom: 50px;
+}
 
-  /* Add these CSS rules to style active/inactive buttons */
-  .toggleinfo button.on {
-    background-color: green;
-    color: white;
+.toggleinfo button {
+  margin: 5px 5px; /* Add some space between buttons */
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Style active/inactive buttons */
+.toggleinfo button.on {
+  background-color: green;
+  color: white;
+}
+
+.toggleinfo button.off {
+  background-color: red;
+  color: white;
+}
+
+.toggleinfo button:hover {
+  background-color: #444;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 600px) {
+  .toggleinfo {
+    flex-direction: column; /* Stack buttons vertically */
+    align-items: center; /* Center horizontally */
   }
-  
-  .toggleinfo button.off {
-    background-color: red;
-    color: white;
-  }
-  
-  .toggleinfo button:hover {
-    background-color: #444;
-  }
-  
+}
+
   div.toggletext{
     position: relative;
     float: left;
@@ -156,43 +166,56 @@ div.toggletext a{
 
   /* pfps */
 
-.container{
-  position: absolute;
-  width: 80%;
-  left: 50%;
-  transform: translateX(-50%);
-}
-div.gallery.active {
-  display: inline-block;
-  margin: 50px 27.5px;
-  border: 3px solid #fff;
-  border-radius: 50% / 35% 35% 0 0;
-  width: 180px;
-  zoom: 1.2;
-}
-div.gallery {
-  display: none;
-}
-
-div.gallery:hover {
-  box-shadow: inset 0 0 10px 1px rgb(0, 255, 234);
-}
-
-div.gallery img {
-  width: 174px;
-  height: 174px;
-  border-radius: 50%;
-  object-fit: cover;
-  overflow: hidden;
-}
-div.gallery a{
-  color: #ed3966;
-}
-div.desc {
-  padding: 15px;
-  text-align: center;
-  color: #fff;
-}
+  .container {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    flex-wrap: wrap; /* Allow wrapping */
+    position: absolute;
+    width: 80%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  /* Ensure the pictures remain centered when stacked vertically */
+  .container .gallery {
+    margin: 50px 27.5px; /* Adjust margins as needed */
+  }
+  
+  /* Other styles remain unchanged */
+  div.gallery.active {
+    display: inline-block;
+    border: 3px solid #fff;
+    border-radius: 50% / 35% 35% 0 0;
+    width: 180px;
+    zoom: 1.2;
+  }
+  
+  div.gallery {
+    display: none;
+  }
+  
+  div.gallery:hover {
+    box-shadow: inset 0 0 10px 1px rgb(0, 255, 234);
+  }
+  
+  div.gallery img {
+    width: 174px;
+    height: 174px;
+    border-radius: 50%;
+    object-fit: cover;
+    overflow: hidden;
+  }
+  
+  div.gallery a {
+    color: #ed3966;
+  }
+  
+  div.desc {
+    padding: 15px;
+    text-align: center;
+    color: #fff;
+  }
 
 /* background */
 
