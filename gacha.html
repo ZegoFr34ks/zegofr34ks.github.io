@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gacha Simulation</title>
+    <style>
+        /* General body styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            height: 100vh;
+        }
+    
+        /* Input section styling */
+        .input-section {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 20px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 48vw;
+            max-height: 48vh;
+            overflow: auto;
+        }
+    
+        /* Scrollbar styling for webkit browsers */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+    
+        ::-webkit-scrollbar-track {
+            background: #252525;  /* Track background */
+            border-radius: 10px;
+        }
+    
+        ::-webkit-scrollbar-thumb {
+            background-color: #4caf50; /* Scrollbar color */
+            border-radius: 10px;
+            border: 2px solid #1e1e1e; /* Adds padding around the scrollbar thumb */
+        }
+    
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #45a049; /* Change color on hover */
+        }
+    
+        /* Scrollbar styling for Firefox */
+        body, .input-section, .output-section {
+            scrollbar-width: thin; /* Firefox */
+            scrollbar-color: #4caf50 #252525; /* thumb and track color */
+        }
+    
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+    
+        input[type="number"], input[type="checkbox"], button {
+            width: 98%;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #333;
+            color: #e0e0e0;
+            font-size: 0.9em;
+        }
+    
+        input[type="number"] {
+            background-color: #252525;
+        }
+    
+        button {
+            background-color: #4caf50;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+    
+        button:hover {
+            background-color: #45a049;
+        }
+    
+        input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+        }
+    
+        .checkbox-label {
+            display: inline-block;
+            vertical-align: middle;
+        }
+    
+        /* Output section and table styling */
+        .output-section {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 48vw;
+            max-height: 48vh;
+            overflow: auto;
+        }
+    
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+    
+        th, td {
+            padding: 10px;
+            border: 1px solid #333;
+            text-align: left;
+        }
+    
+        th {
+            background-color: #333;
+            color: #fff;
+        }
+    
+        td {
+            background-color: #252525;
+        }
+    
+        /* Responsive styling for small screens */
+        @media (max-width: 768px) {
+            .input-section, .output-section {
+                width: 90vw;
+                max-height: 45vh;
+            }
+        }
+    </style>        
+</head>
+<body>
+
+<div class="input-section">
+    <label for="polychrome">Amount of Polychrome:</label>
+    <input type="number" id="polychrome" name="polychrome" placeholder="Enter amount">
+
+    <label for="tapes">Amount of Tapes:</label>
+    <input type="number" id="tapes" name="tapes" placeholder="Enter amount">
+
+    <label for="pity">S-rank Pity (amount of rolls since last S-rank):</label>
+    <input type="number" id="pity" name="pity" placeholder="Enter number">
+
+    <input type="checkbox" id="fiftyfifty" name="fiftyfifty">
+    <label for="fiftyfifty" class="checkbox-label">Next S-Rank is guaranteed to be the featured character</label>
+
+    <button onclick="simulate()">Simulate</button>
+</div>
+
+<div class="output-section">
+    <table>
+        <thead>
+            <tr>
+                <th>Average number of S-rank characters</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Featured S-rank</td>
+                <td id="featured-S-rank-value"></td>
+            </tr>
+            <tr>
+                <td>Any S-rank</td>
+                <td id="any-S-rank-value"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <br>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Average number of A-rank characters</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Featured A-rank</td>
+                <td id="featured-A-rank-value"></td>
+            </tr>
+            <tr>
+                <td>Any A-rank</td>
+                <td id="any-A-rank-value"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <br>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Chance of getting a featured S-rank character</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>C0+</td>
+                <td id="c0-value"></td>
+            </tr>
+            <tr>
+                <td>C1+</td>
+                <td id="c1-value"></td>
+            </tr>
+            <tr>
+                <td>C2+</td>
+                <td id="c2-value"></td>
+            </tr>
+            <tr>
+                <td>C3+</td>
+                <td id="c3-value"></td>
+            </tr>
+            <tr>
+                <td>C4+</td>
+                <td id="c4-value"></td>
+            </tr>
+            <tr>
+                <td>C5+</td>
+                <td id="c5-value"></td>
+            </tr>
+            <tr>
+                <td>C6</td>
+                <td id="c6-value"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function simulate() {
+        // Placeholder for simulation logic
+        console.log("Simulation started");
+    }
+</script>
+
+<script>
+    function simulate() {
+        // Change button text to "Loading..." to indicate the simulation is in progress
+        const simulateButton = document.querySelector('button');
+        simulateButton.textContent = "Loading...";
+        simulateButton.disabled = true; // Disable the button to prevent multiple clicks
+
+        // Use setTimeout to allow the button text to change before starting the simulation
+        setTimeout(() => {
+            // Retrieve user inputs and set defaults to 0 if no values are entered
+            const polychrome = parseInt(document.getElementById("polychrome").value) || 0;
+            const tapes = parseInt(document.getElementById("tapes").value) || 0;
+            const pity = parseInt(document.getElementById("pity").value) || 0;
+            const fiftyFifty = document.getElementById("fiftyfifty").checked;
+
+            // Define constants
+            const pullsFromPolychrome = Math.floor(polychrome / 160); // Each 160 Polychrome is 1 pull
+            const pullsFromTapes = tapes; // Each Tape is 1 pull
+            const totalPulls = pullsFromPolychrome + pullsFromTapes;
+            const sRankProbabilityBase = 0.006; // Base 0.6% chance of S-rank per pull
+            const softPityStart = 75;
+            const pityThreshold = 90; // Hard pity: guaranteed S-rank at 90 pulls
+            const fourStarPityThreshold = 10; // 4-star pity every 10 pulls
+            const totalSimulations = 1000000;
+
+            // Initialize counters for S-rank and A-rank pulls
+            let totalSRanks = 0;
+            let totalFeaturedSRanks = 0; 
+            let totalARanks = 0;
+            let totalFeaturedARanks = 0;
+
+            // Run simulations
+            for (let i = 0; i < totalSimulations; i++) {
+                let pulls = totalPulls;
+                let currentPity = pity;
+                let currentARankPity = 0;
+                let sRanksInThisSimulation = 0;
+                let featuredSInThisSimulation = false; // Track if a featured S-rank has been pulled
+                let featuredAInThisSimulation = false; // Track if a featured A-rank has been pulled
+
+                // If the "Next S-Rank is guaranteed to be the featured character" checkbox is checked
+                if (fiftyFifty) {
+                    featuredSInThisSimulation = true; // Next S-rank will be the featured one
+                }
+
+                // Simulate each pull
+                while (pulls > 0) {
+                    // Check for 5-star (S-rank) pull based on pity and soft pity mechanics
+                    let sRankProbability = sRankProbabilityBase;
+                    
+                    if (currentPity >= softPityStart && currentPity < pityThreshold) {
+                        // Soft pity: Exponentially increase chances as pity increases
+                        sRankProbability = sRankProbabilityBase + ((currentPity - softPityStart) / (pityThreshold - softPityStart)) * (1 - sRankProbabilityBase);
+                    }
+
+                    if (currentPity >= pityThreshold) {
+                        // Guaranteed S-rank due to hard pity
+                        sRanksInThisSimulation++;
+                        totalSRanks++;
+                        currentPity = 0; // Reset pity counter
+
+                        // 50/50 chance mechanic for the featured character
+                        if (!featuredSInThisSimulation) {
+                            // 50/50 chance for featured S-rank
+                            if (Math.random() < 0.5) {
+                                featuredSInThisSimulation = true;
+                                totalFeaturedSRanks++;
+                            } else {
+                                // If the featured is not obtained, the next one is guaranteed
+                                featuredSInThisSimulation = false; // Guarantee featured for next S-rank
+                            }
+                        } else {
+                            // If the featured S-rank was already obtained, reset the 50/50 mechanic
+                            featuredSInThisSimulation = true; // The user gets the featured S-rank
+                        }
+                    } else if (Math.random() < sRankProbability) {
+                        // Regular chance of S-rank
+                        sRanksInThisSimulation++;
+                        totalSRanks++;
+                        currentPity = 0; // Reset pity counter
+
+                        // 50/50 chance for featured S-rank
+                        if (!featuredSInThisSimulation) {
+                            // 50/50 chance for featured S-rank
+                            if (Math.random() < 0.5) {
+                                featuredSInThisSimulation = true;
+                                totalFeaturedSRanks++;
+                            } else {
+                                // User loses the 50/50
+                                featuredSInThisSimulation = false; // Deactivate 50/50 for next S-rank
+                            }
+                        } else {
+                            // If the featured S-rank was already obtained, reset the 50/50 mechanic
+                            featuredSInThisSimulation = true; // The user gets the featured S-rank
+                        }
+                    } else {
+                        // Increment pity if no S-rank
+                        currentPity++;
+                    }
+
+
+                    // Reset featuredSInThisSimulation for the next iteration
+                    if (currentPity === 0) {
+                        featuredSInThisSimulation = false; // Reset for the next pull sequence
+                    }
+
+
+                    // 4-star (A-rank) or W-Engine pull every 10 pulls
+                    if (currentARankPity >= fourStarPityThreshold) {
+                        totalARanks++;
+                        currentARankPity = 0; // Reset 4-star pity
+
+                        // 50/50 chance for featured A-rank
+                        if (!featuredAInThisSimulation) {
+                            // 50/50 chance for featured A-rank
+                            if (Math.random() < 0.5) {
+                                featuredAInThisSimulation = true; // User pulls the featured A-rank
+                                totalFeaturedARanks++;
+                            } else {
+                                featuredAInThisSimulation = false; // User loses the 50/50, next is guaranteed
+                            }
+                        } else {
+                            // If the featured A-rank was already obtained, keep it true
+                            featuredAInThisSimulation = true; // The user gets the featured A-rank
+                        }
+                    } else {
+                        currentARankPity++; // Increment pity if no A-rank
+                    }
+
+                    pulls--; // Decrease remaining pulls
+                }
+            }
+
+            // Calculate and display the probabilities
+            const probabilityOfAnySRank = (totalSRanks / totalSimulations) * 100;
+            const probabilityOfFeaturedSRank = (totalFeaturedSRanks / totalSimulations) * 100;
+            const probabilityOfAnyARank = (totalARanks / totalSimulations) * 100;
+            const probabilityOfFeaturedARank = (totalFeaturedARanks / totalSimulations) * 100;
+
+            // Update the results in the table
+            document.getElementById("any-S-rank-value").textContent = probabilityOfAnySRank.toFixed(2) + "%";
+            document.getElementById("featured-S-rank-value").textContent = probabilityOfFeaturedSRank.toFixed(2) + "%";
+            document.getElementById("any-A-rank-value").textContent = probabilityOfAnyARank.toFixed(2) + "%";
+            document.getElementById("featured-A-rank-value").textContent = probabilityOfFeaturedARank.toFixed(2) + "%";
+
+            // Revert button back to original state
+            simulateButton.textContent = "Simulate";
+            simulateButton.disabled = false;
+        }, 50); // Add a small delay to allow the button text to update
+    }
+</script>
+
+</body>
+</html>
