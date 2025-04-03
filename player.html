@@ -12,7 +12,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
         <style>
-            body {
+            html, body {
                 display: flex;
                 height: 100vh;
                 margin: 0;
@@ -21,6 +21,9 @@
                 color: white;
                 flex-direction: row;  /* Default horizontal layout */
                 position: relative;  /* Allow positioning relative to the page */
+                overflow: hidden;  /* Prevent scrolling */
+                overflow-x: hidden;
+                width: 100%;
             }
 
             .music-library {
@@ -28,6 +31,7 @@
                 padding: 20px;
                 border-right: 2px solid #222;
                 overflow-y: auto;
+                -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
             }
 
             .song {
@@ -282,7 +286,7 @@
                 width: 100%;
             }
 
-            .note {
+            .footer-note {
                 position: absolute;
                 bottom: 20px;
                 width: 100%;
@@ -291,42 +295,51 @@
                 color: #b3b3b3;
             }
 
-            /* Media Queries for Mobile Devices */
-            @media (max-width: 768px) {
-                body {
-                    flex-direction: column;  /* Stack layout vertically for mobile */
-                }
-
-                .music-library {
-                    width: 100%;
-                    padding: 10px;
-                    max-height: 40vh;
-                }
-
-                .player {
-                    width: 90%;
-                    max-width: 90%;
-                }
-
-                .controls {
-                    flex-direction: column;  /* Stack buttons vertically on mobile */
-                }
-
-                .control-button {
-                    width: 40px;
-                    height: 40px;
-                    font-size: 18px;
-                }
-
-                .slider {
-                    width: 100%;
-                }
-
-                .note {
-                    font-size: 10px;
-                }
+        /* Media Queries for Mobile Devices */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;  /* Stack layout vertically for mobile */
+                align-items: center;  /* Ensure everything centers */
+                justify-content: center;
             }
 
+            .music-library {
+                width: 100%;
+                padding: 10px;
+                max-height: 40vh;
+            }
+
+            .player {
+                width: 90%;
+                max-width: 400px; /* Set a reasonable max width */
+                margin: 0 auto; /* Center it horizontally */
+                display: flex;
+                flex-direction: column;
+                align-items: center; /* Ensures content stays centered */
+            }
+
+            .controls {
+                display: flex; /* Ensure controls are laid out horizontally */
+                justify-content: center;
+                align-items: center;
+                margin-top: 20px;
+            }
+
+            .control-button {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+                margin: 0 5px;  /* Add some spacing between buttons */
+            }
+
+            .slider {
+                width: 100%;
+            }
+
+            .note {
+                font-size: 10px;
+            }
+        }
         </style>
     </head>
     <body>
@@ -623,6 +636,10 @@
                     // If it's the last song, loop back to the first song
                     selectSong(0);
                 }
+            });
+
+            volumeSlider.addEventListener("input", function () {
+                audioPlayer.volume = volumeSlider.value / 100;  // Convert range 0-100 to 0-1
             });
         </script>
     </body>
