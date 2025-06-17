@@ -339,6 +339,16 @@
                 font-size: 10px;
                 bottom: 0; /* Adjust position for mobile */
             }
+
+            #speed-select {
+                background: #4e2a84;
+                color: white;
+                border: none;
+                padding: 10px;
+                border-radius: 5px;
+                font-size: 14px;
+                cursor: pointer;
+            }
         }
         </style>
     </head>
@@ -376,15 +386,26 @@
                 <button class="control-button" onclick="nextSong()">⏩</button>
             </div>
             
-            <!-- Loop and Random Buttons -->
+            <!-- Loop, Speed, and Random Buttons -->
             <div class="extra-controls">
                 <button class="extra-control-button" id="loop-button" onclick="loopSong()">
-                    <i class="fas fa-redo"></i> <!-- Loop icon -->
+                    <i class="fas fa-redo"></i>
                 </button>
+
+                <select class="extra-control-button" id="speed-select" onchange="changeSpeed()">
+                    <option value="0.5">0.5x</option>
+                    <option value="0.75">0.75x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="1.2">1.2x</option>
+                    <option value="1.5">1.5x</option>
+                    <option value="2">2x</option>
+                </select>
+
                 <button class="extra-control-button" id="random-button" onclick="toggleRandom()">
-                    <i class="fas fa-random"></i> <!-- Random icon -->
+                    <i class="fas fa-random"></i>
                 </button>
             </div>
+
 
             <div class="description" id="song-description"></div>
             <div class="footer-note">
@@ -443,9 +464,22 @@
             let currentSongIndex = 0;
             let isRandomEnabled = false;
             let isLoopEnabled = false;
+            let playbackSpeed = 1.0;  // Default speed
+            let preloadQueue = [];  // Holds indices of the next 2 songs
+            let audioCache = {};    // Stores Audio objects already preloaded
+            const FADE_DURATION = 10; // seconds
+            let fadeInterval = null;
+            let isCrossfading = false;
+            let crossfadeCancelled = false;
+            let currentFade = null;  // holds fade interval ID
 
             const library = document.getElementById("library");
-            const audioPlayer = document.getElementById("audio-player");
+            let audioPlayer = document.getElementById("audio-player");
+            // Ensure pitch changes with speed
+            audioPlayer.preservesPitch = false;              // Standard
+            audioPlayer.mozPreservesPitch = false;           // Firefox
+            audioPlayer.webkitPreservesPitch = false;        // Safari/Chrome legacy
+
             const songTitle = document.getElementById("player-song-title");
             const songThumbnail = document.getElementById("song-thumbnail");
             const songArtists = document.getElementById("song-artists");
@@ -488,22 +522,32 @@
                 const song = songs[index];
                 
                 // Set the new song details
-                audioPlayer.src = song.file;
+                if (audioCache[index]) {
+                    audioPlayer.src = audioCache[index].src;  // Use cached
+                } else {
+                    audioPlayer.src = song.file;  // Fallback
+                }
+
+                audioPlayer.playbackRate = playbackSpeed;
+                audioPlayer.preservesPitch = false;
+                audioPlayer.mozPreservesPitch = false;
+                audioPlayer.webkitPreservesPitch = false;
                 songThumbnail.src = song.image;
                 songTitle.innerText = song.name;
                 songArtists.innerText = song.artists.join(", ");
                 songDescription.innerText = song.description;
                 
                 // Play the new song
-                audioPlayer.play();
-                
-                // Change play/pause icon to playing state
+                audioPlayer.play().catch(err => console.warn("Playback failed:", err));
+
+                // Update playback icon
                 const playPauseIcon = document.getElementById('play-pause-icon');
                 playPauseIcon.classList.remove('fa-play');
                 playPauseIcon.classList.add('fa-pause');
-                
-                // Update the song selection and other relevant things
+
                 updateSongSelection();
+                updatePreloadQueue();  // 🔁 Preload next songs
+
             }
 
 
@@ -566,6 +610,22 @@
                 // Update current time display (in minutes:seconds format)
                 const currentTime = audioPlayer.currentTime;
                 const totalTime = audioPlayer.duration;
+
+                if (!isCrossfading && !crossfadeCancelled && totalTime - currentTime <= FADE_DURATION) {
+                    let nextIndex;
+
+                    if (isLoopEnabled) return;
+
+                    if (isRandomEnabled) {
+                        do {
+                            nextIndex = Math.floor(Math.random() * songs.length);
+                        } while (nextIndex === currentSongIndex);
+                    } else {
+                        nextIndex = (currentSongIndex + 1) % songs.length;
+                    }
+
+                    crossfadeToNextSong(nextIndex);
+                }
 
                 // Format times in minutes and seconds
                 const formatTime = (time) => {
@@ -633,7 +693,12 @@
                 // Check if it's the last song in the list
                 if (currentSongIndex < songs.length - 1) {
                     // Play the next song
-                    selectSong(currentSongIndex + 1);
+                    if (!isCrossfading) {
+                        let nextIndex = isRandomEnabled
+                            ? Math.floor(Math.random() * songs.length)
+                            : (currentSongIndex + 1) % songs.length;
+                        selectSong(nextIndex);
+                    }
                 } else {
                     // If it's the last song, loop back to the first song
                     selectSong(0);
@@ -643,6 +708,222 @@
             volumeSlider.addEventListener("input", function () {
                 audioPlayer.volume = volumeSlider.value / 100;  // Convert range 0-100 to 0-1
             });
+
+            function changeSpeed() {
+                const speed = parseFloat(document.getElementById("speed-select").value);
+                playbackSpeed = speed;  // Store it globally
+                audioPlayer.playbackRate = speed;
+                audioPlayer.preservesPitch = false;
+                audioPlayer.mozPreservesPitch = false;
+                audioPlayer.webkitPreservesPitch = false;
+            }
+
+            function updatePreloadQueue() {
+                preloadQueue = [];
+
+                if (isLoopEnabled) return; // Looping disables preload
+
+                // Decide next songs depending on random or normal mode
+                if (isRandomEnabled) {
+                    while (preloadQueue.length < 2) {
+                        let rand = Math.floor(Math.random() * songs.length);
+                        if (rand !== currentSongIndex && !preloadQueue.includes(rand)) {
+                            preloadQueue.push(rand);
+                        }
+                    }
+                } else {
+                    for (let i = 1; i <= 2; i++) {
+                        let nextIndex = (currentSongIndex + i) % songs.length;
+                        preloadQueue.push(nextIndex);
+                    }
+                }
+
+                preloadQueue.forEach(index => {
+                    if (!audioCache[index]) {
+                        const audio = new Audio(songs[index].file);
+                        audio.preload = "auto";
+                        audio.preservesPitch = false;
+                        audio.mozPreservesPitch = false;
+                        audio.webkitPreservesPitch = false;
+
+                        // Load manually and store
+                        audio.load();
+                        audioCache[index] = audio;
+                    }
+                });
+                clearOldCache();
+            }
+            
+            function clearOldCache() {
+                Object.keys(audioCache).forEach(index => {
+                    if (parseInt(index) !== currentSongIndex && !preloadQueue.includes(parseInt(index))) {
+                        delete audioCache[index];
+                    }
+                });
+            }
+
+            function crossfadeToNextSong(nextIndex) {
+                if (isCrossfading) return;
+                isCrossfading = true;
+                crossfadeCancelled = false;
+
+                const FADE_INTERVAL = 50;
+                const steps = FADE_DURATION * 1000 / FADE_INTERVAL;
+                let step = 0;
+
+                const newAudio = new Audio(songs[nextIndex].file);
+                newAudio.volume = 0;
+                newAudio.playbackRate = playbackSpeed;
+                newAudio.preservesPitch = false;
+                newAudio.mozPreservesPitch = false;
+                newAudio.webkitPreservesPitch = false;
+                newAudio.preload = "auto";
+
+                updateSongDisplay(nextIndex);
+
+                newAudio.addEventListener("timeupdate", () => {
+                    if (!crossfadeCancelled) updateTimeDisplayFromAudio(newAudio);
+                });
+
+                // 👇 allow canceling crossfade by user seek
+                timeSlider.oninput = function () {
+                    if (isCrossfading) {
+                        crossfadeCancelled = true;
+                        clearInterval(currentFade);
+
+                        promoteNewAudio(newAudio);
+                        audioPlayer.currentTime = timeSlider.value;
+                        updateTimeDisplayFromAudio(audioPlayer);
+
+                        isCrossfading = false;  // 💥 reset flag so future transitions work
+                    }
+                };
+
+                newAudio.play().then(() => {
+                    currentFade = setInterval(() => {
+                        if (crossfadeCancelled) {
+                            clearInterval(currentFade);
+                            return;
+                        }
+
+                        step++;
+                        const ratio = step / steps;
+
+                        audioPlayer.volume = Math.max(0, 1 - ratio);
+                        newAudio.volume = Math.min(1, ratio);
+
+                        if (step >= steps) {
+                            clearInterval(currentFade);
+                            promoteNewAudio(newAudio);
+                            isCrossfading = false;
+                            crossfadeCancelled = false;
+                        }
+                    }, FADE_INTERVAL);
+                });
+            }
+
+            function updateSongDisplay(index) {
+                currentSongIndex = index;
+                const song = songs[index];
+                songThumbnail.src = song.image;
+                songTitle.innerText = song.name;
+                songArtists.innerText = song.artists.join(", ");
+                songDescription.innerText = song.description;
+                updateSongSelection();
+                updatePreloadQueue();
+            }
+
+            function promoteNewAudio(newAudio) {
+                audioPlayer.pause();
+                audioPlayer.removeAttribute("src");
+                audioPlayer.load();
+
+                newAudio.id = "audio-player";
+                const oldAudio = document.getElementById("audio-player");
+                oldAudio.parentNode.replaceChild(newAudio, oldAudio);
+
+                audioPlayer = document.getElementById("audio-player");
+
+                audioPlayer.volume = 1;
+                audioPlayer.playbackRate = playbackSpeed;
+                audioPlayer.preservesPitch = false;
+                audioPlayer.mozPreservesPitch = false;
+                audioPlayer.webkitPreservesPitch = false;
+
+                // Rebind event listeners
+                audioPlayer.addEventListener("timeupdate", () => {
+                    const currentTime = audioPlayer.currentTime;
+                    const totalTime = audioPlayer.duration;
+
+                    // ⛔ Prevent multiple or blocked crossfades
+                    if (!isCrossfading && !crossfadeCancelled && totalTime - currentTime <= FADE_DURATION) {
+                        let nextIndex;
+                        if (isLoopEnabled) return;
+
+                        if (isRandomEnabled) {
+                            do {
+                                nextIndex = Math.floor(Math.random() * songs.length);
+                            } while (nextIndex === currentSongIndex);
+                        } else {
+                            nextIndex = (currentSongIndex + 1) % songs.length;
+                        }
+
+                        crossfadeToNextSong(nextIndex);
+                    }
+
+                    const formatTime = (time) => {
+                        const minutes = Math.floor(time / 60);
+                        const seconds = Math.floor(time % 60);
+                        return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+                    };
+
+                    timeDisplay.textContent = formatTime(currentTime);
+                    totalTimeDisplay.textContent = formatTime(totalTime);
+                    timeSlider.value = currentTime;
+                    timeSlider.max = totalTime;
+                    timeSlider.style.setProperty('--progress', `${(currentTime / totalTime) * 100}%`);
+                });
+
+
+                audioPlayer.addEventListener('ended', () => {
+                    if (!isCrossfading) {
+                        const nextIndex = isRandomEnabled
+                            ? Math.floor(Math.random() * songs.length)
+                            : (currentSongIndex + 1) % songs.length;
+                        selectSong(nextIndex);
+                    }
+                });
+
+                volumeSlider.addEventListener("input", () => {
+                    audioPlayer.volume = volumeSlider.value / 100;
+                });
+
+                timeSlider.oninput = function () {
+                    audioPlayer.currentTime = timeSlider.value;
+                };
+
+                audioPlayer.play();
+                isCrossfading = false;
+                crossfadeCancelled = false;
+            }
+
+            function updateTimeDisplayFromAudio(audio) {
+                const currentTime = audio.currentTime;
+                const totalTime = audio.duration;
+
+                const formatTime = (time) => {
+                    const minutes = Math.floor(time / 60);
+                    const seconds = Math.floor(time % 60);
+                    return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+                };
+
+                timeDisplay.textContent = formatTime(currentTime);
+                totalTimeDisplay.textContent = formatTime(totalTime);
+                timeSlider.value = currentTime;
+                timeSlider.max = totalTime;
+                timeSlider.style.setProperty('--progress', `${(currentTime / totalTime) * 100}%`);
+            }
+
         </script>
     </body>
 </html>
