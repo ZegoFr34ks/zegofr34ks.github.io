@@ -376,11 +376,16 @@
                 <button class="control-button" onclick="nextSong()">⏩</button>
             </div>
             
-            <!-- Loop and Random Buttons -->
+            <!-- Loop, Speed and Random Buttons -->
             <div class="extra-controls">
                 <button class="extra-control-button" id="loop-button" onclick="loopSong()">
                     <i class="fas fa-redo"></i> <!-- Loop icon -->
                 </button>
+
+                <button class="extra-control-button" id="speed-button" onclick="cyclePlaybackSpeed()">
+                    1x
+                </button>
+
                 <button class="extra-control-button" id="random-button" onclick="toggleRandom()">
                     <i class="fas fa-random"></i> <!-- Random icon -->
                 </button>
@@ -643,6 +648,34 @@
             volumeSlider.addEventListener("input", function () {
                 audioPlayer.volume = volumeSlider.value / 100;  // Convert range 0-100 to 0-1
             });
+
+            // === Playback Speed Control ===
+            const speedButton = document.getElementById("speed-button");
+            const speedOptions = [0.8, 0.9, 1, 1.1, 1.2];
+            let currentSpeedIndex = 2; // 1x default
+
+            function applyPlaybackSpeed() {
+                const rate = speedOptions[currentSpeedIndex];
+                audioPlayer.playbackRate = rate;
+
+                // Disable pitch preservation across all browsers
+                audioPlayer.preservesPitch = false;
+                audioPlayer.mozPreservesPitch = false;
+                audioPlayer.webkitPreservesPitch = false;
+
+                speedButton.textContent = rate + "x";
+            }
+
+            function cyclePlaybackSpeed() {
+                currentSpeedIndex = (currentSpeedIndex + 1) % speedOptions.length;
+                applyPlaybackSpeed();
+            }
+
+            // Apply saved speed whenever a song is selected
+            audioPlayer.addEventListener("loadedmetadata", () => {
+                applyPlaybackSpeed();
+            });
+
         </script>
     </body>
 </html>
