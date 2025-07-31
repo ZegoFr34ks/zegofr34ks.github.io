@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gf Day 🎀</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #ffe6f0;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      text-align: center;
+      color: #333;
+      overflow: hidden;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+        transition: opacity 0.5s ease;
+        display: inline-block;
+        max-width: 90%;
+    }
+
+    .h1-box {
+        background-color: #fff0f5;
+        padding: 15px 20px;
+        border-radius: 15px;
+        border: 2px solid #ffb6c1;
+        box-shadow: 0 4px 10px rgba(255, 182, 193, 0.3);
+    }
+
+    input[type="text"] {
+      padding: 10px 15px;
+      font-size: 1rem;
+      border: 2px solid #ffb6c1;
+      border-radius: 10px;
+      outline: none;
+      background-color: #fff0f5;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+    }
+
+    input[type="text"]:focus {
+      border-color: #ff69b4;
+      background-color: #ffeaf3;
+    }
+
+    #catImage {
+        max-width: 60%;
+        opacity: 0;
+        transform: scale(0.5);
+        transition: all 1s ease;
+        position: absolute;
+        z-index: -1;
+    }
+
+    .fade-in {
+      opacity: 1 !important;
+      transform: scale(1) !important;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      background-color: #ffb6c1;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #ff80ab;
+      transform: scale(1.05);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .confetti {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background-color: pink;
+      animation: confetti-fall 1s ease forwards;
+    }
+
+    .content-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .button-space {
+        position: relative;
+        width: 100%;
+        height: 60px;
+        margin-top: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .button-space button {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .quiz-wrapper {
+        width: 100%;
+        text-align: center;
+        padding: 20px 10px;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+
+    .quiz-title {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    }
+
+    .quiz-question {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    background-color: #fff0f5;
+    padding: 12px 20px;
+    border-radius: 15px;
+    border: 2px solid #ffb6c1;
+    display: inline-block;
+    box-shadow: 0 4px 10px rgba(255, 182, 193, 0.3);
+    }
+
+    .image-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+    }
+
+    .image-option {
+    width: 90px;
+    height: 160px; /* 9:16 aspect */
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    transition: border 0.3s ease;
+    border: 3px solid transparent;
+    }
+
+    .image-option img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    }
+
+    .image-option.correct {
+    border-color: #6fdc88; /* green */
+    }
+
+    .image-option.wrong {
+    border-color: #f46c6c; /* red */
+    }
+
+    .quiz-next-btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #ffb6c1;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    }
+
+    .quiz-next-btn:hover {
+    background-color: #ff80ab;
+    transform: scale(1.05);
+    }
+
+    .hidden {
+    display: none;
+    }
+
+    .invisible {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    }
+
+    .visible {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    }
+
+
+
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(150px) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.4rem;
+      }
+
+      input[type="text"] {
+        width: 80%;
+      }
+
+      #catImage {
+        max-width: 90%;
+      }
+    }
+
+    @keyframes quizFade {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        }
+
+    .quiz-fade-in {
+        animation: quizFade 0.7s ease forwards;
+    }
+
+    .button-space-horizontal {
+        display: inline-flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 10px;
+        width: auto; /* shrink to fit buttons */
+        position: static; /* reset absolute positioning */
+    }
+
+    .button-space-horizontal button {
+        position: static; /* override absolute */
+        transform: none;  /* override translateX */
+        min-width: 100px; /* optional, for nice button size */
+    }
+
+
+  </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <h1 id="main-text">Hi du! Wer bist du überhaupt?</h1>
+        <input type="text" id="nameInput" placeholder="Dein Name..." />
+
+        <img id="catImage" src="cutecat.jpg" alt="Cute Cat" class="hidden" />
+
+        <div class="button-space">
+            <button id="okButton" class="invisible">OK</button>
+            <button id="nextButton" class="invisible">nein?</button>
+        </div>
+    </div>
+    <div id="quiz-level-3" class="hidden quiz-wrapper">
+        <h2 class="quiz-title">Weil du ja sagtest das wir uns besser kennenlernen müssen,<br>hier ein kleines Quiz!</h2>
+        <h3 class="quiz-question">Was ist mein Lieblingsgetränk?</h3>
+
+        <div class="image-row">
+            <div class="image-option" data-correct="true">
+                <img src="eistee.jpg" alt="Eistee">
+            </div>
+            <div class="image-option" data-correct="false">
+                <img src="wine.jpg" alt="Wein">
+            </div>
+            <div class="image-option" data-correct="true">
+                <img src="redbull.jpg" alt="Red Bull">
+            </div>
+        </div>
+
+        <button id="next-question-btn" class="quiz-next-btn invisible">Nächste Frage</button>
+    </div>
+    <div id="final-question" class="hidden content-wrapper">
+        <h2 class="quiz-title">Werden wir uns bald wieder treffen?</h2>
+        <div class="button-space-horizontal">
+            <button id="yesBtn">JAA</button>
+            <button id="noBtn">Nee</button>
+        </div>
+    </div>
+    <div id="last-level" class="hidden content-wrapper">
+        <p style="font-size: 1.4rem; max-width: 90%; margin-bottom: 20px;">
+            Das war's schon :) Ich hoffe, du hattest Spaß. Ich hab dich ganz doll lieb und bin stolz auf dich! Du kannst mir jederzeit sagen, was du willst, denn ich bin für dich da. Viel liebe &lt;3
+        </p>
+        <button id="heartBtn">❤️</button>
+    </div>
+
+
+  <script>
+        const input = document.getElementById('nameInput');
+        const mainText = document.getElementById('main-text');
+        const catImage = document.getElementById('catImage');
+        const buttonNo = document.getElementById('nextButton');
+        const buttonOk = document.getElementById('okButton');
+
+        input.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                const value = input.value.trim().toUpperCase();
+
+                if (value === 'AILEEN') {
+                input.classList.add('invisible');
+                mainText.textContent = "";
+                mainText.classList.remove('h1-box');
+                catImage.classList.remove('hidden');
+
+                // Animate cat
+                setTimeout(() => {
+                    catImage.classList.add('fade-in');
+                }, 100);
+
+                // Show compliment text
+                setTimeout(() => {
+                    mainText.textContent = "Du siehst mal wieder gut aus heute! Ich weiss es weil deine Kamera an ist :) (joke..)";
+                    mainText.classList.add('h1-box');
+
+                    // Show "OK :)" after 1s
+                    setTimeout(() => {
+                    buttonOk.classList.remove('invisible');
+                    buttonOk.classList.add('visible');
+                    }, 1000);
+                }, 1300);
+                } else {
+                mainText.textContent = "Oh okay...";
+                input.value = '';
+                }
+            }
+        });
+
+        function spawnConfetti(x, y) {
+            for (let i = 0; i < 20; i++) {
+            const confetti = document.createElement('div');
+            confetti.classList.add('confetti');
+            confetti.style.left = `${x + Math.random() * 40 - 20}px`;
+            confetti.style.top = `${y + Math.random() * 10 - 5}px`;
+            confetti.style.backgroundColor = ['#ffb6c1', '#ffc0cb', '#ff69b4'][Math.floor(Math.random() * 3)];
+            confetti.style.animationDelay = `${Math.random() * 0.5}s`;
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 1000);
+            }
+        }
+
+        buttonOk.addEventListener('click', () => {
+            const rect = buttonOk.getBoundingClientRect();
+            spawnConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
+
+            catImage.classList.add('hidden');
+            buttonOk.classList.remove('visible');
+            buttonOk.classList.add('invisible');
+            mainText.textContent = "Weisst du was für ein Tag heute ist?";
+            mainText.classList.add('h1-box');
+
+            setTimeout(() => {
+                buttonNo.classList.remove('invisible');
+                buttonNo.classList.add('visible');
+            }, 1000);
+        });
+
+        buttonNo.addEventListener('click', () => {
+            const rect = buttonNo.getBoundingClientRect();
+            spawnConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
+
+            mainText.textContent = "Heute ist NATIONAL GIRLFRIENDS DAY! ❤️";
+            buttonNo.textContent = "Weiter";
+
+           buttonNo.onclick = () => {
+                const rect2 = buttonNo.getBoundingClientRect();
+                spawnConfetti(rect2.left + rect2.width / 2, rect2.top + rect2.height / 2);
+
+                // Hide level 2 elements
+                mainText.classList.add('hidden');
+                buttonNo.classList.remove('visible');
+                buttonNo.classList.add('invisible');
+
+                // Show quiz
+                quizContainer.classList.remove('hidden');
+                quizContainer.classList.add('quiz-fade-in');
+            };
+
+        });
+
+        const quizContainer = document.getElementById('quiz-level-3');
+        const options = document.querySelectorAll('.image-option');
+        const nextBtn = document.getElementById('next-question-btn');
+        let answered = false;
+
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                if (answered) return;
+                answered = true;
+
+                const correct = option.dataset.correct === 'true';
+
+                if (correct) {
+                spawnConfetti(option.getBoundingClientRect().left + option.offsetWidth / 2,
+                                option.getBoundingClientRect().top + option.offsetHeight / 2);
+                option.classList.add('correct');
+                } else {
+                option.classList.add('wrong');
+                }
+
+                // Highlight correct answers, too
+                options.forEach(opt => {
+                if (opt.dataset.correct === 'true') {
+                    opt.classList.add('correct');
+                } else if (opt !== option) {
+                    opt.classList.add('wrong');
+                }
+                });
+
+                setTimeout(() => {
+                nextBtn.classList.remove('invisible');
+                nextBtn.classList.add('visible');
+                }, 800);
+            });
+        });
+
+        nextBtn.addEventListener('click', () => {
+            spawnConfetti(window.innerWidth / 2, nextBtn.getBoundingClientRect().top);
+            // Logic for next question will go here
+            nextBtn.classList.add('invisible');
+            answered = false;
+        });
+
+        // Track current quiz step
+        let quizStep = 1;
+
+        nextBtn.addEventListener('click', () => {
+            spawnConfetti(window.innerWidth / 2, nextBtn.getBoundingClientRect().top);
+
+            if (quizStep === 1) {
+                // Load second question (Was sind meine Interessen?)
+                document.querySelector('.quiz-question').textContent = "Was sind meine Interessen?";
+                document.querySelector('.image-row').innerHTML = `
+                    <div class="image-option" data-correct="true">
+                        <img src="military.jpg" alt="Military">
+                    </div>
+                    <div class="image-option" data-correct="true">
+                        <img src="coding.jpg" alt="Coding">
+                    </div>
+                    <div class="image-option" data-correct="true">
+                        <img src="song.jpg" alt="Song">
+                    </div>
+                `;
+            } else if (quizStep === 2) {
+                // Load third question (Was ist mein Lieblingsauto?)
+                document.querySelector('.quiz-question').textContent = "Was ist mein Lieblingsauto?";
+                document.querySelector('.image-row').innerHTML = `
+                    <div class="image-option" data-correct="true">
+                        <img src="mercedes.jpg" alt="Mercedes">
+                    </div>
+                    <div class="image-option" data-correct="false">
+                        <img src="kia.jpg" alt="Kia">
+                    </div>
+                    <div class="image-option" data-correct="false">
+                        <img src="ford.jpg" alt="Ford">
+                    </div>
+                `;
+            } else if (quizStep === 3) {
+                // Hide quiz
+                quizContainer.classList.add('hidden');
+
+                // Show final question
+                document.getElementById('final-question').classList.remove('hidden');
+                quizStep++; // for tracking next levels if needed
+            } else {
+                nextBtn.classList.add('invisible');
+                return;
+            }
+
+
+            // Reset for next question
+            nextBtn.classList.add('invisible');
+            answered = false;
+
+            // Rebind click events for new options
+            const newOptions = document.querySelectorAll('.image-option');
+            newOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    if (answered) return;
+                    answered = true;
+
+                    const correct = option.dataset.correct === 'true';
+
+                    if (correct) {
+                        spawnConfetti(option.getBoundingClientRect().left + option.offsetWidth / 2,
+                                    option.getBoundingClientRect().top + option.offsetHeight / 2);
+                        option.classList.add('correct');
+                    } else {
+                        option.classList.add('wrong');
+                    }
+
+                    newOptions.forEach(opt => {
+                        if (opt.dataset.correct === 'true') {
+                            opt.classList.add('correct');
+                        } else if (opt !== option) {
+                            opt.classList.add('wrong');
+                        }
+                    });
+
+                    setTimeout(() => {
+                        nextBtn.classList.remove('invisible');
+                        nextBtn.classList.add('visible');
+                    }, 800);
+                });
+            });
+
+            quizStep++;
+        });
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+
+        noBtn.addEventListener('click', () => {
+            noBtn.textContent = "Ehrlich?";
+            noBtn.style.backgroundColor = "#ccc";
+            noBtn.style.cursor = "not-allowed";
+            noBtn.disabled = true;
+        });
+
+        yesBtn.addEventListener('click', () => {
+            const rect = yesBtn.getBoundingClientRect();
+            spawnConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
+
+            // Hide final question section
+            document.getElementById('final-question').classList.add('hidden');
+
+            // TODO: Show last level here
+            // We'll add it in the next step when you're ready!
+        });
+        const lastLevel = document.getElementById('last-level');
+        const heartBtn = document.getElementById('heartBtn');
+
+        yesBtn.addEventListener('click', () => {
+            const rect = yesBtn.getBoundingClientRect();
+            spawnConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
+
+            // Hide final question section
+            document.getElementById('final-question').classList.add('hidden');
+
+            // Show last level
+            lastLevel.classList.remove('hidden');
+        });
+
+        heartBtn.addEventListener('click', (e) => {
+            const rect = heartBtn.getBoundingClientRect();
+            spawnConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        });
+    </script>
+</body>
+</html>
