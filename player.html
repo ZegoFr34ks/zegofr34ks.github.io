@@ -422,13 +422,6 @@
 
             ];
 
-            // Service Worker registration
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('./service-worker.js')
-                    .then(() => console.log('✅ Service worker registered'))
-                    .catch(err => console.warn('SW registration failed:', err));
-            }
-
             // DOM elements
             const library = document.getElementById("library");
             const audioPlayer = document.getElementById("audio-player");
@@ -613,11 +606,17 @@
                 const nextSrc = songs[idx].file;
 
                 try {
-                    const cache = await caches.open("music-player-v1");
-                    const response = await fetch(nextSrc);
-                    await cache.put(nextSrc, response.clone());
-                    updateNextUpDisplay(idx);
-                    console.log("✅ Cached next track for offline:", nextSrc);
+                    // 🔥 FIX: Use dynamic cache name from service worker
+                    const cacheNames = await caches.keys();
+                    const musicCache = cacheNames.find(name => name.startsWith('music-player-'));
+                    
+                    if (musicCache) {
+                        const cache = await caches.open(musicCache);
+                        const response = await fetch(nextSrc);
+                        await cache.put(nextSrc, response.clone());
+                        updateNextUpDisplay(idx);
+                        console.log("✅ Cached next track:", nextSrc);
+                    }
                 } catch (err) {
                     console.warn("⚠️ Cache preload failed:", err);
                 }
@@ -667,6 +666,105 @@
                                        volume <= 50 ? 'fas fa-volume-down' : 
                                        'fas fa-volume-up';
             });
+
+            // Add this to your HTML's <script> section, before the closing </body> tag
+
+            // Enhanced Service Worker registration with update detection
+            if ('serviceWorker' in navigator) {
+                let refreshing = false;
+
+                // Detect when a new service worker takes control
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (refreshing) return;
+                    refreshing = true;
+                    console.log('🔄 New version detected, reloading...');
+                    window.location.reload();
+                });
+
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(registration => {
+                        console.log('✅ Service worker registered');
+
+                        // Check for updates every 30 seconds while page is open
+                        setInterval(() => {
+                            registration.update();
+                        }, 30000);
+
+                        // Listen for new service worker waiting to activate
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New version available!
+                                    showUpdateNotification();
+                                }
+                            });
+                        });
+                    })
+                    .catch(err => console.warn('SW registration failed:', err));
+            }
+
+            // Show a user-friendly update notification
+            function showUpdateNotification() {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 15px 25px;
+                    border-radius: 10px;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                    z-index: 10000;
+                    font-family: Arial, sans-serif;
+                    display: flex;
+                    align-items: center;
+                    gap: 15px;
+                    animation: slideDown 0.3s ease-out;
+                `;
+                
+                notification.innerHTML = `
+                    <span>🎵 New version available!</span>
+                    <button onclick="window.location.reload()" style="
+                        background: white;
+                        color: #667eea;
+                        border: none;
+                        padding: 8px 16px;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-weight: bold;
+                    ">Update Now</button>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Add animation
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes slideDown {
+                        from { top: -100px; opacity: 0; }
+                        to { top: 20px; opacity: 1; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            // Optional: Add a manual refresh cache button
+            function clearCacheAndReload() {
+                if ('caches' in window) {
+                    caches.keys().then(names => {
+                        names.forEach(name => caches.delete(name));
+                    }).then(() => {
+                        window.location.reload(true);
+                    });
+                } else {
+                    window.location.reload(true);
+                }
+            }
         </script>
     </body>
 </html>
