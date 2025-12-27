@@ -1,6 +1,6 @@
 // service-worker.js
 // 🔥 IMPORTANT: Increment this version number whenever you deploy changes
-const CACHE_VERSION = "v251220250717"; // Change this to v3, v4, etc. on each deploy //IMPORTANT TO CHANGE EACH DEPLOY
+const CACHE_VERSION = "v271220250110"; // Change this to v3, v4, etc. on each deploy //IMPORTANT TO CHANGE EACH DEPLOY
 const CACHE_NAME = `music-player-${CACHE_VERSION}`;
 
 // Optional: List critical files to cache immediately on install
