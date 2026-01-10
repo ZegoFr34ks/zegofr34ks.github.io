@@ -1,0 +1,9 @@
+{
+  "id": "bittihilfi",
+  "title": "Bitti Hilfi",
+  "artists": ["YZKKAIZAH", "WAVE"],
+  "description": "YAY",
+  "versions": [
+    { "name": "V1", "file": "v1.wav" }
+  ]
+}

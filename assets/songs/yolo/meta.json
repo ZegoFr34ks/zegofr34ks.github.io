@@ -1,0 +1,9 @@
+{
+  "id": "yolo",
+  "title": "YOLO",
+  "artists": ["MK205", "WAVE"],
+  "description": "No description was added.",
+  "versions": [
+    { "name": "V1", "file": "v1.wav" }
+  ]
+}

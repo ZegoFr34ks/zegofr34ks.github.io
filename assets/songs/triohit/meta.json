@@ -1,0 +1,9 @@
+{
+  "id": "triohit",
+  "title": "Trio Hit",
+  "artists": ["YZKKAIZAH", "KR-T", "KAMØ"],
+  "description": "No description was added.",
+  "versions": [
+    { "name": "V1", "file": "v1.wav" }
+  ]
+}

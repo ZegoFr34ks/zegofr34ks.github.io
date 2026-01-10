@@ -1,0 +1,396 @@
+{
+    "songs": [
+        {
+            "id": "triod4nfer",
+            "title": "Trio D4nfer",
+            "artists": ["YZKKAIZAH", "KR-T", "f3i"],
+            "description": "First ever real song; all started from here thanks to KR-T <3",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "duodnb",
+            "title": "Duo DNB",
+            "artists": ["YZKKAIZAH", "KR-T"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "duoeiscafe",
+            "title": "Duo du eiscafé",
+            "artists": ["YZKKAIZAH", "f3i"],
+            "description": "This song has an audio error where the vocals only come out of the left side. sry...",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "winterufo",
+            "title": "WINTERUFO",
+            "artists": ["YZKKAIZAH", "f3i"],
+            "description": "[deprecated]",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "triosub",
+            "title": "Trio$ub",
+            "artists": ["YZKKAIZAH", "KR-T", "Heze_ash"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "triorazzbar",
+            "title": "Trio Razzbar",
+            "artists": ["YZKKAIZAH", "KR-T", "f3i"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "triopicolo",
+            "title": "Trio Picolo",
+            "artists": ["YZKKAIZAH", "KR-T", "f3i"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "trionuages",
+            "title": "Trio des nuages",
+            "artists": ["YZKKAIZAH", "KR-T", "KAMØ"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "trionomtemp",
+            "title": "trio nom temporaire",
+            "artists": ["YZKKAIZAH", "KR-T", "f3i"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "trioshkeks",
+            "title": "Trio du shkeks",
+            "artists": ["YZKKAIZAH", "KR-T", "kwnx."],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "trioparadis",
+            "title": "Trio du paradis",
+            "artists": ["YZKKAIZAH", "KR-T", "f3i"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "tempo2",
+            "title": "tempooooo",
+            "artists": ["YZKKAIZAH", "Wave", "Eve"],
+            "description": "[deprecated]",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "tempo1",
+            "title": "Tempo",
+            "artists": ["YZKKAIZAH", "KR-T", "f3i"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "element",
+            "title": "ELEMENT",
+            "artists": ["YZKKAIZAH"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "shishaboss",
+            "title": "SHISHA BAR BOSS DELUXE EDITION",
+            "artists": ["YZKKAIZAH", "KR-T", "KAMØ"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "qfc",
+            "title": "QuattroFicheCancer",
+            "artists": ["YZKKAIZAH", "MK205", "KAMØ", "kwnx."],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "palala",
+            "title": "PALALA GANSTAH",
+            "artists": ["YZKKAIZAH", "KR-T"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "nightride",
+            "title": "night ride",
+            "artists": ["YZKKAIZAH", "KAMØ"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "miamore",
+            "title": "Mi Amore",
+            "artists": ["YZKKAIZAH"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "meinewelt",
+            "title": "Meine Welt",
+            "artists": ["MK205", "ROBOTSTAR"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "mastercum",
+            "title": "MasterCum",
+            "artists": ["KAMØ"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "lassmichschlafen",
+            "title": "Lass mich schlafen",
+            "artists": ["YZKKAIZAH"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "halloweendds",
+            "title": "halloweendds",
+            "artists": ["YZKKAIZAH", "KAMØ", "kwnx."],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "gutefrage",
+            "title": "Gute Frage",
+            "artists": ["YZKKAIZAH", "MK205"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "duovodkajager",
+            "title": "Duo Vodka Jäger",
+            "artists": ["YZKKAIZAH", "KAMØ"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "bldcdf",
+            "title": "BLDCDF",
+            "artists": ["KAMØ"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "ravy",
+            "title": "Ravy",
+            "artists": ["YZKKAIZAH"],
+            "description": "My first techno track :)",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "maybach",
+            "title": "Maybach",
+            "artists": ["YZKKAIZAH"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "beidir",
+            "title": "Bei Dir",
+            "artists": ["MK205"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "nachdenken",
+            "title": "Nachdenken",
+            "artists": ["YZKKAIZAH", "MK205"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "yolo",
+            "title": "YOLO",
+            "artists": ["MK205", "WAVE"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "summer25",
+            "title": "Summer 25'",
+            "artists": ["MK205", "WAVE"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "triosub2",
+            "title": "Trio$ub 2",
+            "artists": ["YZKKAIZAH", "KR-T", "Heze_ash"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "keineahnung",
+            "title": "Keine Ahnung",
+            "artists": ["YZKKAIZAH", "f3i", "Wave", "Rai"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "shababs",
+            "title": "Shabas",
+            "artists": ["YZKKAIZAH", "MK205"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "vrctrail",
+            "title": "VRCTrail",
+            "artists": ["YZKKAIZAH"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "nio30k",
+            "title": "nio30k",
+            "artists": ["YZKKAIZAH", "KR-T"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "kys",
+            "title": "K.Y.S.",
+            "artists": ["YZKKAIZAH"],
+            "description": "Keep Yourself Safe",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "alqaida",
+            "title": "Alqaida",
+            "artists": ["YZKKAIZAH", "MK205"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "bittihilfi",
+            "title": "Bitti Hilfi",
+            "artists": ["YZKKAIZAH", "WAVE"],
+            "description": "YAY",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "holidaynfreetime",
+            "title": "Holiday & Free Time",
+            "artists": ["YZKKAIZAH", "KR-T"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "gls",
+            "title": "GLS",
+            "artists": ["YZKKAIZAH", "KAMØ"],
+            "description": "We dealin' drugs in this bih..",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "xoxo",
+            "title": "XOXO",
+            "artists": ["YZKKAIZAH", "KR-T", "KAMØ"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "verstort",
+            "title": "Verstört",
+            "artists": ["YZKKAIZAH", "MK205"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "neosky",
+            "title": "NEO SKY",
+            "artists": ["YZKKAIZAH", "KR-T"],
+            "description": "Highhhhh -_-",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "seminar",
+            "title": "Seminar",
+            "artists": ["YZKKAIZAH", "KR-T"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "110",
+            "title": "110",
+            "artists": ["KAMØ"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "duokamo",
+            "title": "DUO KAMØ",
+            "artists": ["KR-T", "KAMØ"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "quietlove",
+            "title": "Quiet Love",
+            "artists": ["KAMØ"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "lunepale",
+            "title": "Lune Pale",
+            "artists": ["KAMØ"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "jeteregarde",
+            "title": "Je te regarde",
+            "artists": ["KAMØ"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "triohit",
+            "title": "Trio Hit",
+            "artists": ["YZKKAIZAH", "KR-T", "KAMØ"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "pasnvxmic",
+            "title": "PasNvxMic",
+            "artists": ["KR-T", "KAMØ"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "tjrspasducoup",
+            "title": "Tjrs pas ducoup",
+            "artists": ["KR-T", "KAMØ"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "trio6hdubah",
+            "title": "Trio 6h",
+            "artists": ["YZKKAIZAH", "KR-T", "KAMØ"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "dansesouslalune",
+            "title": "Danse sous la lune",
+            "artists": ["KAMØ"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        }
+    ]
+}

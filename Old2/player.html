@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="description" content="ZegoFr34ks' Own Personal Website (WIP)">
+        <meta name="author" content="ZegoFr34ks">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" href="Ref/Pictures/webicon.png" type="image/x-icon">
+        <title>Music Player [leaks]</title>
+        <link rel="stylesheet" href="gallery.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+        <style>
+            html, body {
+                display: flex;
+                height: 100vh;
+                margin: 0;
+                font-family: Arial, sans-serif;
+                background-color: #121212;
+                color: white;
+                flex-direction: row;
+                position: relative;
+                overflow-x: hidden;
+                width: 100%;
+            }
+
+            .music-library {
+                width: 40%;
+                padding: 20px;
+                border-right: 2px solid #222;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .song {
+                display: flex;
+                align-items: center;
+                padding: 10px;
+                cursor: pointer;
+                border-radius: 5px;
+                transition: background-color 0.3s, box-shadow 0.3s;
+            }
+
+            .song:hover {
+                background-color: #333;
+            }
+
+            .song.selected {
+                background-color: #6a4f97;
+                box-shadow: 0 0 10px 4px rgba(106, 79, 151, 0.7);
+            }
+
+            .song img {
+                width: 50px;
+                height: 50px;
+                margin-right: 10px;
+                border-radius: 5px;
+            }
+
+            .song-info {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .song-title {
+                display: flex;
+            }
+
+            .song-artists {
+                font-size: 12px;
+                color: #b3b3b3;
+            }
+
+            .player {
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                padding: 20px;
+                position: relative;
+                max-width: 500px;
+                margin: 0 auto;
+            }
+
+            .controls {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-top: 20px;
+                width: 100%;
+            }
+
+            .control-button {
+                background: #4e2a84;
+                color: white;
+                border: none;
+                padding: 10px;
+                cursor: pointer;
+                border-radius: 50%;
+                width: 50px;
+                height: 50px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                transition: background 0.3s, box-shadow 0.3s;
+                margin: 0 10px;
+            }
+
+            .control-button:hover {
+                background-color: #6a4f97;
+            }
+
+            .control-button.active {
+                box-shadow: 0 0 15px 4px rgba(106, 79, 151, 0.8);
+            }
+
+            .slider {
+                width: 80%;
+                margin: 10px 0;
+                height: 10px;
+                background-color: #444;
+                border-radius: 5px;
+                -webkit-appearance: none;
+                outline: none;
+                position: relative;
+                transition: background 0.3s, box-shadow 0.3s;
+            }
+
+            .slider::-webkit-slider-runnable-track {
+                height: 10px;
+                border-radius: 5px;
+                background: linear-gradient(to right, #8e7fb3 0%, #8e7fb3 var(--progress, 0%), #444 var(--progress, 0%), #444 100%);
+            }
+
+            .slider::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                height: 10px;
+                width: 10px;
+                background: #6a4f97;
+                border-radius: 2px;
+                box-shadow: 0 0 10px rgba(106, 79, 151, 0.8);
+                transition: background 0.3s, box-shadow 0.3s;
+            }
+
+            .top-buttons {
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                display: flex;
+                flex-direction: row;
+                align-items: flex-end;
+            }
+
+            .top-buttons button {
+                margin: 5px;
+                padding: 10px 15px;
+                border: none;
+                border-radius: 5px;
+                background-color: #4e2a84;
+                color: white;
+                font-size: 16px;
+                cursor: pointer;
+            }
+
+            .top-buttons button:hover {
+                background-color: #4e2a84;
+            }
+
+            .player img {
+                width: 150px;
+                height: 150px;
+                border-radius: 10px;
+                margin-bottom: 10px;
+            }
+
+            #player-song-title {
+                font-size: 26px;
+                margin: 10px 0;
+                text-align: center;
+                width: 100%;
+            }
+
+            .artists {
+                font-size: 14px;
+                color: #b3b3b3;
+                margin-bottom: 10px;
+            }
+
+            .description {
+                font-size: 12px;
+                color: #777;
+                margin-top: 20px;
+                max-width: 80%;
+                text-align: center;
+            }
+
+            .extra-controls {
+                display: flex;
+                justify-content: center;
+                margin-top: 10px;
+                width: 100%;
+            }
+
+            .extra-control-button {
+                background: #4e2a84;
+                color: white;
+                border: none;
+                padding: 10px;
+                cursor: pointer;
+                border-radius: 5px;
+                width: 60px;
+                height: 40px;
+                margin: 0 10px;
+                font-size: 14px;
+                transition: background 0.3s, box-shadow 0.3s;
+            }
+
+            .extra-control-button:hover {
+                background-color: #6a4f97;
+            }
+
+            .extra-control-button.active {
+                box-shadow: 0 0 15px 4px rgba(106, 79, 151, 0.8);
+            }
+
+            .time {
+                color: white;
+                font-size: 14px;
+                font-weight: bold;
+            }
+
+            #song-player {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+            }
+
+            #current-time {
+                margin-right: 10px;
+            }
+
+            #total-time {
+                margin-left: 10px;
+            }
+
+            #volume-control {
+                position: relative;
+                width: 80%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            #volume-icon {
+                position: absolute;
+                left: 0;
+                color: white;
+                font-size: 20px;
+                margin-left: -30px;
+            }
+
+            #volume-slider {
+                width: 100%;
+            }
+
+            .footer-note {
+                position: absolute;
+                bottom: 20px;
+                width: 100%;
+                text-align: center;
+                font-size: 12px;
+                color: #b3b3b3;
+            }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .music-library {
+                width: 100%;
+                padding: 10px;
+                max-height: 40vh;
+            }
+
+            .player {
+                width: 90%;
+                max-width: 400px;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .controls {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-top: 20px;
+            }
+
+            .control-button {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+                margin: 0 5px;
+            }
+
+            .slider {
+                width: 100%;
+            }
+
+            .footer-note {
+                font-size: 10px;
+                bottom: 0;
+            }
+        }
+        </style>
+    </head>
+    <body>
+        <div class="music-library" id="library"></div>
+        <div class="player">
+            <div class="top-buttons">
+                <button onclick="window.location.href='index.html'">Home</button>
+                <button onclick="window.history.back()">Back</button>
+            </div>
+
+            <img id="song-thumbnail" src="" alt="Song Thumbnail">
+            <div id="player-song-title">Select Song</div>
+            <div class="artists" id="song-artists"></div>
+            <audio id="audio-player"></audio>
+
+            <div id="song-player">
+                <span id="current-time" class="time">0:00</span>
+                <input type="range" id="time-slider" class="slider" min="0" value="0" />
+                <span id="total-time" class="time">0:00</span>
+            </div>
+
+            <div id="volume-control">
+                <i class="fas fa-volume-up" id="volume-icon"></i>
+                <input type="range" id="volume-slider" class="slider" min="0" max="100" value="100" />
+            </div>
+
+            <div class="controls">
+                <button class="control-button" onclick="prevSong()">⏪</button>
+                <button class="control-button" id="play-pause-btn" onclick="playPause()">
+                    <i id="play-pause-icon" class="fas fa-play"></i>
+                </button>
+                <button class="control-button" onclick="nextSong()">⏩</button>
+            </div>
+            
+            <div class="extra-controls">
+                <button class="extra-control-button" id="loop-button" onclick="loopSong()">
+                    <i class="fas fa-redo"></i>
+                </button>
+                <button class="extra-control-button" id="speed-button" onclick="cyclePlaybackSpeed()">
+                    1x
+                </button>
+                <button class="extra-control-button" id="random-button" onclick="toggleRandom()">
+                    <i class="fas fa-random"></i>
+                </button>
+            </div>
+
+            <div class="description" id="song-description"></div>
+            <div id="next-up" style="font-size:12px;color:#b3b3b3;margin-top:8px">Next: —</div>
+            <div class="footer-note">
+                All rights reserved to YZKKAIZAH, please do not share.
+            </div>
+        </div>
+
+        <script>
+            const songs = [
+                { file: "Ref/Songs/TrioD4nfer.wav", image: "Ref/Songs/TrioD4nfer.jpg", name: "Trio D4nfer", artists: ["YZKKAIZAH, KR-T, f3i"], description: "First ever song from YZKKAIZAH that started it all! thanks to KR-T that made it all possible <3" },
+                { file: "Ref/Songs/duodnb.wav", image: "Ref/Songs/duodnb.jpg", name: "Duo DNB", artists: ["YZKKAIZAH, KR-T"], description: "No description. :)" },
+                { file: "Ref/Songs/duodueiscafee.wav", image: "Ref/Songs/duodueiscafe.jpg", name: "Duo du eiscafé", artists: ["YZKKAIZAH, f3i"], description: "This song has an audio error where the vocals only come out of the left side. sry..." },
+                { file: "Ref/Songs/WINTERUFO.wav", image: "Ref/Songs/default.jpg", name: "WINTERUFO", artists: ["YZKKAIZAH, f3i"], description: "Unfinished" },
+                { file: "Ref/Songs/trioSub.wav", image: "Ref/Songs/triosub.jpg", name: "Trio$ub", artists: ["YZKKAIZAH, KR-T, Heze_ash"], description: "Unfinished" },
+                { file: "Ref/Songs/TRIORAZZBAR.wav", image: "Ref/Songs/default.jpg", name: "Trio Razzbar", artists: ["YZKKAIZAH, KR-T, f3i"], description: "No description. :)" },
+                { file: "Ref/Songs/triopicolo.wav", image: "Ref/Songs/triopicolo.jpg", name: "trio picolo", artists: ["YZKKAIZAH, KR-T, f3i"], description: "No description. :)" },
+                { file: "Ref/Songs/trioodesnuages.wav", image: "Ref/Songs/default.jpg", name: "trio des nuages", artists: ["YZKKAIZAH, KR-T, KAMØ"], description: "No description. :)" },
+                { file: "Ref/Songs/trionomtemporaire.wav", image: "Ref/Songs/trionomtemp.jpg", name: "trio nom temporaire", artists: ["YZKKAIZAH, KR-T, f3i"], description: "No description. :)" },
+                { file: "Ref/Songs/TRIODUSKEKS.wav", image: "Ref/Songs/default.jpg", name: "Trio du shkeks", artists: ["YZKKAIZAH, KR-T, kwnx."], description: "Unfinished" },
+                { file: "Ref/Songs/trioduparadis.wav", image: "Ref/Songs/default.jpg", name: "trio du paradis", artists: ["YZKKAIZAH, KR-T, f3i"], description: "No description. :)" },
+                { file: "Ref/Songs/tempoooooooo.wav", image: "Ref/Songs/default.jpg", name: "tempooooo", artists: ["YZKKAIZAH, Eve, Wave"], description: "deprecated" },
+                { file: "Ref/Songs/tempo.wav", image: "Ref/Songs/default.jpg", name: "tempo", artists: ["YZKKAIZAH, KR-T, f3i"], description: "Unfinished" },
+                { file: "Ref/Songs/Summer25.wav", image: "Ref/Songs/default.jpg", name: "Summer 25'", artists: ["Vavawagen, MK205"], description: "No description. :)" },
+                { file: "Ref/Songs/SHISHABAR.wav", image: "Ref/Songs/shisha.jpg", name: "SHISHA BAR BOSS DELUXE EDITION", artists: ["YZKKAIZAH, KR-T, KAMØ"], description: "No description. :)" },
+                { file: "Ref/Songs/quatrofichecancer.wav", image: "Ref/Songs/quatro.jpg", name: "quatrofichecancer", artists: ["YZKKAIZAH, kwnx., KAMØ, MK205"], description: "No description. :)" },
+                { file: "Ref/Songs/PALALAGANSTAH.wav", image: "Ref/Songs/palalaganstah.jpg", name: "PALALA GANSTAH", artists: ["YZKKAIZAH, KR-T"], description: "No description. :)" },
+                { file: "Ref/Songs/nightridebruhsleepy.wav", image: "Ref/Songs/default.jpg", name: "night ride", artists: ["YZKKAIZAH, KAMØ"], description: "No description. :)" },
+                { file: "Ref/Songs/miamore.wav", image: "Ref/Songs/miamore.jpg", name: "Mi Amore", artists: ["YZKKAIZAH"], description: "No description. :)" },
+                { file: "Ref/Songs/MeineWelt.wav", image: "Ref/Songs/default.jpg", name: "Meine Welt", artists: ["MK205, ROBOTSTAR"], description: "No description. :)" },
+                { file: "Ref/Songs/MasterCum.wav", image: "Ref/Songs/default.jpg", name: "MasterCum", artists: ["KAMØ"], description: "No description. :)" },
+                { file: "Ref/Songs/LMS.wav", image: "Ref/Songs/lassmich.jpg", name: "Lass mich schlafen", artists: ["YZKKAIZAH"], description: "No description. :)" },
+                { file: "Ref/Songs/halloween.wav", image: "Ref/Songs/halloween.jpg", name: "halloweendds", artists: ["YZKKAIZAH, kwnx., KAMØ"], description: "No description. :)" },
+                { file: "Ref/Songs/FRAGE.wav", image: "Ref/Songs/default.jpg", name: "Gute Frage", artists: ["YZKKAIZAH, MK205"], description: "No description. :)" },
+                { file: "Ref/Songs/duovodkajAger.wav", image: "Ref/Songs/duovodkajager.jpg", name: "duo vodka jäger", artists: ["YZKKAIZAH, KAMØ"], description: "No description. :)" },
+                { file: "Ref/Songs/BLDCDF.wav", image: "Ref/Songs/default.jpg", name: "BLDCDF", artists: ["KAMØ"], description: "No description. :)" },
+                { file: "Ref/Songs/Ravy.wav", image: "Ref/Songs/ravy.jpg", name: "Ravy", artists: ["YZKKAIZAH"], description: "My first ever track (unmixed), it's a techno, hardstyle, ... track."},
+                { file: "Ref/Songs/maybach.wav", image: "Ref/Songs/maybach.jpg", name: "Maybach", artists: ["YZKKAIZAH"], description: "No description. :)" },
+                { file: "Ref/Songs/MixFRClub.wav", image: "Ref/Songs/mixfrclub.jpg", name: "Mix FR Club", artists: ["YZKKAIZAH"], description: "Just a track of multiple french club bangers with transitions. First Mix Track so yea >.<" },
+                { file: "Ref/Songs/beidir.wav", image: "Ref/Songs/default.jpg", name: "Bei dir", artists: ["MK205"], description: "No description. :)" },
+                { file: "Ref/Songs/nachdenkendeinernst.wav", image: "Ref/Songs/nachdenkendeinernst.jpg", name: "Nachdenken", artists: ["YZKKAIZAH, MK205"], description: "No description. :)" },
+                { file: "Ref/Songs/Keinplanneindasnicht.wav", image: "Ref/Songs/default.jpg", name: "YOLO", artists: ["Wave, MK205"], description: "No description. :)" },
+                { file: "Ref/Songs/ELEMENT.wav", image: "Ref/Songs/default.jpg", name: "ELEMENT", artists: ["YZKKAIZAH"], description: "No description. :)" },
+                { file: "Ref/Songs/triosub2.wav", image: "Ref/Songs/default.jpg", name: "Trio$ub 2", artists: ["YZKKAIZAH, KR-T, Heze_ash"], description: "Unfinished" },
+                { file: "Ref/Songs/Keineahnung.wav", image: "Ref/Songs/Keineahnung.jpg", name: "Keine Ahnung", artists: ["YZKKAIZAH, KENZA, Wave"], description: "No description. :)" },
+                { file: "Ref/Songs/Shababs.wav", image: "Ref/Songs/default.jpg", name: "Shababs", artists: ["YZKKAIZAH, MK205"], description: "Made high and drunk btw :3" },
+                { file: "Ref/Songs/VRCTrail.wav", image: "Ref/Songs/VRCTrail.jpg", name: "VRCTrail", artists: ["YZKKAIZAH"], description: "No description. :)" },
+                { file: "Ref/Songs/nio30k.wav", image: "Ref/Songs/nio30k.jpg", name: "nio30k", artists: ["YZKKAIZAH, KR-T"], description: "No description. :)" },
+                { file: "Ref/Songs/KYS.wav", image: "Ref/Songs/KYS.jpg", name: "K.Y.S.", artists: ["YZKKAIZAH"], description: "No description. :)" },
+                { file: "Ref/Songs/Alqaida.wav", image: "Ref/Songs/Alqaida.jpg", name: "Alqaida", artists: ["YZKKAIZAH, MK205"], description: "No description. :)" },
+                { file: "Ref/Songs/BittiHilfi.wav", image: "Ref/Songs/BittiHilfi.jpg", name: "Bitti Hilfi", artists: ["YZKKAIZAH, Wave"], description: "YAY" },
+                { file: "Ref/Songs/holidayandfreetime.wav", image: "Ref/Songs/holidayandfreetime.jpg", name: "Holiday & Free Time", artists: ["YZKKAIZAH, KR-T"], description: "No description. :)" },
+                { file: "Ref/Songs/GLS.wav", image: "Ref/Songs/default.jpg", name: "GLS", artists: ["YZKKAIZAH, KAMØ"], description: "We dealin' drugs in this bi.." },
+                { file: "Ref/Songs/XOXO.wav", image: "Ref/Songs/XOXO.jpg", name: "XOXO", artists: ["YZKKAIZAH, KR-T, KAMØ"], description: "No description. :)" },
+                { file: "Ref/Songs/verstört.wav", image: "Ref/Songs/default.jpg", name: "Verstört", artists: ["YZKKAIZAH, MK205"], description: "No description. :)" },
+                { file: "Ref/Songs/neosky.wav", image: "Ref/Songs/neosky.gif", name: "NEO SKY", artists: ["YZKKAIZAH, KR-T"], description: "Highhhhh -_-" },
+                { file: "Ref/Songs/seminar.wav", image: "Ref/Songs/seminar.jpg", name: "Seminar", artists: ["YZKKAIZAH, KR-T"], description: "No description. :)" }
+                
+
+            ];
+
+            // DOM elements
+            const library = document.getElementById("library");
+            const audioPlayer = document.getElementById("audio-player");
+            const songTitle = document.getElementById("player-song-title");
+            const songThumbnail = document.getElementById("song-thumbnail");
+            const songArtists = document.getElementById("song-artists");
+            const songDescription = document.getElementById("song-description");
+            const timeSlider = document.getElementById("time-slider");
+            const volumeSlider = document.getElementById("volume-slider");
+            const loopButton = document.getElementById("loop-button");
+            const randomButton = document.getElementById("random-button");
+            const speedButton = document.getElementById("speed-button");
+            const playPauseIcon = document.getElementById('play-pause-icon');
+            const volumeIcon = document.getElementById("volume-icon");
+            const timeDisplay = document.getElementById("current-time");
+            const totalTimeDisplay = document.getElementById("total-time");
+            const nextUpDisplay = document.getElementById('next-up');
+
+            // State variables
+            let currentSongIndex = 0;
+            let isRandomEnabled = false;
+            let isLoopEnabled = false;
+            let nextPreloadIndex = null;
+            const speedOptions = [0.8, 0.9, 1, 1.1, 1.2];
+            let currentSpeedIndex = 2;
+
+            // Helper function for time formatting
+            const formatTime = (time) => {
+                const minutes = Math.floor(time / 60);
+                const seconds = Math.floor(time % 60);
+                return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+            };
+
+            // Update slider progress bar
+            const updateSliderProgress = (slider) => {
+                slider.style.setProperty('--progress', `${(slider.value / slider.max) * 100}%`);
+            };
+
+            // Initialize sliders
+            document.querySelectorAll('.slider').forEach(slider => {
+                updateSliderProgress(slider);
+                slider.addEventListener('input', () => updateSliderProgress(slider));
+            });
+
+            // Populate song library
+            songs.forEach((song, index) => {
+                const songElement = document.createElement("div");
+                songElement.classList.add("song");
+                songElement.onclick = () => selectSong(index);
+
+                songElement.innerHTML = `
+                    <img src="${song.image}" alt="Thumbnail">
+                    <div class="song-info">
+                        <span class="player-song-title">${song.name}</span>
+                        <span class="song-artists">${song.artists.join(", ")}</span>
+                    </div>
+                `;
+                library.appendChild(songElement);
+            });
+
+            function selectSong(index, skipPreloadReset = false) {
+                currentSongIndex = index;
+                const song = songs[index];
+                
+                audioPlayer.src = song.file;
+                songThumbnail.src = song.image;
+                songTitle.innerText = song.name;
+                songArtists.innerText = song.artists.join(", ");
+                songDescription.innerText = song.description;
+
+                audioPlayer.play();
+                playPauseIcon.classList.remove('fa-play');
+                playPauseIcon.classList.add('fa-pause');
+
+                updateSongSelection();
+                
+                if (!skipPreloadReset) {
+                    nextPreloadIndex = null;
+                }
+                preloadNext();
+            }
+
+            function updateSongSelection() {
+                document.querySelectorAll('.song').forEach((el, i) => {
+                    el.classList.toggle('selected', i === currentSongIndex);
+                });
+            }
+
+            function playPause() {
+                if (audioPlayer.paused) {
+                    audioPlayer.play();
+                    playPauseIcon.classList.replace('fa-play', 'fa-pause');
+                } else {
+                    audioPlayer.pause();
+                    playPauseIcon.classList.replace('fa-pause', 'fa-play');
+                }
+            }
+
+            function nextSong() {
+                if (isRandomEnabled && nextPreloadIndex !== null) {
+                    selectSong(nextPreloadIndex);
+                } else if (isRandomEnabled) {
+                    let randomIndex = Math.floor(Math.random() * songs.length);
+                    if (randomIndex === currentSongIndex && songs.length > 1) {
+                        randomIndex = (randomIndex + 1) % songs.length;
+                    }
+                    selectSong(randomIndex);
+                } else {
+                    selectSong((currentSongIndex + 1) % songs.length);
+                }
+            }
+
+            function prevSong() {
+                if (isRandomEnabled) {
+                    let randomIndex = Math.floor(Math.random() * songs.length);
+                    if (randomIndex === currentSongIndex && songs.length > 1) {
+                        randomIndex = (randomIndex + 1) % songs.length;
+                    }
+                    selectSong(randomIndex);
+                } else {
+                    selectSong((currentSongIndex - 1 + songs.length) % songs.length);
+                }
+            }
+
+            function loopSong() {
+                isLoopEnabled = !isLoopEnabled;
+                audioPlayer.loop = isLoopEnabled;
+                loopButton.classList.toggle("active", isLoopEnabled);
+                nextPreloadIndex = null;
+                preloadNext();
+            }
+
+            function toggleRandom() {
+                isRandomEnabled = !isRandomEnabled;
+                
+                if (isRandomEnabled) {
+                    nextPreloadIndex = Math.floor(Math.random() * songs.length);
+                    if (nextPreloadIndex === currentSongIndex && songs.length > 1) {
+                        nextPreloadIndex = (nextPreloadIndex + 1) % songs.length;
+                    }
+                } else {
+                    nextPreloadIndex = null;
+                }
+
+                randomButton.classList.toggle("active", isRandomEnabled);
+                preloadNext();
+            }
+
+            function applyPlaybackSpeed() {
+                const rate = speedOptions[currentSpeedIndex];
+                audioPlayer.playbackRate = rate;
+                audioPlayer.preservesPitch = false;
+                audioPlayer.mozPreservesPitch = false;
+                audioPlayer.webkitPreservesPitch = false;
+                speedButton.textContent = rate + "x";
+            }
+
+            function cyclePlaybackSpeed() {
+                currentSpeedIndex = (currentSpeedIndex + 1) % speedOptions.length;
+                applyPlaybackSpeed();
+            }
+
+            function computeNextIndexForPreload() {
+                if (isLoopEnabled) return currentSongIndex;
+                
+                if (isRandomEnabled) {
+                    if (nextPreloadIndex !== null) return nextPreloadIndex;
+                    nextPreloadIndex = Math.floor(Math.random() * songs.length);
+                    return nextPreloadIndex;
+                }
+                
+                return (currentSongIndex + 1) % songs.length;
+            }
+
+            function updateNextUpDisplay(index) {
+                const s = songs[index];
+                nextUpDisplay.textContent = `Next: ${s.name} — ${s.artists.join(', ')}`;
+            }
+
+            async function preloadNext() {
+                const idx = computeNextIndexForPreload();
+                const nextSrc = songs[idx].file;
+
+                try {
+                    // 🔥 FIX: Use dynamic cache name from service worker
+                    const cacheNames = await caches.keys();
+                    const musicCache = cacheNames.find(name => name.startsWith('music-player-'));
+                    
+                    if (musicCache) {
+                        const cache = await caches.open(musicCache);
+                        const response = await fetch(nextSrc);
+                        await cache.put(nextSrc, response.clone());
+                        updateNextUpDisplay(idx);
+                        console.log("✅ Cached next track:", nextSrc);
+                    }
+                } catch (err) {
+                    console.warn("⚠️ Cache preload failed:", err);
+                }
+            }
+
+            // Audio player event listeners
+            audioPlayer.addEventListener("timeupdate", () => {
+                const currentTime = audioPlayer.currentTime;
+                const totalTime = audioPlayer.duration;
+
+                timeDisplay.textContent = formatTime(currentTime);
+                totalTimeDisplay.textContent = formatTime(totalTime);
+
+                timeSlider.value = currentTime;
+                timeSlider.max = totalTime;
+                updateSliderProgress(timeSlider);
+            });
+
+            audioPlayer.addEventListener('ended', () => {
+                let nextIndex;
+                if (isLoopEnabled) {
+                    nextIndex = currentSongIndex;
+                } else if (isRandomEnabled) {
+                    nextIndex = (nextPreloadIndex !== null) ? nextPreloadIndex : Math.floor(Math.random() * songs.length);
+                } else {
+                    nextIndex = (currentSongIndex + 1) % songs.length;
+                }
+
+                nextPreloadIndex = null;
+                selectSong(nextIndex);
+                preloadNext();
+            });
+
+            audioPlayer.addEventListener("loadedmetadata", applyPlaybackSpeed);
+
+            // Time slider control
+            timeSlider.addEventListener('input', () => {
+                audioPlayer.currentTime = timeSlider.value;
+            });
+
+            // Volume slider control
+            volumeSlider.addEventListener("input", () => {
+                const volume = volumeSlider.value;
+                audioPlayer.volume = volume / 100;
+
+                volumeIcon.className = volume == 0 ? 'fas fa-volume-mute' : 
+                                       volume <= 50 ? 'fas fa-volume-down' : 
+                                       'fas fa-volume-up';
+            });
+
+            // Add this to your HTML's <script> section, before the closing </body> tag
+
+            // Enhanced Service Worker registration with update detection
+            if ('serviceWorker' in navigator) {
+                let refreshing = false;
+
+                // Detect when a new service worker takes control
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (refreshing) return;
+                    refreshing = true;
+                    console.log('🔄 New version detected, reloading...');
+                    window.location.reload();
+                });
+
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(registration => {
+                        console.log('✅ Service worker registered');
+
+                        // Check for updates every 30 seconds while page is open
+                        setInterval(() => {
+                            registration.update();
+                        }, 30000);
+
+                        // Listen for new service worker waiting to activate
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New version available!
+                                    showUpdateNotification();
+                                }
+                            });
+                        });
+                    })
+                    .catch(err => console.warn('SW registration failed:', err));
+            }
+
+            // Show a user-friendly update notification
+            function showUpdateNotification() {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 15px 25px;
+                    border-radius: 10px;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                    z-index: 10000;
+                    font-family: Arial, sans-serif;
+                    display: flex;
+                    align-items: center;
+                    gap: 15px;
+                    animation: slideDown 0.3s ease-out;
+                `;
+                
+                notification.innerHTML = `
+                    <span>🎵 New version available!</span>
+                    <button onclick="window.location.reload()" style="
+                        background: white;
+                        color: #667eea;
+                        border: none;
+                        padding: 8px 16px;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-weight: bold;
+                    ">Update Now</button>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Add animation
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes slideDown {
+                        from { top: -100px; opacity: 0; }
+                        to { top: 20px; opacity: 1; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            // Optional: Add a manual refresh cache button
+            function clearCacheAndReload() {
+                if ('caches' in window) {
+                    caches.keys().then(names => {
+                        names.forEach(name => caches.delete(name));
+                    }).then(() => {
+                        window.location.reload(true);
+                    });
+                } else {
+                    window.location.reload(true);
+                }
+            }
+        </script>
+    </body>
+</html>

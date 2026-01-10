@@ -1,0 +1,9 @@
+{
+  "id": "kys",
+  "title": "K.Y.S.",
+  "artists": ["YZKKAIZAH"],
+  "description": "Keep Yourself Safe",
+  "versions": [
+    { "name": "V1", "file": "v1.wav" }
+  ]
+}

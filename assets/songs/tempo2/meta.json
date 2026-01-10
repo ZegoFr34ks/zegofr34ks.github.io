@@ -1,0 +1,9 @@
+{
+  "id": "tempo2",
+  "title": "tempooooo",
+  "artists": ["YZKKAIZAH", "Wave", "Eve"],
+  "description": "[deprecated]",
+  "versions": [
+    { "name": "V1", "file": "v1.wav" }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "triosheks",
+  "title": "Trio du shkeks",
+  "artists": ["YZKKAIZAH", "KR-T", "kwnx."],
+  "description": "No description was added.",
+  "versions": [
+    { "name": "V1", "file": "v1.wav" }
+  ]
+}
