@@ -1,11 +1,18 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-site-version="202612010810">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>YZK LP3</title>
-  <link rel="stylesheet" href="assets/player.css" />
+  <link id="playerCss" rel="stylesheet" />
   <link rel="icon" type="image/x-icon" href="assets/icon.ico">
+  <script>
+    (() => {
+      const v = document.documentElement.dataset.siteVersion || "1";
+      const css = document.getElementById("playerCss");
+      if (css) css.href = `assets/player.css?v=${encodeURIComponent(v)}`;
+    })();
+  </script>
 </head>
 
 <body>
@@ -175,7 +182,14 @@
   <audio id="audio" preload="metadata"></audio>
   <audio id="audioPreload" preload="auto"></audio>
 
-  <script src="assets/player.js"></script>
+  <script id="playerJs"></script>
+  <script>
+    (() => {
+      const v = document.documentElement.dataset.siteVersion || "1";
+      const js = document.getElementById("playerJs");
+      if (js) js.src = `assets/player.js?v=${encodeURIComponent(v)}`;
+    })();
+  </script>
   
 </body>
 </html>

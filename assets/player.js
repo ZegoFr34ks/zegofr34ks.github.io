@@ -9,12 +9,46 @@
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
   const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
   const SETTINGS_KEY = "yzk_settings";
+  const VERSION_STORAGE_KEY = "yzk_site_version";
 
   function normText(s) {
     return String(s || "")
       .toLowerCase()
       .replace(/\s+/g, "")        // remove spaces
       .replace(/[^\p{L}\p{N}]/gu, ""); // remove symbols (unicode-safe)
+  }
+
+  function handleVersionUpdate() {
+    const siteVersion = document.documentElement.dataset.siteVersion || "1";
+    let stored;
+    try {
+      stored = localStorage.getItem(VERSION_STORAGE_KEY);
+      if (!stored) {
+        localStorage.setItem(VERSION_STORAGE_KEY, siteVersion);
+        return;
+      }
+      if (stored === siteVersion) return;
+      localStorage.setItem(VERSION_STORAGE_KEY, siteVersion);
+    } catch {
+      // If storage is unavailable, skip auto-refresh to avoid loops.
+      return;
+    }
+
+    // Clear Cache API entries (if any) to avoid stale assets.
+    if ("caches" in window && typeof caches.keys === "function") {
+      caches.keys().then((keys) => {
+        keys.forEach((k) => caches.delete(k));
+      }).catch(() => {});
+    }
+
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("v") !== siteVersion) {
+      url.searchParams.set("v", siteVersion);
+      window.location.replace(url.toString());
+      return;
+    }
+
+    window.location.reload();
   }
 
   function formatTime(seconds) {
@@ -428,6 +462,9 @@
   };
 
   state.preferredFormat = state.settings.defaultFormat || "mp3";
+
+  // Ensure version changes refresh assets before app logic runs.
+  handleVersionUpdate();
 
   // Apply theme tokens ASAP (so refresh doesn't flash/keep old look)
   applyThemeTokens(state.settings);
@@ -2402,7 +2439,7 @@ New features include: Customization, Sorting/Filtering, Queuing, Liking, Crossfa
 Did you know you can swipe a song card to either queue or like them? Swipe -> queue | <- like
 
 
-LP3 Version: 011220260636
+LP3 Version: 202612010810
 
 Created By Azryx (Github source code: https://github.com/ZegoFr34ks/zegofr34ks.github.io)
 
