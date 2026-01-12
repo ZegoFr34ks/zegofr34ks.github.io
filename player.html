@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>YZK LP3 BETA</title>
+  <title>YZK LP3</title>
   <link rel="stylesheet" href="assets/player.css" />
+  <link rel="icon" type="image/x-icon" href="assets/icon.ico">
 </head>
 
 <body>
@@ -16,7 +17,7 @@
     </button>
 
     <div class="brand" aria-label="Player name">
-      <div class="brand-title">YZK LP3 BETA</div>
+      <div class="brand-title">YZK LP3</div>
     </div>
 
     <div class="topbar-actions">
@@ -75,7 +76,7 @@
       </div>
 
       <button class="icon-btn mini-like" id="miniLike" aria-label="Like">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.35-9.5-8.5C.68 9.01 2.4 6 5.7 6c1.86 0 3.06 1.02 3.8 2.02C10.24 7.02 11.44 6 13.3 6c3.3 0 5.02 3.01 3.2 6.5C19 16.65 12 21 12 21z"/></svg>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
       </button>
 
       <button class="icon-btn mini-play" id="miniPlayPause" aria-label="Play/Pause">
@@ -103,8 +104,8 @@
       <img class="sheet-cover" id="sheetCover" alt="Cover" />
 
       <div class="sheet-meta">
-        <button class="linkish sheet-title" id="sheetTitle" type="button">—</button>
-        <button class="linkish sheet-artist" id="sheetArtist" type="button">—</button>
+        <div class="sheet-title" id="sheetTitle">—</div>
+        <div class="sheet-artist" id="sheetArtist">—</div>
         <div class="sheet-desc" id="sheetDesc">—</div>
       </div>
 
@@ -123,7 +124,7 @@
       <!-- Main Controls -->
       <div class="controls">
         <button class="icon-btn" id="btnShuffle" aria-label="Shuffle">
-          <svg viewBox="0 0 24 24"><path d="M16 3h5v5h-2V6.41l-3.29 3.3-1.42-1.42L17.59 5H16V3zM4 4h4.59l10 10H20v2h-2.41l-10-10H4V4zm16 16h-5v-2h1.59l-3.29-3.29 1.42-1.42L19 17.59V16h2v5zM4 18h4.59l2.3-2.29 1.41 1.41L9.41 20H4v-2z"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h4l8 10h4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17h4l3-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 10l3-3h4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 5l2 2-2 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 15l2 2-2 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
 
         <button class="icon-btn" id="btnPrev" aria-label="Previous">
@@ -139,7 +140,7 @@
         </button>
 
         <button class="icon-btn" id="btnLoop" aria-label="Loop">
-          <svg viewBox="0 0 24 24"><path d="M17 1l4 4-4 4V6H7v4L3 6l4-4v3h10V1zM7 23l-4-4 4-4v3h10v-4l4 4-4 4v-3H7v4z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M7 7h10l-1.5-1.5L17 4l4 4-4 4-1.5-1.5L17 9H7a4 4 0 0 0-4 4v1H1v-1a6 6 0 0 1 6-6zm10 10H7l1.5 1.5L7 20l-4-4 4-4 1.5 1.5L7 15h10a4 4 0 0 0 4-4v-1h2v1a6 6 0 0 1-6 6z"/></svg>
         </button>
       </div>
 
@@ -148,10 +149,9 @@
         <button class="pill" id="btnSpeed" type="button">1×</button>
         <button class="pill" id="btnQueue" type="button">Queue</button>
         <button class="pill" id="btnFormat" type="button">Format</button>
-        <button class="pill" id="btnInfo" type="button">Info</button>
 
         <button class="icon-btn like-btn" id="sheetLike" aria-label="Like">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.35-9.5-8.5C.68 9.01 2.4 6 5.7 6c1.86 0 3.06 1.02 3.8 2.02C10.24 7.02 11.44 6 13.3 6c3.3 0 5.02 3.01 3.2 6.5C19 16.65 12 21 12 21z"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
         </button>
       </div>
 

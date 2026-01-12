@@ -1,9 +1,0 @@
-{
-  "id": "summer25",
-  "title": "Summer 25'",
-  "artists": ["MK205", "WAVE"],
-  "description": "No description was added.",
-  "versions": [
-    { "name": "V1", "file": "v1.wav" }
-  ]
-}

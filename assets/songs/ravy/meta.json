@@ -1,9 +1,0 @@
-{
-  "id": "ravy",
-  "title": "Ravy",
-  "artists": ["YZKKAIZAH"],
-  "description": "My first techno track :)",
-  "versions": [
-    { "name": "V1", "file": "v1.wav" }
-  ]
-}

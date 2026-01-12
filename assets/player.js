@@ -103,9 +103,7 @@
     const s = state.settings;
 
     // Theme + accent + motion
-    document.documentElement.dataset.theme = s.themeMode;
-    document.documentElement.dataset.accent = s.accent;
-    document.documentElement.dataset.reducemotion = s.reduceMotion ? "1" : "0";
+    applyThemeTokens(s);
     // Default format (single source of truth)
     state.preferredFormat = s.defaultFormat;
 
@@ -126,6 +124,12 @@
       if (audioPreload?.src) audioPreload.removeAttribute("src");
       audioPreload?.load?.();
     }
+  }
+
+  function applyThemeTokens(settings) {
+    document.documentElement.dataset.theme = settings.themeMode;
+    document.documentElement.dataset.accent = settings.accent;
+    document.documentElement.dataset.reducemotion = settings.reduceMotion ? "1" : "0";
   }
 
   function mountUpNextIfNeeded() {
@@ -158,6 +162,8 @@
    *  ------------------------- */
   const SONGS_BASE = "assets/songs"; // <-- your choice
   const CATALOG_URL = `${SONGS_BASE}/catalog.json`;
+  const ARTISTS_URL = `${SONGS_BASE}/artists.json`;
+  const SONGS_LINKS_URL = `${SONGS_BASE}/songs_links.json`;
 
   /** -------------------------
    *  State
@@ -171,6 +177,80 @@
   // - preloadAudio: the element used for preloading (and becomes the fade-in deck during crossfade)
   let masterAudio = audio;
   let preloadAudio = audioPreload;
+
+  /** -------------------------
+   *  Cross-browser volume control (Safari/iOS-safe)
+   *
+   *  - On iOS Safari, HTMLMediaElement.volume is effectively ignored (hardware-controlled).
+   *  - Some Safari builds are also flaky when fading two <audio> elements via .volume.
+   *
+   *  We therefore prefer a WebAudio GainNode mixer when available, and fall back to
+   *  element.volume elsewhere.
+   *
+   *  IMPORTANT: The AudioContext MUST be created/resumed from a user gesture.
+   *  We only initialize it lazily from user-driven actions (play/next/prev/format, etc.).
+   *  ------------------------- */
+  const audioMix = {
+    ctx: null,
+    ready: false,
+    // Per element nodes
+    nodes: new Map(), // el -> { source, gain }
+  };
+
+  function canUseWebAudioMixer() {
+    return typeof window !== "undefined" &&
+      (window.AudioContext || window.webkitAudioContext) &&
+      typeof window.MediaElementAudioSourceNode !== "undefined";
+  }
+
+  function ensureAudioMixer() {
+    // Only create inside a user gesture (call this from click handlers / user actions).
+    if (audioMix.ready) return true;
+    if (!canUseWebAudioMixer()) return false;
+
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!audioMix.ctx) audioMix.ctx = new Ctx();
+      // Some browsers start in suspended state until a gesture.
+      if (audioMix.ctx.state === "suspended") {
+        // resume() is promise-based; we can fire-and-forget here.
+        audioMix.ctx.resume().catch(() => {});
+      }
+
+      // Attach both decks once (MediaElementSource can only be created once per element)
+      [audio, audioPreload].forEach((el) => {
+        if (!el || audioMix.nodes.has(el)) return;
+        const source = audioMix.ctx.createMediaElementSource(el);
+        const gain = audioMix.ctx.createGain();
+        gain.gain.value = 1;
+        source.connect(gain);
+        gain.connect(audioMix.ctx.destination);
+        audioMix.nodes.set(el, { source, gain });
+      });
+
+      audioMix.ready = true;
+      return true;
+    } catch (err) {
+      // If creation fails (rare), just fall back to element.volume.
+      console.warn("Audio mixer init failed, falling back to element.volume", err);
+      audioMix.ctx = null;
+      audioMix.ready = false;
+      return false;
+    }
+  }
+
+  function setDeckGain(el, value) {
+    const v = clamp(Number(value) || 0, 0, 1);
+    if (audioMix.ready) {
+      const n = audioMix.nodes.get(el);
+      if (n?.gain) {
+        try { n.gain.gain.value = v; } catch {}
+        return;
+      }
+    }
+    // Fallback
+    try { el.volume = v; } catch {}
+  }
 
   function applyTapeSpeedMode() {
     // "false" = do NOT preserve pitch -> pitch changes with playbackRate
@@ -192,6 +272,135 @@
     // Playback controls should operate on the track that is "current" in the UI.
     return getUIAudio();
   }
+
+  /** -------------------------
+   *  Media Session (Bluetooth/headset/car controls + metadata)
+   *
+   *  Notes:
+   *  - Works in most Chromium-based browsers and modern Android WebView.
+   *  - iOS Safari support is limited; metadata may not appear everywhere.
+   *  - For best results, serve the site over HTTPS (not file://).
+   *  ------------------------- */
+  const mediaSession = {
+    supported: typeof navigator !== "undefined" && "mediaSession" in navigator,
+    wired: false,
+    lastMetaKey: "",
+  };
+
+  function wireMediaSessionOnce() {
+    if (!mediaSession.supported || mediaSession.wired) return;
+    mediaSession.wired = true;
+
+    const ms = navigator.mediaSession;
+    const safeSetHandler = (action, handler) => {
+      try { ms.setActionHandler(action, handler); } catch {}
+    };
+
+    safeSetHandler("play", () => {
+      if (!state.currentSongId) {
+        const first = getActiveSongs?.()?.[0];
+        if (first) loadAndPlay(first.id, 0, true);
+        return;
+      }
+      const a = getControlAudio();
+      if (a?.paused) {
+        ensureAudioMixer?.(); // keeps your Safari/iOS mixer behavior intact
+        a.play().catch(() => {});
+      }
+    });
+
+    safeSetHandler("pause", () => {
+      const a = getControlAudio();
+      try { a.pause(); } catch {}
+    });
+
+    safeSetHandler("previoustrack", () => prevTrack());
+    safeSetHandler("nexttrack", () => nextTrack());
+
+    safeSetHandler("seekto", (details) => {
+      const a = getControlAudio();
+      if (!a) return;
+      const t = Number(details?.seekTime);
+      if (!Number.isFinite(t)) return;
+      try {
+        if (details?.fastSeek && typeof a.fastSeek === "function") a.fastSeek(t);
+        else a.currentTime = t;
+      } catch {}
+      updatePositionState?.();
+    });
+
+    safeSetHandler("seekbackward", (details) => {
+      const a = getControlAudio();
+      if (!a) return;
+      const offset = Number(details?.seekOffset);
+      const jump = Number.isFinite(offset) ? offset : 10;
+      try { a.currentTime = Math.max(0, (a.currentTime || 0) - jump); } catch {}
+      updatePositionState?.();
+    });
+
+    safeSetHandler("seekforward", (details) => {
+      const a = getControlAudio();
+      if (!a) return;
+      const offset = Number(details?.seekOffset);
+      const jump = Number.isFinite(offset) ? offset : 10;
+      try { a.currentTime = Math.min(a.duration || Infinity, (a.currentTime || 0) + jump); } catch {}
+      updatePositionState?.();
+    });
+
+    safeSetHandler("stop", () => {
+      const a = getControlAudio();
+      try { a.pause(); a.currentTime = 0; } catch {}
+      updatePositionState?.();
+    });
+  }
+
+  function updateMediaSessionMetadata() {
+    if (!mediaSession.supported) return;
+    const song = currentSong?.();
+    if (!song) return;
+
+    const artistsText = (song.artists || []).join(", ");
+    const key = `${song.id}::${artistsText}::${song.title}::${song.cover}`;
+    if (key === mediaSession.lastMetaKey) return;
+    mediaSession.lastMetaKey = key;
+
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: song.title || "",
+        artist: artistsText || "",
+        album: "",
+        artwork: song.cover ? [
+          { src: song.cover, sizes: "96x96", type: "image/jpeg" },
+          { src: song.cover, sizes: "192x192", type: "image/jpeg" },
+          { src: song.cover, sizes: "512x512", type: "image/jpeg" }
+        ] : []
+      });
+    } catch {}
+  }
+
+  function updateMediaSessionPlaybackState() {
+    if (!mediaSession.supported) return;
+    try {
+      const isPlaying = (!masterAudio.paused) || (!preloadAudio.paused);
+      navigator.mediaSession.playbackState = isPlaying ? "playing" : "paused";
+    } catch {}
+  }
+
+  function updatePositionState() {
+    if (!mediaSession.supported) return;
+    const a = getUIAudio?.();
+    if (!a) return;
+    try {
+      const dur = Number(a.duration);
+      if (!Number.isFinite(dur) || dur <= 0) return;
+      navigator.mediaSession.setPositionState({
+        duration: dur,
+        playbackRate: Number(a.playbackRate) || 1,
+        position: clamp(Number(a.currentTime) || 0, 0, dur)
+      });
+    } catch {}
+  }
+
 
   const state = {
     shuffle: false,
@@ -221,9 +430,7 @@
   state.preferredFormat = state.settings.defaultFormat || "mp3";
 
   // Apply theme tokens ASAP (so refresh doesn't flash/keep old look)
-  document.documentElement.dataset.theme = state.settings.themeMode;
-  document.documentElement.dataset.accent = state.settings.accent;
-  document.documentElement.dataset.reducemotion = state.settings.reduceMotion ? "1" : "0";
+  applyThemeTokens(state.settings);
 
 
   /** -------------------------
@@ -245,7 +452,6 @@
 
   const sheet = $("#playerSheet");
   const sheetBackdrop = $("#sheetBackdrop");
-  const btnSheetClose = $("#btnSheetClose");
 
   const sheetCover = $("#sheetCover");
   const sheetTitle = $("#sheetTitle");
@@ -267,7 +473,6 @@
   const btnSpeed = $("#btnSpeed");
   const btnQueue = $("#btnQueue");
   const btnFormat = $("#btnFormat");
-  const btnInfo = $("#btnInfo");
 
   const btnHome = $("#btnHome");
   const btnSort = $("#btnSort");
@@ -287,6 +492,415 @@
     if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
     return res.json();
   }
+
+
+/** -------------------------
+ *  Artists metadata (manual list + auto song scan)
+ *  ------------------------- */
+let artistsMeta = null; // { artists: [...] }
+
+async function loadArtistsMeta() {
+  if (artistsMeta) return artistsMeta;
+  try {
+    const data = await fetchJSON(ARTISTS_URL);
+    const list = Array.isArray(data?.artists) ? data.artists : [];
+    artistsMeta = {
+      artists: list.map((a) => ({
+        id: String(a.id || a.name || "").trim(),
+        name: String(a.name || a.id || "").trim(),
+        avatar: a.avatar ? String(a.avatar) : "",
+        bio: a.bio ? String(a.bio) : "",
+        links: (a.links && typeof a.links === "object") ? a.links : {},
+        aliases: Array.isArray(a.aliases) ? a.aliases.map(String) : []
+      })).filter(a => a.name)
+    };
+    return artistsMeta;
+  } catch (err) {
+    artistsMeta = { artists: [] };
+    console.warn("Artists metadata missing or invalid:", err);
+    return artistsMeta;
+  }
+
+}
+
+
+/** -------------------------
+ *  Songs & links metadata (manual list + catalog reference)
+ *  ------------------------- */
+let songsLinksMeta = null; // { songs: [...] }
+
+async function loadSongsLinksMeta() {
+  if (songsLinksMeta) return songsLinksMeta;
+  try {
+    const data = await fetchJSON(SONGS_LINKS_URL);
+    const list = Array.isArray(data?.songs) ? data.songs : [];
+    songsLinksMeta = {
+      songs: list.map((s) => ({
+        id: String(s.id || "").trim(),
+        cover: s.cover ? String(s.cover) : "", // optional override
+        links: (s.links && typeof s.links === "object") ? s.links : {}
+      })).filter(s => s.id)
+    };
+    return songsLinksMeta;
+  } catch (err) {
+    songsLinksMeta = { songs: [] };
+    console.warn("Songs & links metadata missing or invalid:", err);
+    return songsLinksMeta;
+  }
+}
+
+function getSongById(id) {
+  return songs.find(s => s.id === id) || null;
+}
+
+function artistMatchesName(entry, name) {
+  const target = normText(name);
+  if (!target) return false;
+  if (normText(entry.name) === target) return true;
+  if (entry.id && normText(entry.id) === target) return true;
+  if (Array.isArray(entry.aliases) && entry.aliases.some(a => normText(a) === target)) return true;
+  return false;
+}
+
+function getSongsForArtist(artistName) {
+  const t = normText(artistName);
+  return songs.filter(s => (s.artists || []).some(a => normText(a) === t));
+}
+
+function safeUrl(u) {
+  const s = String(u || "").trim();
+  if (!s) return "";
+  // Allow only http(s) to avoid accidental javascript: etc.
+  if (/^https?:\/\//i.test(s)) return s;
+  return "";
+}
+
+function platformIconSvg(platform) {
+  // Simple inline SVGs (monochrome; uses currentColor)
+  if (platform === "spotify") {
+    return `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 .01 20.01A10 10 0 0 0 12 2Zm4.6 14.53a.75.75 0 0 1-1.03.25c-2.8-1.71-6.33-2.1-10.5-1.15a.75.75 0 0 1-.33-1.46c4.56-1.04 8.47-.59 11.6 1.34.35.21.46.68.26 1.02Zm1.48-3.12a.9.9 0 0 1-1.24.3c-3.2-1.97-8.07-2.54-11.85-1.39a.9.9 0 1 1-.52-1.72c4.33-1.31 9.72-.66 13.4 1.6.42.25.56.8.21 1.21Zm.13-3.3C14.5 7.9 8.6 7.72 5.14 8.78a1 1 0 0 1-.58-1.92c3.95-1.2 10.55-.97 14.74 1.53a1 1 0 1 1-1.09 1.72Z"/></svg>`;
+  }
+  if (platform === "apple") {
+    return `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.6 13.2c0 2.7 2.4 3.6 2.4 3.6s-1.8 5.2-4.3 5.2c-1.1 0-2-.7-3.2-.7s-2.1.7-3.2.7C5.8 22 3 16.9 3 12.9 3 9 5.5 7 7.8 7c1.2 0 2.3.8 3.2.8.9 0 2.2-.9 3.8-.9.6 0 2.5.1 3.7 1.9-3.2 1.8-2.9 4.4-2.9 4.4ZM14.2 4.9c.7-.9 1.2-2.1 1-3.4-1.1.1-2.4.8-3.2 1.7-.7.8-1.3 2.1-1.1 3.3 1.2.1 2.5-.6 3.3-1.6Z"/></svg>`;
+  }
+  if (platform === "youtube") {
+    return `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.6 7.2a3 3 0 0 0-2.1-2.1C17.7 4.6 12 4.6 12 4.6s-5.7 0-7.5.5A3 3 0 0 0 2.4 7.2 31 31 0 0 0 2 12a31 31 0 0 0 .4 4.8 3 3 0 0 0 2.1 2.1c1.8.5 7.5.5 7.5.5s5.7 0 7.5-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 22 12a31 31 0 0 0-.4-4.8ZM10 15.5v-7l6 3.5-6 3.5Z"/></svg>`;
+  }
+  if (platform === "soundcloud") {
+    return `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.9 11.2a3.3 3.3 0 0 0-1.5.36 4.6 4.6 0 0 0-8.9 1.6v5.2h10.9a3.6 3.6 0 0 0 .5-7.16Zm-12.1 2.5c-.3 0-.5.2-.5.5v3.7c0 .3.2.5.5.5s.5-.2.5-.5v-3.7c0-.3-.2-.5-.5-.5Zm-2 0c-.3 0-.5.2-.5.5v3.7c0 .3.2.5.5.5s.5-.2.5-.5v-3.7c0-.3-.2-.5-.5-.5Z"/></svg>`;
+  }
+  return `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 .01 20.01A10 10 0 0 0 12 2Zm1 14h-2v-2h2v2Zm0-4h-2V6h2v6Z"/></svg>`;
+}
+
+let artistsPanelHandler = null;
+
+function openArtists() {
+  openArtistsList();
+}
+
+function openArtistsList() {
+  loadArtistsMeta().then((meta) => {
+    const items = meta.artists;
+
+    const listHtml = items.length ? `
+      <div class="artists-list">
+        ${items.map((a) => {
+          const count = getSongsForArtist(a.name).length;
+          const initials = escapeHTML((a.name || "?").slice(0, 1).toUpperCase());
+          const avatar = a.avatar
+            ? `<img class="artist-avatar" src="${escapeHTML(a.avatar)}" alt="${escapeHTML(a.name)}" loading="lazy" />`
+            : `<div class="artist-avatar ph" aria-hidden="true">${initials}</div>`;
+          return `
+            <button class="artist-row" type="button" data-artist="${escapeHTML(a.id || a.name)}">
+              ${avatar}
+              <div class="artist-row-meta">
+                <div class="artist-row-name">${escapeHTML(a.name)}</div>
+                <div class="artist-row-sub">${count ? `${count} song${count === 1 ? "" : "s"}` : "No songs yet"}</div>
+              </div>
+              <div class="artist-row-go" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M10 6l6 6-6 6-1.4-1.4L13.2 12 8.6 7.4 10 6z"/></svg>
+              </div>
+            </button>
+          `;
+        }).join("")}
+      </div>
+    ` : `<div class="panel-empty">No artists found. Add <code>assets/songs/artists.json</code>.</div>`;
+
+    openFullPanel("Artists", `
+      <div class="panel-note">All artists of <b>YZKSTUDIOS</b> are listed here. If you are one of those artists and want to modify your page, please contact your management. Songs are detected automatically.</div>
+      ${listHtml}
+    `);
+
+    bindArtistsPanel();
+  });
+}
+
+function openArtistDetail(artistKey) {
+  loadArtistsMeta().then((meta) => {
+    const entry =
+      meta.artists.find(a => artistMatchesName(a, artistKey)) ||
+      meta.artists.find(a => a.id === artistKey) ||
+      null;
+
+    if (!entry) {
+      toast("Artist not found.");
+      openArtistsList();
+      return;
+    }
+
+    const links = {
+      spotify: safeUrl(entry.links?.spotify),
+      apple: safeUrl(entry.links?.apple),
+      youtube: safeUrl(entry.links?.youtube),
+      soundcloud: safeUrl(entry.links?.soundcloud),
+    };
+
+    const songsFor = getSongsForArtist(entry.name);
+
+    const platformsHtml = `
+      <div class="artist-platforms" role="group" aria-label="Platforms">
+        ${["spotify","apple","youtube","soundcloud"].map((p) => {
+          const url = links[p];
+          const disabled = !url;
+          return `
+            <button class="platform-btn ${disabled ? "is-disabled" : ""}" type="button"
+              data-platform="${p}" ${disabled ? "disabled" : ""} ${url ? `data-url="${escapeHTML(url)}"` : ""} aria-label="${p}">
+              ${platformIconSvg(p)}
+            </button>
+          `;
+        }).join("")}
+      </div>
+    `;
+
+    const songsHtml = songsFor.length ? `
+      <div class="artist-songs-grid">
+        ${songsFor.map((s) => `
+          <button class="tiny-song" type="button" data-song-id="${escapeHTML(s.id)}" aria-label="Play ${escapeHTML(s.title)}">
+            <img class="tiny-cover" src="${escapeHTML(s.cover)}" alt="" loading="lazy" />
+            <div class="tiny-meta">
+              <div class="tiny-title">${escapeHTML(s.title)}</div>
+              <div class="tiny-artist">${escapeHTML((s.artists || []).join(", "))}</div>
+            </div>
+          </button>
+        `).join("")}
+      </div>
+    ` : `<div class="panel-empty">No songs found for this artist.</div>`;
+
+    const avatarTop = entry.avatar
+      ? `<img class="artist-hero-avatar" src="${escapeHTML(entry.avatar)}" alt="${escapeHTML(entry.name)}" loading="lazy" />`
+      : `<div class="artist-hero-avatar ph" aria-hidden="true">${escapeHTML(entry.name.slice(0,1).toUpperCase())}</div>`;
+
+    openFullPanel(entry.name, `
+      <button class="back-row" type="button" data-artists-back>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 7 9 12l5 5-1.4 1.4L6.2 12l6.4-6.4L14 7z"/></svg>
+        <span>Back to Artists</span>
+      </button>
+
+      <div class="artist-hero">
+        ${avatarTop}
+        <div class="artist-hero-text">
+          <div class="artist-hero-name">${escapeHTML(entry.name)}</div>
+          <div class="artist-hero-bio">${escapeHTML(entry.bio || "—")}</div>
+        </div>
+      </div>
+
+      ${platformsHtml}
+
+      <div class="artist-section-title">Songs</div>
+      ${songsHtml}
+    `);
+
+    bindArtistsPanel();
+  });
+}
+
+function bindArtistsPanel() {
+  // remove old handler to avoid stacking as we re-render the panel body
+  if (artistsPanelHandler) panelBody.removeEventListener("click", artistsPanelHandler);
+
+  artistsPanelHandler = (e) => {
+    const back = e.target.closest("[data-artists-back]");
+    if (back) {
+      e.preventDefault();
+      openArtistsList();
+      return;
+    }
+
+    const row = e.target.closest("[data-artist]");
+    if (row) {
+      e.preventDefault();
+      openArtistDetail(row.dataset.artist);
+      return;
+    }
+
+    const plat = e.target.closest("[data-url]");
+    if (plat) {
+      const url = plat.dataset.url;
+      if (url) window.open(url, "_blank", "noopener");
+      return;
+    }
+
+    const songBtn = e.target.closest("[data-song-id]");
+    if (songBtn) {
+      const id = songBtn.dataset.songId;
+      if (!id) return;
+      // Keep the panel open; play in background.
+      cancelCrossfade?.();
+      loadAndPlay(id, 0, true);
+      preloadNextTrack?.();
+      updateUpNextUI?.();
+      toast("Playing…");
+      return;
+    }
+  };
+
+  panelBody.addEventListener("click", artistsPanelHandler);
+}
+
+/** -------------------------
+ *  Songs & links panel
+ *  ------------------------- */
+let songsLinksPanelHandler = null;
+
+function openSongsLinks() {
+  openSongsLinksList();
+}
+
+function openSongsLinksList() {
+  loadSongsLinksMeta().then((meta) => {
+    const items = meta.songs;
+
+    const notice = `<div class="panel-note">Only the songs listed here are available on streaming platforms. All other songs in the player are <b>not</b> published anywhere.</div>`;
+
+    const listHtml = items.length ? `
+      <div class="songslinks-list">
+        ${items.map((it) => {
+          const song = getSongById(it.id);
+          if (!song) {
+            return `
+              <button class="songlink-row missing" type="button" data-songlink-id="${escapeHTML(it.id)}">
+                <div class="songlink-cover ph" aria-hidden="true">?</div>
+                <div class="songlink-meta">
+                  <div class="songlink-title">${escapeHTML(it.id)}</div>
+                  <div class="songlink-sub">Not found in catalog.json</div>
+                </div>
+                <div class="songlink-go" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M10 6l6 6-6 6-1.4-1.4L13.2 12 8.6 7.4 10 6z"/></svg>
+                </div>
+              </button>
+            `;
+          }
+          const cover = it.cover ? it.cover : song.cover;
+          return `
+            <button class="songlink-row" type="button" data-songlink-id="${escapeHTML(it.id)}">
+              <img class="songlink-cover" src="${escapeHTML(cover)}" alt="" loading="lazy" />
+              <div class="songlink-meta">
+                <div class="songlink-title">${escapeHTML(song.title)}</div>
+                <div class="songlink-sub">${escapeHTML((song.artists || []).join(", "))}</div>
+              </div>
+              <div class="songlink-go" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M10 6l6 6-6 6-1.4-1.4L13.2 12 8.6 7.4 10 6z"/></svg>
+              </div>
+            </button>
+          `;
+        }).join("")}
+      </div>
+    ` : `<div class="panel-empty">No songs listed. Add <code>assets/songs/songs_links.json</code>.</div>`;
+
+    openFullPanel("Songs & links", `${notice}${listHtml}`);
+    bindSongsLinksPanel();
+  });
+}
+
+function openSongLinksDetail(songId) {
+  loadSongsLinksMeta().then((meta) => {
+    const it = meta.songs.find(x => x.id === songId) || null;
+    const song = getSongById(songId);
+
+    if (!it || !song) {
+      toast("Song not found.");
+      openSongsLinksList();
+      return;
+    }
+
+    const links = {
+      spotify: safeUrl(it.links?.spotify),
+      apple: safeUrl(it.links?.apple),
+      youtube: safeUrl(it.links?.youtube),
+      soundcloud: safeUrl(it.links?.soundcloud),
+    };
+
+    const cover = it.cover ? it.cover : song.cover;
+
+    const platformsHtml = `
+      <div class="songlink-platforms" role="group" aria-label="Platforms">
+        ${["spotify","apple","youtube","soundcloud"].map((p) => {
+          const url = links[p];
+          const disabled = !url;
+          return `
+            <button class="platform-btn ${disabled ? "is-disabled" : ""}" type="button"
+              data-platform="${p}" ${disabled ? "disabled" : ""} ${url ? `data-url="${escapeHTML(url)}"` : ""} aria-label="${p}">
+              ${platformIconSvg(p)}
+            </button>
+          `;
+        }).join("")}
+      </div>
+    `;
+
+    openFullPanel(song.title, `
+      <button class="back-row" type="button" data-songslinks-back>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 7 9 12l5 5-1.4 1.4L6.2 12l6.4-6.4L14 7z"/></svg>
+        <span>Back to Songs</span>
+      </button>
+
+      <div class="songlink-hero">
+        <img class="songlink-hero-cover" src="${escapeHTML(cover)}" alt="" loading="lazy" />
+        <div class="songlink-hero-text">
+          <div class="songlink-hero-title">${escapeHTML(song.title)}</div>
+          <div class="songlink-hero-artists">${escapeHTML((song.artists || []).join(", "))}</div>
+        </div>
+      </div>
+
+      <div class="songlink-desc">${escapeHTML(song.description || "—")}</div>
+
+      <div class="artist-section-title">Listen on</div>
+      ${platformsHtml}
+    `);
+
+    bindSongsLinksPanel();
+  });
+}
+
+function bindSongsLinksPanel() {
+  if (songsLinksPanelHandler) panelBody.removeEventListener("click", songsLinksPanelHandler);
+
+  songsLinksPanelHandler = (e) => {
+    const back = e.target.closest("[data-songslinks-back]");
+    if (back) {
+      e.preventDefault();
+      openSongsLinksList();
+      return;
+    }
+
+    const row = e.target.closest("[data-songlink-id]");
+    if (row) {
+      e.preventDefault();
+      openSongLinksDetail(row.dataset.songlinkId);
+      return;
+    }
+
+    const plat = e.target.closest("[data-url]");
+    if (plat) {
+      const url = plat.dataset.url;
+      if (url) window.open(url, "_blank", "noopener");
+      return;
+    }
+  };
+
+  panelBody.addEventListener("click", songsLinksPanelHandler);
+}
+
+
 
   function normalizeMetaToSong(folderId, meta) {
     // folder path: assets/songs/<id>/
@@ -445,7 +1059,7 @@
             </div>
             <div class="swipe-left">
               <span>Like</span>
-              <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.35-9.5-8.5C.68 9.01 2.4 6 5.7 6c1.86 0 3.06 1.02 3.8 2.02C10.24 7.02 11.44 6 13.3 6c3.3 0 5.02 3.01 3.2 6.5C19 16.65 12 21 12 21z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
             </div>
           </div>
 
@@ -461,7 +1075,7 @@
                 <svg viewBox="0 0 24 24"><path d="M3 10h14v2H3v-2zm0-4h14v2H3V6zm0 8h10v2H3v-2zm16 0v-3h2v3h3v2h-3v3h-2v-3h-3v-2h3z"/></svg>
               </button>
               <button class="small-btn btn-like ${likedClass}" aria-label="Like song">
-                <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.35-9.5-8.5C.68 9.01 2.4 6 5.7 6c1.86 0 3.06 1.02 3.8 2.02C10.24 7.02 11.44 6 13.3 6c3.3 0 5.02 3.01 3.2 6.5C19 16.65 12 21 12 21z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
               </button>
             </div>
 
@@ -750,6 +1364,11 @@
     btnLoop.classList.toggle("is-on", state.loop !== "off");
 
     btnSpeed.textContent = `${state.speed.toFixed(2).replace(/\.00$/, "")}×`;
+
+    wireMediaSessionOnce();
+    updateMediaSessionMetadata();
+    updateMediaSessionPlaybackState();
+    updatePositionState();
   }
 
   function updateUpNextUI() {
@@ -904,8 +1523,8 @@
     // (Used when user manually changes tracks / formats.)
     try { masterAudio.pause(); } catch {}
     try { preloadAudio.pause(); } catch {}
-    try { masterAudio.volume = 1; } catch {}
-    try { preloadAudio.volume = 1; } catch {}
+    setDeckGain(masterAudio, 1);
+    setDeckGain(preloadAudio, 1);
   }
 
   function commitCrossfadeNow({ pause = false } = {}) {
@@ -933,8 +1552,8 @@
     crossfade.src = null;
 
     try { outgoing.pause(); } catch {}
-    try { outgoing.volume = 1; } catch {}
-    try { incoming.volume = 1; } catch {}
+    setDeckGain(outgoing, 1);
+    setDeckGain(incoming, 1);
 
     // Swap roles: incoming becomes master.
     masterAudio = incoming;
@@ -950,7 +1569,7 @@
     // Ensure the preload deck is idle/clean for future loads.
     try {
       preloadAudio.pause();
-      preloadAudio.volume = 1;
+      setDeckGain(preloadAudio, 1);
     } catch {}
 
     if (pause) {
@@ -1025,9 +1644,12 @@
     crossfade.canplayHandler = null;
 
     try {
+      // Prefer WebAudio gains when available (Safari/iOS-safe). This should already
+      // be initialized from a prior user gesture; if not, we'll just fall back.
+      ensureAudioMixer();
       applyTapeSpeedMode?.();
       incomingEl.pause();
-      incomingEl.volume = 0;
+      setDeckGain(incomingEl, 0);
       incomingEl.loop = false;
       incomingEl.playbackRate = state.speed;
     } catch {}
@@ -1082,8 +1704,8 @@
       const t = clamp((now - crossfade.startedAt) / crossfade.durationMs, 0, 1);
 
       // Linear fade; keep it predictable (matches your clean UX)
-      try { masterAudio.volume = 1 - t; } catch {}
-      try { preloadAudio.volume = t; } catch {}
+      setDeckGain(masterAudio, 1 - t);
+      setDeckGain(preloadAudio, t);
 
       if (t < 1) {
         crossfade.raf = requestAnimationFrame(tick);
@@ -1102,8 +1724,8 @@
 
       // Stop outgoing deck and normalize volumes
       try { outgoing.pause(); } catch {}
-      try { outgoing.volume = 1; } catch {}
-      try { incoming.volume = 1; } catch {}
+      setDeckGain(outgoing, 1);
+      setDeckGain(incoming, 1);
 
       // Swap roles: incoming becomes master, old master becomes the preload deck
       masterAudio = incoming;
@@ -1119,7 +1741,7 @@
       // Leave the preload deck in a clean state for the next preload
       try {
         preloadAudio.pause();
-        preloadAudio.volume = 1;
+        setDeckGain(preloadAudio, 1);
       } catch {}
 
       // Preload the next-up track for the *new* now-playing
@@ -1213,7 +1835,7 @@
     // Keep preload deck idle when switching manually
     try {
       preloadAudio.pause();
-      preloadAudio.volume = 1;
+      setDeckGain(preloadAudio, 1);
     } catch {}
 
     renderList();
@@ -1221,7 +1843,11 @@
     preloadNextTrack();
     updateUpNextUI();
 
-    if (autoplay) masterAudio.play().catch(() => {});
+    if (autoplay) {
+      // Initialize WebAudio mixer from this user gesture when possible (Safari/iOS fade support)
+      ensureAudioMixer();
+      masterAudio.play().catch(() => {});
+    }
   }
 
   function togglePlay() {
@@ -1240,13 +1866,18 @@
       // "pause" if *either* deck is currently playing.
       const isAnyPlaying = (!masterAudio.paused) || (!preloadAudio.paused);
       commitCrossfadeNow({ pause: isAnyPlaying });
-      if (!isAnyPlaying) masterAudio.play().catch(() => {});
+      if (!isAnyPlaying) {
+        ensureAudioMixer();
+        masterAudio.play().catch(() => {});
+      }
       return;
     }
 
     const a = getControlAudio();
-    if (a.paused) a.play().catch(() => {});
-    else a.pause();
+    if (a.paused) {
+      ensureAudioMixer();
+      a.play().catch(() => {});
+    } else a.pause();
   }
 
   function nextTrack() {
@@ -1334,11 +1965,184 @@
     loadAndPlay(songId, 0, true);
   });
 
+  /** -------------------------
+   *  Mini Player swipe (left = next, right = previous)
+   *  - Prevents accidental "open sheet" tap when user swipes
+   *  ------------------------- */
+  const miniSwipe = { ignoreClick: false };
+
+  function miniSwipeNext() {
+    // For swipe navigation we intentionally do NOT loop/shuffle/queue.
+    if (crossfade.active) commitCrossfadeNow();
+    if (!state.currentSongId) return;
+
+    rebuildPlayList();
+    const ids = state.playListIds || [];
+    const i = ids.indexOf(state.currentSongId);
+    if (i < 0) return;
+
+    const nextIndex = i + 1;
+    if (nextIndex >= ids.length) return; // last song => do nothing
+    loadAndPlay(ids[nextIndex], 0, true);
+  }
+
+  function miniSwipePrev() {
+    if (crossfade.active) commitCrossfadeNow();
+    if (!state.currentSongId) return;
+
+    rebuildPlayList();
+    const ids = state.playListIds || [];
+    const i = ids.indexOf(state.currentSongId);
+    if (i < 0) return;
+
+    const prevIndex = i - 1;
+    if (prevIndex < 0) return; // first song => do nothing
+    loadAndPlay(ids[prevIndex], 0, true);
+  }
+
+  function attachMiniPlayerSwipe() {
+    let active = false;
+    let pointerId = null;
+    let startX = 0;
+    let startY = 0;
+    let dx = 0;
+    let dy = 0;
+    let gesture = null; // null | "scroll" | "swipe"
+
+    // Visual feedback (subtle horizontal drag on the mini card's inner sections)
+    const maxVisual = 72;          // px, after this we apply resistance
+    const hardClamp = 96;          // px, absolute cap
+    const setSwipeX = (x) => miniPlayer.style.setProperty("--miniSwipeX", `${x}px`);
+    // Immediate reset (no animation) — useful before starting a new gesture.
+    const hardResetSwipeX = () => {
+      miniPlayer.classList.remove("is-swiping");
+      setSwipeX(0);
+    };
+    // Animated snap-back (remove is-swiping first so transitions are enabled, then set X to 0).
+    const snapBackSwipeX = () => {
+      miniPlayer.classList.remove("is-swiping");
+      requestAnimationFrame(() => setSwipeX(0));
+    };
+    const applySwipeX = (rawDx) => {
+      const sign = rawDx < 0 ? -1 : 1;
+      const abs = Math.abs(rawDx);
+      let x = abs;
+      if (x > maxVisual) x = maxVisual + (x - maxVisual) * 0.22; // gentle resistance
+      x = Math.min(hardClamp, x) * sign;
+      setSwipeX(x);
+    };
+
+    const threshold = 55;    // action trigger
+    const lockDistance = 8;  // decide swipe vs scroll
+
+    const isInteractiveTarget = (t) =>
+      Boolean(t.closest("#miniLike") || t.closest("#miniPlayPause"));
+
+    const cleanup = () => {
+      if (pointerId != null) {
+        try { miniPlayer.releasePointerCapture(pointerId); } catch {}
+      }
+      active = false;
+      pointerId = null;
+      gesture = null;
+      dx = 0;
+      dy = 0;
+    };
+
+    const onDown = (e) => {
+      // Only handle the primary pointer and ignore button taps (like/play).
+      if (e.isPrimary === false) return;
+      if (!state.currentSongId) return;
+      if (isInteractiveTarget(e.target)) return;
+
+      active = true;
+      pointerId = e.pointerId;
+      gesture = null;
+      dx = 0;
+      dy = 0;
+
+      startX = e.clientX;
+      startY = e.clientY;
+
+      // Ensure we're visually reset before a new gesture.
+      hardResetSwipeX();
+
+      // Capture so we still get pointerup even if the finger drifts slightly.
+      try { miniPlayer.setPointerCapture(pointerId); } catch {}
+    };
+
+    const onMove = (e) => {
+      if (!active || e.pointerId !== pointerId) return;
+
+      dx = e.clientX - startX;
+      dy = e.clientY - startY;
+
+      if (!gesture) {
+        if (Math.abs(dx) < lockDistance && Math.abs(dy) < lockDistance) return;
+        gesture = (Math.abs(dx) > Math.abs(dy)) ? "swipe" : "scroll";
+
+        // Once we decide it's a swipe, suppress the following click-to-open.
+        if (gesture === "swipe") {
+          miniSwipe.ignoreClick = true;
+          miniPlayer.classList.add("is-swiping");
+        }
+      }
+
+      if (gesture !== "swipe") return;
+
+      // Block the browser from treating this as a tap/scroll.
+      e.preventDefault();
+
+      // Visual: drag the inner content a bit.
+      applySwipeX(dx);
+    };
+
+    const onUp = (e) => {
+      if (!active || e.pointerId !== pointerId) return;
+
+      const wasSwipe = (gesture === "swipe");
+      const finalDx = dx;
+
+      cleanup();
+
+      // If it was a swipe gesture, prevent the click and run navigation if passed threshold.
+      if (wasSwipe) {
+        // Snap back with a soft transition.
+        snapBackSwipeX();
+        if (Math.abs(finalDx) >= threshold) {
+          if (finalDx < 0) miniSwipeNext();
+          else miniSwipePrev();
+        }
+        // Click fires after pointerup; clear on next tick after click handler checks it.
+        setTimeout(() => { miniSwipe.ignoreClick = false; }, 0);
+      } else {
+        // Not a swipe => ensure no leftover transform.
+        hardResetSwipeX();
+      }
+    };
+
+    const onCancel = () => {
+      const wasSwipe = (gesture === "swipe");
+      cleanup();
+      snapBackSwipeX();
+      if (wasSwipe) setTimeout(() => { miniSwipe.ignoreClick = false; }, 0);
+    };
+
+    miniPlayer.addEventListener("pointerdown", onDown, { passive: true });
+    miniPlayer.addEventListener("pointermove", onMove, { passive: false });
+    miniPlayer.addEventListener("pointerup", onUp);
+    miniPlayer.addEventListener("pointercancel", onCancel);
+  }
+
+  attachMiniPlayerSwipe();
+
   miniPlayer.addEventListener("click", (e) => {
+    if (miniSwipe.ignoreClick) { miniSwipe.ignoreClick = false; return; }
     if (e.target.closest("#miniLike")) return;
     if (e.target.closest("#miniPlayPause")) return;
     openSheet();
   });
+
 
   miniLike.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -1399,9 +2203,6 @@
   });
 
   // stubs for later
-  $("#sheetTitle").addEventListener("click", () => toast("Song widget (next)"));
-  $("#sheetArtist").addEventListener("click", () => toast("Artist widget (next)"));
-  btnInfo.addEventListener("click", () => toast("Info tab (next)"));
   btnQueue.addEventListener("click", () => {
     renderQueuePanel();
   });
@@ -1424,6 +2225,7 @@
   seekBar.addEventListener("input", () => {
     isSeeking = true;
     setSeekVisualFromValue();
+    updatePositionStateThrottled();
     const deck = getUIAudio();
     const dur = deck?.duration || 0;
     const target = (Number(seekBar.value) / 1000) * dur;
@@ -1435,6 +2237,7 @@
     const dur = deck?.duration || 0;
     const target = (Number(seekBar.value) / 1000) * dur;
     try { deck.currentTime = target; } catch {}
+    updatePositionState();
     isSeeking = false;
   });
 
@@ -1444,6 +2247,7 @@
   function updatePlayIconsFromDecks() {
     const playing = (!masterAudio.paused) || (!preloadAudio.paused);
     setPlayIcons(playing);
+    updateMediaSessionPlaybackState();
   }
 
   [audio, audioPreload].forEach((el) => {
@@ -1451,6 +2255,15 @@
     el.addEventListener("play", updatePlayIconsFromDecks);
     el.addEventListener("pause", updatePlayIconsFromDecks);
   });
+
+  let _posStateLast = 0;
+
+  function updatePositionStateThrottled() {
+    const now = performance.now();
+    if (now - _posStateLast < 1000) return; // 1 update per second
+    _posStateLast = now;
+    updatePositionState();
+  }
 
   function updateTimelineUI() {
     const deck = getUIAudio();
@@ -1473,6 +2286,7 @@
     // Only the deck currently shown in the UI should drive timeline updates.
     if (el !== getUIAudio()) return;
     updateTimelineUI();
+    if ("mediaSession" in navigator) updatePositionStateThrottled();
 
     // Auto-start crossfade near the end of the OUTGOING track (if enabled)
     // Use the current master deck timing as the reference.
@@ -1485,6 +2299,7 @@
     el.addEventListener("loadedmetadata", () => {
       if (el !== getUIAudio()) return;
       timeTotal.textContent = formatTime(el.duration || 0);
+      updatePositionState();
     });
     el.addEventListener("ended", () => {
       // Only the current master ending should advance.
@@ -1579,10 +2394,6 @@
 
   function openAboutPanel() {
     const txt = `Welcome to the Official YZK Leaks Player 3! 
-This player is still in Beta so some things are still in development.
-
-If you find any bugs please report them, thank you.
-
 
 About:
 
@@ -1591,23 +2402,7 @@ New features include: Customization, Sorting/Filtering, Queuing, Liking, Crossfa
 Did you know you can swipe a song card to either queue or like them? Swipe -> queue | <- like
 
 
-Coming Soon:
-
-- Artist Page
-- Song Page
-- Clickable Title
-- Clickable Artists
-- Info Card for a Song
-- Minor Design Overhaul
-
-
-Known Bugs:
-
-- Multiple Icons deformed
-- Header disappearing after 100vh
-
-
-LP3 Version: 011020260901 
+LP3 Version: 011220260636
 
 Created By Azryx (Github source code: https://github.com/ZegoFr34ks/zegofr34ks.github.io)
 
@@ -1656,8 +2451,18 @@ Contact: contact.kavzego@gmail.com`;
 
         // If something is playing, switch source immediately at same time position
         if (state.currentSongId) {
-          // Format switches mid-crossfade can desync decks; just abort transition.
-          cancelCrossfade();
+          // If a crossfade is in progress, the "current" track is the fade-in deck.
+          // We first commit the transition so format switching never targets the fade-out deck
+          // (which caused random jumps / wrong track on format change).
+          if (crossfade.active) {
+            const wasAnyPlaying = (!masterAudio.paused) || (!preloadAudio.paused);
+            // Commit without pausing so playback keeps going on the UI/incoming track.
+            commitCrossfadeNow({ pause: false });
+            // If both decks were paused (rare), preserve that.
+            if (!wasAnyPlaying) {
+              try { masterAudio.pause(); } catch {}
+            }
+          }
 
           const song = currentSong();
           const a = getControlAudio();
@@ -1674,10 +2479,14 @@ Contact: contact.kavzego@gmail.com`;
             return;
           }
 
+          // Always apply to the current control deck (after commit, that's masterAudio).
+          // Ensure mixer is ready so Safari/iOS can fade via WebAudio gains.
+          ensureAudioMixer();
           masterAudio.src = src;
           applyTapeSpeedMode?.();
           masterAudio.playbackRate = state.speed;
           masterAudio.loop = (state.loop === "one");
+          setDeckGain(masterAudio, 1);
 
           masterAudio.addEventListener("loadedmetadata", function once() {
             masterAudio.removeEventListener("loadedmetadata", once);
@@ -1955,6 +2764,26 @@ Contact: contact.kavzego@gmail.com`;
       });
     }
 
+    // Ensure "Artists" is always clickable (avoids any delegation edge cases)
+    const artistsBtn = panelBody.querySelector('[data-nav="artists"]');
+    if (artistsBtn) {
+      artistsBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openArtists();
+      });
+    }
+
+    // Ensure "Songs & links" is always clickable (placeholder for later)
+    const songsLinksBtn = panelBody.querySelector('[data-nav="songs"]');
+    if (songsLinksBtn) {
+      songsLinksBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openSongsLinks();
+      });
+    }
+
     // remove old handler to avoid stacking
     if (settingsPanelHandler) panelBody.removeEventListener("click", settingsPanelHandler);
 
@@ -2032,8 +2861,8 @@ Contact: contact.kavzego@gmail.com`;
       const nav = e.target.closest("[data-nav]");
       if (nav) {
         const where = nav.dataset.nav;
-        if (where === "artists") toast("Artists panel (next)");
-        if (where === "songs") toast("Songs & links (next)");
+        if (where === "artists") { openArtists(); return; }
+        if (where === "songs") { openSongsLinks(); return; }
         if (where === "about") { openAboutPanel(); return; }
         return;
       }
@@ -2232,10 +3061,7 @@ Contact: contact.kavzego@gmail.com`;
         state.searchQuery = searchInput.value || "";
         searchClear.hidden = !searchInput.value;
 
-        rebuildPlayList();
-        renderList();
-        preloadNextTrack?.();
-        updateUpNextUI();
+        applyViewAndPlaybackUpdate();
       });
     }
 
@@ -2245,10 +3071,7 @@ Contact: contact.kavzego@gmail.com`;
         state.searchQuery = "";
         searchClear.hidden = true;
 
-        rebuildPlayList();
-        renderList();
-        preloadNextTrack?.();
-        updateUpNextUI();
+        applyViewAndPlaybackUpdate();
         searchInput.focus();
       });
     }

@@ -1,9 +1,0 @@
-{
-  "id": "meinewelt",
-  "title": "Meine Welt",
-  "artists": ["MK205", "ROBOTSTAR"],
-  "description": "No description was added.",
-  "versions": [
-    { "name": "V1", "file": "v1.wav" }
-  ]
-}

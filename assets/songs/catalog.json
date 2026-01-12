@@ -80,7 +80,7 @@
         {
             "id": "tempo2",
             "title": "tempooooo",
-            "artists": ["YZKKAIZAH", "Wave", "Eve"],
+            "artists": ["YZKKAIZAH", "WAVE", "Eve"],
             "description": "[deprecated]",
             "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
         },
@@ -206,7 +206,7 @@
         {
             "id": "nachdenken",
             "title": "Nachdenken",
-            "artists": ["YZKKAIZAH", "MK205"],
+            "artists": ["YZKKAIZAH", "MK205", "WAVE"],
             "description": "No description was added.",
             "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
         },
@@ -234,7 +234,7 @@
         {
             "id": "keineahnung",
             "title": "Keine Ahnung",
-            "artists": ["YZKKAIZAH", "f3i", "Wave", "Rai"],
+            "artists": ["YZKKAIZAH", "f3i", "WAVE", "Rai"],
             "description": "No description was added.",
             "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
         },

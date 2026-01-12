@@ -1,7 +1,0 @@
-{
-  "id": "test",
-  "title": "Test Track",
-  "artists": ["YZK"],
-  "description": "Short description here.",
-  "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
-}

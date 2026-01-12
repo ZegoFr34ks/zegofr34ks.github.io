@@ -1,0 +1,136 @@
+{
+  "artists": [
+    {
+      "id": "yzkkaizah",
+      "name": "YZKKAIZAH",
+      "avatar": "assets/artists/yzkkaizah.jpg",
+      "bio": "Song Artist, YZKSTUDIOS Founder, YZKSTUDIOS Co-producer",
+      "links": {
+        "spotify": "https://open.spotify.com/artist/7znAvuSAX1I4z0IIipfhEF?si=kL8NzasWSleJh2OcxA0VOg",
+        "apple": "https://music.apple.com/us/artist/yzkkaizah/1855001531",
+        "youtube": "https://www.youtube.com/@YZKKAIZAH",
+        "soundcloud": "https://soundcloud.com/yzkkaizah"
+      }
+    },
+    {
+      "id": "krt",
+      "name": "KR-T",
+      "avatar": "assets/artists/krt.jpg",
+      "bio": "Song Artist, Subcosmic Founder, YZKSTUDIOS Producer",
+      "links": {
+        "spotify": "https://open.spotify.com/artist/4afFfy1QE4gQIr6KptRoi2?si=0a6w8WIZQ4-i8qSvUBVbbw",
+        "apple": "https://music.apple.com/us/artist/kr-t/1636175415",
+        "youtube": "https://www.youtube.com/@kr-tk",
+        "soundcloud": "https://soundcloud.com/theo-kartner"
+      }
+    },
+    {
+      "id": "hezeash",
+      "name": "Heze Ash",
+      "avatar": "assets/artists/hezeash.jpg",
+      "bio": "Song Artist, Subcosmic Founder",
+      "links": {
+        "spotify": "https://open.spotify.com/artist/7MoKOIvUuQobpllSm5sGIZ",
+        "apple": "https://music.apple.com/us/artist/heze-ash/1598972450",
+        "youtube": "https://www.youtube.com/@hezeash3541",
+        "soundcloud": "https://soundcloud.com/user-68090196-430385047"
+      }
+    },
+    {
+      "id": "f3i",
+      "name": "f3i",
+      "avatar": "assets/artists/none.jpg",
+      "bio": "Song Artist",
+      "links": {
+        "spotify": "",
+        "apple": "",
+        "youtube": "",
+        "soundcloud": ""
+      }
+    },
+    {
+      "id": "kamo",
+      "name": "KAMØ",
+      "avatar": "assets/artists/none.jpg",
+      "bio": "Song Artist",
+      "links": {
+        "spotify": "",
+        "apple": "",
+        "youtube": "",
+        "soundcloud": ""
+      }
+    },
+    {
+      "id": "mk205",
+      "name": "MK205",
+      "avatar": "assets/artists/none.jpg",
+      "bio": "Song Artist",
+      "links": {
+        "spotify": "",
+        "apple": "",
+        "youtube": "",
+        "soundcloud": ""
+      }
+    },
+    {
+      "id": "wave",
+      "name": "WAVE",
+      "avatar": "assets/artists/none.jpg",
+      "bio": "Song Artist",
+      "links": {
+        "spotify": "",
+        "apple": "",
+        "youtube": "",
+        "soundcloud": ""
+      }
+    },
+    {
+      "id": "kwnx",
+      "name": "kwnx.",
+      "avatar": "assets/artists/none.jpg",
+      "bio": "Song Artist",
+      "links": {
+        "spotify": "",
+        "apple": "",
+        "youtube": "",
+        "soundcloud": ""
+      }
+    },
+    {
+      "id": "rai",
+      "name": "Rai",
+      "avatar": "assets/artists/none.jpg",
+      "bio": "Song Artist",
+      "links": {
+        "spotify": "",
+        "apple": "",
+        "youtube": "",
+        "soundcloud": ""
+      }
+    },
+    {
+      "id": "robotstar",
+      "name": "ROBOTSTAR",
+      "avatar": "assets/artists/none.jpg",
+      "bio": "Song Artist",
+      "links": {
+        "spotify": "",
+        "apple": "",
+        "youtube": "",
+        "soundcloud": ""
+      }
+    },
+    {
+      "id": "eve",
+      "name": "Eve",
+      "avatar": "assets/artists/none.jpg",
+      "bio": "[Resigned]",
+      "links": {
+        "spotify": "",
+        "apple": "",
+        "youtube": "",
+        "soundcloud": ""
+      }
+    }
+  ]
+}
