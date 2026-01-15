@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-site-version="202615010708">
+<html lang="en" data-site-version="202615010742">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -179,12 +179,8 @@
   </aside>
 
   <!-- Audio element -->
-    <!--
-    playsinline helps mobile browsers keep media playback stable (avoids unintended fullscreen media UI)
-    and improves background audio reliability on several engines.
-  -->
-  <audio id="audio" preload="metadata" playsinline></audio>
-  <audio id="audioPreload" preload="auto" playsinline></audio>
+  <audio id="audio" preload="metadata" playsinline webkit-playsinline></audio>
+  <audio id="audioPreload" preload="auto" playsinline webkit-playsinline></audio>
 
   <script id="playerJs"></script>
   <script>

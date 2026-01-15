@@ -430,6 +430,14 @@
 
   function setWantPlaying(v) { _wantPlaying = Boolean(v); }
 
+  function forceAudible(el) {
+    if (!el) return;
+    // Can't override the hardware silent switch, but prevents accidental muting by code/state.
+    try { el.muted = false; } catch {}
+    try { if (Number.isFinite(el.volume) && el.volume < 1) el.volume = 1; } catch {}
+    try { setDeckGain(el, 1); } catch {}
+  }
+
   function ensurePlayingSoon(el) {
     const my = ++_playIntentToken;
     // small delay lets the engine settle after src swap / decode start
@@ -439,6 +447,7 @@
       if (!el || !state.currentSongId) return;
       if (el.paused) {
         ensureAudioMixer?.();
+        forceAudible(audioElement);
         el.play().catch(() => {});
       }
     }, 350);
@@ -490,6 +499,7 @@
       if (a?.paused) {
         ensureAudioMixer?.();
         setWantPlaying(true);
+        forceAudible(a)
         a.play().catch(() => {});
         ensurePlayingSoon(a);
       }
@@ -1954,6 +1964,7 @@ function bindSongsLinksPanel() {
         incomingEl.currentTime = 0;
       } catch {}
       try {
+        forceAudible(incomingEl);
         await incomingEl.play();
       } catch {
         // If the browser blocks a second simultaneous element, fall back to normal next.
@@ -2035,6 +2046,48 @@ function bindSongsLinksPanel() {
     };
 
     crossfade.raf = requestAnimationFrame(tick);
+  }
+
+  function commitCrossfadeImmediately() {
+    if (!crossfade.active) return;
+
+    try { if (crossfade.raf) cancelAnimationFrame(crossfade.raf); } catch {}
+    crossfade.raf = 0;
+
+    const incoming = preloadAudio;
+    const outgoing = masterAudio;
+
+    crossfade.active = false;
+    crossfade.target = null;
+    crossfade.src = null;
+
+    try { if (incoming && incoming.paused) {
+      forceAudible(incoming);
+      incoming.play().catch(() => {});}
+    } catch {}
+
+    // Normalize volumes so nothing stays stuck at 0 when rAF freezes in background.
+    try { setDeckGain(outgoing, 1); } catch {}
+    try { setDeckGain(incoming, 1); } catch {}
+
+    try { outgoing.pause(); } catch {}
+
+    masterAudio = incoming;
+    preloadAudio = outgoing;
+
+    try {
+      applyTapeSpeedMode?.();
+      setDeckPlaybackRate(masterAudio, state.speed);
+      masterAudio.loop = (state.loop === "one");
+    } catch {}
+
+    try {
+      preloadAudio.pause();
+      setDeckGain(preloadAudio, 1);
+    } catch {}
+
+    preloadNextTrack();
+    updateUpNextUI();
   }
 
   function maybeStartCrossfade() {
@@ -2132,6 +2185,7 @@ function bindSongsLinksPanel() {
       // Initialize WebAudio mixer from this user gesture when possible (Safari/iOS fade support)
       ensureAudioMixer();
       setWantPlaying(true);
+      forceAudible(audioElement);
       masterAudio.play().catch(() => {});
       ensurePlayingSoon(masterAudio);
     }
@@ -2156,6 +2210,7 @@ function bindSongsLinksPanel() {
       if (!isAnyPlaying) {
         ensureAudioMixer();
         setWantPlaying(true);
+        forceAudible(audioElement);
         masterAudio.play().catch(() => {});
         ensurePlayingSoon(masterAudio);
       }
@@ -2166,6 +2221,7 @@ function bindSongsLinksPanel() {
     if (a.paused) {
       ensureAudioMixer();
       setWantPlaying(true);
+      forceAudible(a);
       a.play().catch(() => {});
       ensurePlayingSoon(a);
     } else {
@@ -2697,7 +2753,7 @@ New features include: Customization, Sorting/Filtering, Queuing, Liking, Crossfa
 Did you know you can swipe a song card to either queue or like them? Swipe -> queue | <- like
 
 
-LP3 Version: 202615010708
+LP3 Version: 202615010742
 
 Created By Azryx (Github source code: https://github.com/ZegoFr34ks/zegofr34ks.github.io )
 
@@ -3358,6 +3414,36 @@ Contact: contact.kavzego@gmail.com`;
     renderNowPlayingUI();
     setSeekVisualFromValue();
     setPlayIcons(false);
+
+    if (!init._bgWired) {
+      init._bgWired = true;
+
+      const onHidden = () => {
+        // iOS/WebKit: prevent crossfade getting stuck at gain=0 (silent) when rAF freezes.
+        if (isIOS && crossfade?.active) commitCrossfadeImmediately();
+        forceAudible(masterAudio);
+        forceAudible(preloadAudio);
+      };
+
+      const onVisible = () => {
+        const deck = getControlAudio?.() || masterAudio;
+        forceAudible(deck);
+        if (_wantPlaying && deck?.paused) {
+          ensureAudioMixer?.();
+          forceAudible(deck);
+          deck.play().catch(() => {});
+        }
+      };
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") onHidden();
+        else onVisible();
+      });
+
+      window.addEventListener("pagehide", onHidden);
+      window.addEventListener("pageshow", onVisible);
+      window.addEventListener("focus", onVisible);
+    }
 
     if (searchInput) {
       searchInput.addEventListener("input", () => {
