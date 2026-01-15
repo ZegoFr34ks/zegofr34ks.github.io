@@ -287,14 +287,49 @@
   }
 
   function applyTapeSpeedMode() {
-    // "false" = do NOT preserve pitch -> pitch changes with playbackRate
-    // Apply to BOTH decks so speed effect is consistent during crossfade.
+    // "Tape speed" effect:
+    // - When speed != 1, we disable pitch preservation so pitch follows playbackRate.
+    // - When speed == 1, we keep pitch preservation enabled to avoid Safari/Chromium glitches
+    //   where toggling preservesPitch repeatedly can cause tiny time jumps.
+    const rate = Number(state?.speed ?? 1) || 1;
+    const useTape = rate !== 1;
+
     [audio, audioPreload].forEach((el) => {
       if (!el) return;
-      try { el.preservesPitch = false; } catch {}
-      try { el.mozPreservesPitch = false; } catch {}
-      try { el.webkitPreservesPitch = false; } catch {}
+      // Prefer toggling to the minimum required state (some browsers are finicky).
+      try { if ("preservesPitch" in el) el.preservesPitch = !useTape; } catch {}
+      try { if ("mozPreservesPitch" in el) el.mozPreservesPitch = !useTape; } catch {}
+      try { if ("webkitPreservesPitch" in el) el.webkitPreservesPitch = !useTape; } catch {}
     });
+  }
+
+  function setDeckPlaybackRate(el, rate) {
+    if (!el) return;
+    const r = Number(rate);
+    if (!Number.isFinite(r) || r <= 0) return;
+    // Setting defaultPlaybackRate reduces periodic resync/stutter on some engines.
+    try { el.defaultPlaybackRate = r; } catch {}
+    try { el.playbackRate = r; } catch {}
+  }
+
+  // Playback intent guard: prevents "mystery pauses" right after auto-advance.
+  let _playIntentToken = 0;
+  let _wantPlaying = false;
+
+  function setWantPlaying(v) { _wantPlaying = Boolean(v); }
+
+  function ensurePlayingSoon(el) {
+    const my = ++_playIntentToken;
+    // small delay lets the engine settle after src swap / decode start
+    setTimeout(() => {
+      if (my !== _playIntentToken) return;
+      if (!_wantPlaying) return;
+      if (!el || !state.currentSongId) return;
+      if (el.paused) {
+        ensureAudioMixer?.();
+        el.play().catch(() => {});
+      }
+    }, 350);
   }
 
   function getUIAudio() {
@@ -331,19 +366,25 @@
     };
 
     safeSetHandler("play", () => {
+      // If nothing selected yet, start first track and mark intent as playing
       if (!state.currentSongId) {
+        setWantPlaying(true);
         const first = getActiveSongs?.()?.[0];
         if (first) loadAndPlay(first.id, 0, true);
         return;
       }
+
       const a = getControlAudio();
       if (a?.paused) {
-        ensureAudioMixer?.(); // keeps your Safari/iOS mixer behavior intact
+        ensureAudioMixer?.();
+        setWantPlaying(true);
         a.play().catch(() => {});
+        ensurePlayingSoon(a);
       }
     });
 
     safeSetHandler("pause", () => {
+      setWantPlaying(false);
       const a = getControlAudio();
       try { a.pause(); } catch {}
     });
@@ -382,6 +423,7 @@
     });
 
     safeSetHandler("stop", () => {
+      setWantPlaying(false);
       const a = getControlAudio();
       try { a.pause(); a.currentTime = 0; } catch {}
       updatePositionState?.();
@@ -1599,7 +1641,7 @@ function bindSongsLinksPanel() {
     // Ensure master has correct runtime properties.
     try {
       applyTapeSpeedMode?.();
-      masterAudio.playbackRate = state.speed;
+      setDeckPlaybackRate(masterAudio, state.speed);
       masterAudio.loop = (state.loop === "one");
     } catch {}
 
@@ -1688,7 +1730,7 @@ function bindSongsLinksPanel() {
       incomingEl.pause();
       setDeckGain(incomingEl, 0);
       incomingEl.loop = false;
-      incomingEl.playbackRate = state.speed;
+      setDeckPlaybackRate(incomingEl, state.speed);
     } catch {}
 
     // If preload deck already has the exact source, keep it.
@@ -1771,7 +1813,7 @@ function bindSongsLinksPanel() {
       // Ensure master has the correct runtime properties
       try {
         applyTapeSpeedMode?.();
-        masterAudio.playbackRate = state.speed;
+        setDeckPlaybackRate(masterAudio, state.speed);
         masterAudio.loop = (state.loop === "one");
       } catch {}
 
@@ -1866,7 +1908,7 @@ function bindSongsLinksPanel() {
     // Load into the current master deck
     masterAudio.src = src;
     applyTapeSpeedMode?.();
-    masterAudio.playbackRate = state.speed;
+    setDeckPlaybackRate(masterAudio, state.speed);
     masterAudio.loop = (state.loop === "one");
 
     // Keep preload deck idle when switching manually
@@ -1883,7 +1925,9 @@ function bindSongsLinksPanel() {
     if (autoplay) {
       // Initialize WebAudio mixer from this user gesture when possible (Safari/iOS fade support)
       ensureAudioMixer();
+      setWantPlaying(true);
       masterAudio.play().catch(() => {});
+      ensurePlayingSoon(masterAudio);
     }
   }
 
@@ -1905,7 +1949,9 @@ function bindSongsLinksPanel() {
       commitCrossfadeNow({ pause: isAnyPlaying });
       if (!isAnyPlaying) {
         ensureAudioMixer();
+        setWantPlaying(true);
         masterAudio.play().catch(() => {});
+        ensurePlayingSoon(masterAudio);
       }
       return;
     }
@@ -1913,8 +1959,13 @@ function bindSongsLinksPanel() {
     const a = getControlAudio();
     if (a.paused) {
       ensureAudioMixer();
+      setWantPlaying(true);
       a.play().catch(() => {});
-    } else a.pause();
+      ensurePlayingSoon(a);
+    } else {
+      setWantPlaying(false);
+      a.pause();
+    }
   }
 
   function nextTrack() {
@@ -2227,8 +2278,8 @@ function bindSongsLinksPanel() {
       state.speed = Number(val);
       applyTapeSpeedMode?.();
       // Apply speed to both decks (order matters if decks swapped).
-      try { masterAudio.playbackRate = state.speed; } catch {}
-      try { preloadAudio.playbackRate = state.speed; } catch {}
+      try { setDeckPlaybackRate(masterAudio, state.speed); } catch {}
+      try { setDeckPlaybackRate(preloadAudio, state.speed); } catch {}
       renderNowPlayingUI();
       toast(`Speed: ${state.speed}×`);
     });
@@ -2521,7 +2572,7 @@ Contact: contact.kavzego@gmail.com`;
           ensureAudioMixer();
           masterAudio.src = src;
           applyTapeSpeedMode?.();
-          masterAudio.playbackRate = state.speed;
+          setDeckPlaybackRate(masterAudio, state.speed);
           masterAudio.loop = (state.loop === "one");
           setDeckGain(masterAudio, 1);
 
