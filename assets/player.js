@@ -227,27 +227,9 @@
   const audioMix = {
     ctx: null,
     ready: false,
+    // Per element nodes
     nodes: new Map(), // el -> { source, gain }
   };
-
-  // iOS/WebKit background playback caveat:
-  // When an <audio> element is routed through WebAudio (createMediaElementSource),
-  // iOS commonly suspends the AudioContext when the page is backgrounded.
-  // This makes playback appear to continue (time advances) but output is silent.
-  // To prioritize background audio on iOS browsers, we avoid the WebAudio mixer there.
-  const _ua = (typeof navigator !== "undefined" && navigator.userAgent) ? navigator.userAgent : "";
-  const isIOS =
-    /iPad|iPhone|iPod/i.test(_ua) ||
-    (typeof navigator !== "undefined" && navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
-  function canUseWebAudioMixer() {
-    // Avoid on iOS to prevent "background mute" when AudioContext is suspended.
-    if (isIOS) return false;
-
-    return typeof window !== "undefined" &&
-      (window.AudioContext || window.webkitAudioContext) &&
-      typeof window.MediaElementAudioSourceNode !== "undefined";
-  }
 
   function canUseWebAudioMixer() {
     return typeof window !== "undefined" &&
@@ -304,153 +286,15 @@
     try { el.volume = v; } catch {}
   }
 
-  function setPitchPreserve(el, preserve) {
-    if (!el) return;
-    // Different engines expose different names
-    try { if ("preservesPitch" in el) el.preservesPitch = preserve; } catch {}
-    try { if ("mozPreservesPitch" in el) el.mozPreservesPitch = preserve; } catch {}
-    try { if ("webkitPreservesPitch" in el) el.webkitPreservesPitch = preserve; } catch {}
-  }
-
-  function setTapePitchMode(useTape) {
-    // useTape=true => pitch follows rate => preservePitch=false
-    const preserve = !useTape;
-    [audio, audioPreload].forEach((el) => setPitchPreserve(el, preserve));
-  }
-
   function applyTapeSpeedMode() {
-    // Keep existing behavior for places that still call this:
-    const rate = Number(state?.speed ?? 1) || 1;
-    setTapePitchMode(rate !== 1);
-  }
-
-  function setDeckPlaybackRate(el, rate) {
-    if (!el) return;
-    const r = Number(rate);
-    if (!Number.isFinite(r) || r <= 0) return;
-    // Setting defaultPlaybackRate reduces periodic resync/stutter on some engines.
-    try { el.defaultPlaybackRate = r; } catch {}
-    try { el.playbackRate = r; } catch {}
-  }
-
-  /** -------------------------
-   *  Smooth "tape speed" ramp
-   *  ------------------------- */
-  const _speedRampToken = new WeakMap(); // el -> number token
-
-  function _easeInOut(t) {
-    // smoothstep
-    return t * t * (3 - 2 * t);
-  }
-
-  function rampDeckPlaybackRate(el, targetRate, rampMs) {
-    if (!el) return;
-
-    const startRate = Number(el.playbackRate) || 1;
-    const endRate = Number(targetRate) || 1;
-
-    // Nothing to do
-    if (Math.abs(endRate - startRate) < 0.0001 || rampMs <= 0) {
-      setDeckPlaybackRate(el, endRate);
-      return Promise.resolve();
-    }
-
-    const myToken = (_speedRampToken.get(el) || 0) + 1;
-    _speedRampToken.set(el, myToken);
-
-    const startAt = performance.now();
-    const dur = Math.max(60, Number(rampMs) || 180);
-
-    return new Promise((resolve) => {
-      const tick = () => {
-        // canceled / superseded
-        if (_speedRampToken.get(el) !== myToken) return resolve();
-
-        const now = performance.now();
-        const t = clamp((now - startAt) / dur, 0, 1);
-        const k = _easeInOut(t);
-        const r = startRate + (endRate - startRate) * k;
-
-        setDeckPlaybackRate(el, r);
-
-        // Keep Media Session position state feeling correct (optional but nice)
-        updatePositionStateThrottled?.();
-
-        if (t < 1) {
-          requestAnimationFrame(tick);
-        } else {
-          setDeckPlaybackRate(el, endRate);
-          resolve();
-        }
-      };
-
-      requestAnimationFrame(tick);
+    // "false" = do NOT preserve pitch -> pitch changes with playbackRate
+    // Apply to BOTH decks so speed effect is consistent during crossfade.
+    [audio, audioPreload].forEach((el) => {
+      if (!el) return;
+      try { el.preservesPitch = false; } catch {}
+      try { el.mozPreservesPitch = false; } catch {}
+      try { el.webkitPreservesPitch = false; } catch {}
     });
-  }
-
-  async function setSpeedSmooth(nextRate, { rampMs = 200 } = {}) {
-    const target = clamp(Number(nextRate) || 1, 0.5, 2.0);
-
-    // IMPORTANT:
-    // While we are ramping, keep "tape mode" ON if either start/target is != 1,
-    // so pitch follows continuously (no mid-ramp preservePitch flips).
-    const curMaster = Number(masterAudio?.playbackRate) || 1;
-    const curPre = Number(preloadAudio?.playbackRate) || 1;
-    const needsTape = (target !== 1) || (curMaster !== 1) || (curPre !== 1);
-
-    setTapePitchMode(needsTape);
-
-    state.speed = target;
-
-    // Ramp both decks so crossfade / preloading stays consistent
-    await Promise.all([
-      rampDeckPlaybackRate(masterAudio, target, rampMs),
-      rampDeckPlaybackRate(preloadAudio, target, rampMs),
-    ]);
-
-    // If we ended exactly at 1x, re-enable pitch preservation (helps reduce engine quirks)
-    if (target === 1) setTapePitchMode(false);
-
-    renderNowPlayingUI?.();
-    updatePositionState?.();
-  }
-
-  function setDeckPlaybackRate(el, rate) {
-    if (!el) return;
-    const r = Number(rate);
-    if (!Number.isFinite(r) || r <= 0) return;
-    // Setting defaultPlaybackRate reduces periodic resync/stutter on some engines.
-    try { el.defaultPlaybackRate = r; } catch {}
-    try { el.playbackRate = r; } catch {}
-  }
-
-  // Playback intent guard: prevents "mystery pauses" right after auto-advance.
-  let _playIntentToken = 0;
-  let _wantPlaying = false;
-
-  function setWantPlaying(v) { _wantPlaying = Boolean(v); }
-
-  function forceAudible(el) {
-    if (!el) return;
-    // Can't override the hardware silent switch, but prevents accidental muting by code/state.
-    try { el.muted = false; } catch {}
-    try { if (Number.isFinite(el.volume) && el.volume < 1) el.volume = 1; } catch {}
-    try { setDeckGain(el, 1); } catch {}
-  }
-
-  function ensurePlayingSoon(el) {
-    const my = ++_playIntentToken;
-    // small delay lets the engine settle after src swap / decode start
-    setTimeout(() => {
-      if (my !== _playIntentToken) return;
-      if (!_wantPlaying) return;
-      if (!el || !state.currentSongId) return;
-      if (el.paused) {
-        ensureAudioMixer?.();
-        forceAudible(audioElement);
-        el.play().catch(() => {});
-      }
-    }, 350);
   }
 
   function getUIAudio() {
@@ -487,26 +331,19 @@
     };
 
     safeSetHandler("play", () => {
-      // If nothing selected yet, start first track and mark intent as playing
       if (!state.currentSongId) {
-        setWantPlaying(true);
         const first = getActiveSongs?.()?.[0];
         if (first) loadAndPlay(first.id, 0, true);
         return;
       }
-
       const a = getControlAudio();
       if (a?.paused) {
-        ensureAudioMixer?.();
-        setWantPlaying(true);
-        forceAudible(a)
+        ensureAudioMixer?.(); // keeps your Safari/iOS mixer behavior intact
         a.play().catch(() => {});
-        ensurePlayingSoon(a);
       }
     });
 
     safeSetHandler("pause", () => {
-      setWantPlaying(false);
       const a = getControlAudio();
       try { a.pause(); } catch {}
     });
@@ -545,7 +382,6 @@
     });
 
     safeSetHandler("stop", () => {
-      setWantPlaying(false);
       const a = getControlAudio();
       try { a.pause(); a.currentTime = 0; } catch {}
       updatePositionState?.();
@@ -575,100 +411,6 @@
       });
     } catch {}
   }
-
-  /** -------------------------
-   *  Background playback helpers (mobile)
-   *
-   *  Reality check:
-   *  - We can’t override OS/browser power policies, but we can make background playback
-   *    more reliable by (1) using Media Session (already present), (2) keeping the
-   *    AudioContext alive when possible, and (3) requesting a Screen Wake Lock while
-   *    audio is playing (prevents the device from sleeping and cutting audio).
-   *
-   *  This is intentionally lightweight and does NOT change any existing playback logic.
-   *  ------------------------- */
-  const bgPlayback = (() => {
-    const ua = (typeof navigator !== "undefined" && navigator.userAgent) ? navigator.userAgent : "";
-    const isMobile = Boolean(
-      (typeof navigator !== "undefined" && navigator.userAgentData && navigator.userAgentData.mobile) ||
-      /Android|iPhone|iPad|iPod|Mobile/i.test(ua)
-    );
-
-    let wakeLock = null;
-    let wantPlaying = false;
-
-    const canWakeLock = () => {
-      return isMobile &&
-        typeof navigator !== "undefined" &&
-        "wakeLock" in navigator &&
-        typeof navigator.wakeLock?.request === "function";
-    };
-
-    async function requestWakeLock() {
-      if (!canWakeLock()) return;
-      if (!wantPlaying) return;
-      if (document.visibilityState !== "visible") return;
-      if (wakeLock) return;
-
-      try {
-        wakeLock = await navigator.wakeLock.request("screen");
-        wakeLock.addEventListener?.("release", () => { wakeLock = null; });
-      } catch {
-        // Not supported / permission denied / system policy
-      }
-    }
-
-    function releaseWakeLock() {
-      try { wakeLock?.release?.(); } catch {}
-      wakeLock = null;
-    }
-
-    function resumeMixerIfNeeded() {
-      const ctx = audioMix?.ctx;
-      if (!ctx) return;
-      if (ctx.state === "suspended") ctx.resume().catch(() => {});
-    }
-
-    function onReturnToForeground() {
-      if (!isMobile) return;
-      if (!wantPlaying) return;
-
-      requestWakeLock();
-      resumeMixerIfNeeded();
-
-      // If the engine got paused during backgrounding, try to restore.
-      // We only do this if the user intent says “should be playing”.
-      const a = getControlAudio?.();
-      if (a && a.paused) {
-        ensureAudioMixer?.();
-        a.play().catch(() => {});
-        ensurePlayingSoon?.(a);
-      }
-    }
-
-    // Re-acquire wake lock when coming back (wake locks are released when hidden)
-    document.addEventListener("visibilitychange", () => {
-      if (!isMobile) return;
-      if (document.visibilityState === "visible") onReturnToForeground();
-      else releaseWakeLock();
-    });
-
-    // Page lifecycle (Chrome/Android)
-    document.addEventListener?.("freeze", () => releaseWakeLock());
-    document.addEventListener?.("resume", () => onReturnToForeground());
-    window.addEventListener("pageshow", () => onReturnToForeground());
-    window.addEventListener("pagehide", () => releaseWakeLock());
-
-    return {
-      isMobile,
-      setPlaying(v) {
-        wantPlaying = Boolean(v);
-        if (wantPlaying) requestWakeLock();
-        else releaseWakeLock();
-        resumeMixerIfNeeded();
-      }
-    };
-  })();
 
   function updateMediaSessionPlaybackState() {
     if (!mediaSession.supported) return;
@@ -1857,7 +1599,7 @@ function bindSongsLinksPanel() {
     // Ensure master has correct runtime properties.
     try {
       applyTapeSpeedMode?.();
-      setDeckPlaybackRate(masterAudio, state.speed);
+      masterAudio.playbackRate = state.speed;
       masterAudio.loop = (state.loop === "one");
     } catch {}
 
@@ -1946,7 +1688,7 @@ function bindSongsLinksPanel() {
       incomingEl.pause();
       setDeckGain(incomingEl, 0);
       incomingEl.loop = false;
-      setDeckPlaybackRate(incomingEl, state.speed);
+      incomingEl.playbackRate = state.speed;
     } catch {}
 
     // If preload deck already has the exact source, keep it.
@@ -1964,7 +1706,6 @@ function bindSongsLinksPanel() {
         incomingEl.currentTime = 0;
       } catch {}
       try {
-        forceAudible(incomingEl);
         await incomingEl.play();
       } catch {
         // If the browser blocks a second simultaneous element, fall back to normal next.
@@ -2030,7 +1771,7 @@ function bindSongsLinksPanel() {
       // Ensure master has the correct runtime properties
       try {
         applyTapeSpeedMode?.();
-        setDeckPlaybackRate(masterAudio, state.speed);
+        masterAudio.playbackRate = state.speed;
         masterAudio.loop = (state.loop === "one");
       } catch {}
 
@@ -2046,48 +1787,6 @@ function bindSongsLinksPanel() {
     };
 
     crossfade.raf = requestAnimationFrame(tick);
-  }
-
-  function commitCrossfadeImmediately() {
-    if (!crossfade.active) return;
-
-    try { if (crossfade.raf) cancelAnimationFrame(crossfade.raf); } catch {}
-    crossfade.raf = 0;
-
-    const incoming = preloadAudio;
-    const outgoing = masterAudio;
-
-    crossfade.active = false;
-    crossfade.target = null;
-    crossfade.src = null;
-
-    try { if (incoming && incoming.paused) {
-      forceAudible(incoming);
-      incoming.play().catch(() => {});}
-    } catch {}
-
-    // Normalize volumes so nothing stays stuck at 0 when rAF freezes in background.
-    try { setDeckGain(outgoing, 1); } catch {}
-    try { setDeckGain(incoming, 1); } catch {}
-
-    try { outgoing.pause(); } catch {}
-
-    masterAudio = incoming;
-    preloadAudio = outgoing;
-
-    try {
-      applyTapeSpeedMode?.();
-      setDeckPlaybackRate(masterAudio, state.speed);
-      masterAudio.loop = (state.loop === "one");
-    } catch {}
-
-    try {
-      preloadAudio.pause();
-      setDeckGain(preloadAudio, 1);
-    } catch {}
-
-    preloadNextTrack();
-    updateUpNextUI();
   }
 
   function maybeStartCrossfade() {
@@ -2167,7 +1866,7 @@ function bindSongsLinksPanel() {
     // Load into the current master deck
     masterAudio.src = src;
     applyTapeSpeedMode?.();
-    setDeckPlaybackRate(masterAudio, state.speed);
+    masterAudio.playbackRate = state.speed;
     masterAudio.loop = (state.loop === "one");
 
     // Keep preload deck idle when switching manually
@@ -2184,10 +1883,7 @@ function bindSongsLinksPanel() {
     if (autoplay) {
       // Initialize WebAudio mixer from this user gesture when possible (Safari/iOS fade support)
       ensureAudioMixer();
-      setWantPlaying(true);
-      forceAudible(audioElement);
       masterAudio.play().catch(() => {});
-      ensurePlayingSoon(masterAudio);
     }
   }
 
@@ -2209,10 +1905,7 @@ function bindSongsLinksPanel() {
       commitCrossfadeNow({ pause: isAnyPlaying });
       if (!isAnyPlaying) {
         ensureAudioMixer();
-        setWantPlaying(true);
-        forceAudible(audioElement);
         masterAudio.play().catch(() => {});
-        ensurePlayingSoon(masterAudio);
       }
       return;
     }
@@ -2220,14 +1913,8 @@ function bindSongsLinksPanel() {
     const a = getControlAudio();
     if (a.paused) {
       ensureAudioMixer();
-      setWantPlaying(true);
-      forceAudible(a);
       a.play().catch(() => {});
-      ensurePlayingSoon(a);
-    } else {
-      setWantPlaying(false);
-      a.pause();
-    }
+    } else a.pause();
   }
 
   function nextTrack() {
@@ -2537,12 +2224,13 @@ function bindSongsLinksPanel() {
     ];
 
     openSelect("Speed", steps, String(state.speed), (val) => {
-      const next = Number(val);
-
-      // Smooth ramp + correct pitch behavior
-      setSpeedSmooth(next, { rampMs: 220 });
-
-      toast(`Speed: ${Number(next).toFixed(2).replace(/\.00$/, "")}×`);
+      state.speed = Number(val);
+      applyTapeSpeedMode?.();
+      // Apply speed to both decks (order matters if decks swapped).
+      try { masterAudio.playbackRate = state.speed; } catch {}
+      try { preloadAudio.playbackRate = state.speed; } catch {}
+      renderNowPlayingUI();
+      toast(`Speed: ${state.speed}×`);
     });
   });
 
@@ -2596,8 +2284,6 @@ function bindSongsLinksPanel() {
   function updatePlayIconsFromDecks() {
     const playing = (!masterAudio.paused) || (!preloadAudio.paused);
     setPlayIcons(playing);
-    // Mobile background playback: keep wake lock / audio focus in sync with actual playback.
-    bgPlayback?.setPlaying?.(playing);
     updateMediaSessionPlaybackState();
   }
 
@@ -2753,9 +2439,9 @@ New features include: Customization, Sorting/Filtering, Queuing, Liking, Crossfa
 Did you know you can swipe a song card to either queue or like them? Swipe -> queue | <- like
 
 
-LP3 Version: 202615010742
+LP3 Version: 202612010810
 
-Created By Azryx (Github source code: https://github.com/ZegoFr34ks/zegofr34ks.github.io )
+Created By Azryx (Github source code: https://github.com/ZegoFr34ks/zegofr34ks.github.io)
 
 The songs are under Copyright © YZKSTUDIOS and shall not be uploaded without permission
 
@@ -2835,7 +2521,7 @@ Contact: contact.kavzego@gmail.com`;
           ensureAudioMixer();
           masterAudio.src = src;
           applyTapeSpeedMode?.();
-          setDeckPlaybackRate(masterAudio, state.speed);
+          masterAudio.playbackRate = state.speed;
           masterAudio.loop = (state.loop === "one");
           setDeckGain(masterAudio, 1);
 
@@ -3383,14 +3069,6 @@ Contact: contact.kavzego@gmail.com`;
    *  ------------------------- */
   async function init() {
     applySettingsToRuntime();
-    
-    // Mobile stability: ensure inline media mode is set even if HTML was cached/modified.
-    // (No-op on desktop; safe on all browsers.)
-    [audio, audioPreload].forEach((el) => {
-      if (!el) return;
-      try { el.setAttribute("playsinline", ""); } catch {}
-      try { el.setAttribute("webkit-playsinline", ""); } catch {}
-    });
 
     renderSkeletonList(10);
     try {
@@ -3414,36 +3092,6 @@ Contact: contact.kavzego@gmail.com`;
     renderNowPlayingUI();
     setSeekVisualFromValue();
     setPlayIcons(false);
-
-    if (!init._bgWired) {
-      init._bgWired = true;
-
-      const onHidden = () => {
-        // iOS/WebKit: prevent crossfade getting stuck at gain=0 (silent) when rAF freezes.
-        if (isIOS && crossfade?.active) commitCrossfadeImmediately();
-        forceAudible(masterAudio);
-        forceAudible(preloadAudio);
-      };
-
-      const onVisible = () => {
-        const deck = getControlAudio?.() || masterAudio;
-        forceAudible(deck);
-        if (_wantPlaying && deck?.paused) {
-          ensureAudioMixer?.();
-          forceAudible(deck);
-          deck.play().catch(() => {});
-        }
-      };
-
-      document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "hidden") onHidden();
-        else onVisible();
-      });
-
-      window.addEventListener("pagehide", onHidden);
-      window.addEventListener("pageshow", onVisible);
-      window.addEventListener("focus", onVisible);
-    }
 
     if (searchInput) {
       searchInput.addEventListener("input", () => {
