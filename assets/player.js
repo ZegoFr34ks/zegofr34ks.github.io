@@ -273,6 +273,42 @@
     }
   }
 
+  // -------------------------
+  // iOS background-play safety
+  // -------------------------
+  const IS_IOS = (() => {
+    const ua = navigator.userAgent || "";
+    const isIPhoneIPadIPod = /iPad|iPhone|iPod/.test(ua);
+    const isIPadOS13Plus = ua.includes("Mac") && "ontouchend" in document; // iPadOS reports as Mac
+    return isIPhoneIPadIPod || isIPadOS13Plus;
+  })();
+
+  /**
+   * On iOS, routing <audio> through WebAudio (MediaElementSource -> AudioContext)
+   * is a common reason playback goes silent in the background because iOS may
+   * suspend the AudioContext. For background reliability:
+   * - Prefer native <audio> output on iOS (no WebAudio) unless crossfade is enabled.
+   * - Only create the mixer when it's truly needed (crossfade) and we're visible.
+   */
+  function ensurePlaybackPipeline() {
+    const needsMixer = Boolean(state?.settings?.crossfadeEnabled); // only when user enabled crossfade
+
+    // If we're on iOS and crossfade is OFF, never create the mixer.
+    // This keeps audio on the native media pipeline => best chance to keep playing in background.
+    if (IS_IOS && !needsMixer) return false;
+
+    // If we're hidden on iOS, don't create the mixer (avoid switching pipeline right before backgrounding).
+    if (IS_IOS && document.visibilityState === "hidden") return false;
+
+    return ensureAudioMixer();
+  }
+
+  // If we already have a context (e.g., crossfade enabled), try to resume it when returning to foreground.
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible") return;
+    try { audioMix?.ctx?.resume?.().catch(() => {}); } catch {}
+  });
+
   function setDeckGain(el, value) {
     const v = clamp(Number(value) || 0, 0, 1);
     if (audioMix.ready) {
@@ -338,7 +374,7 @@
       }
       const a = getControlAudio();
       if (a?.paused) {
-        ensureAudioMixer?.(); // keeps your Safari/iOS mixer behavior intact
+        ensurePlaybackPipeline();
         a.play().catch(() => {});
       }
     });
@@ -1643,6 +1679,7 @@ function bindSongsLinksPanel() {
   }
 
   async function startCrossfadeTo(next) {
+    if (IS_IOS && document.visibilityState === "hidden") return; // ✅ don't spin up mixer in background
     if (crossfade.active) return;
     if (!canCrossfadeNow()) return;
     if (!next || !state.currentSongId) return;
@@ -1683,7 +1720,7 @@ function bindSongsLinksPanel() {
     try {
       // Prefer WebAudio gains when available (Safari/iOS-safe). This should already
       // be initialized from a prior user gesture; if not, we'll just fall back.
-      ensureAudioMixer();
+      ensurePlaybackPipeline();
       applyTapeSpeedMode?.();
       incomingEl.pause();
       setDeckGain(incomingEl, 0);
@@ -1790,6 +1827,7 @@ function bindSongsLinksPanel() {
   }
 
   function maybeStartCrossfade() {
+    if (IS_IOS && document.visibilityState === "hidden") return; // ✅ don't start on background
     if (!canCrossfadeNow()) return;
     if (crossfade.active) return;
     if (!state.currentSongId) return;
@@ -1882,7 +1920,7 @@ function bindSongsLinksPanel() {
 
     if (autoplay) {
       // Initialize WebAudio mixer from this user gesture when possible (Safari/iOS fade support)
-      ensureAudioMixer();
+      ensurePlaybackPipeline();
       masterAudio.play().catch(() => {});
     }
   }
@@ -1904,7 +1942,7 @@ function bindSongsLinksPanel() {
       const isAnyPlaying = (!masterAudio.paused) || (!preloadAudio.paused);
       commitCrossfadeNow({ pause: isAnyPlaying });
       if (!isAnyPlaying) {
-        ensureAudioMixer();
+        ensurePlaybackPipeline();
         masterAudio.play().catch(() => {});
       }
       return;
@@ -1912,7 +1950,7 @@ function bindSongsLinksPanel() {
 
     const a = getControlAudio();
     if (a.paused) {
-      ensureAudioMixer();
+      ensurePlaybackPipeline();
       a.play().catch(() => {});
     } else a.pause();
   }
@@ -2439,7 +2477,7 @@ New features include: Customization, Sorting/Filtering, Queuing, Liking, Crossfa
 Did you know you can swipe a song card to either queue or like them? Swipe -> queue | <- like
 
 
-LP3 Version: 202612010810
+LP3 Version: 202615010843
 
 Created By Azryx (Github source code: https://github.com/ZegoFr34ks/zegofr34ks.github.io)
 
@@ -2518,7 +2556,7 @@ Contact: contact.kavzego@gmail.com`;
 
           // Always apply to the current control deck (after commit, that's masterAudio).
           // Ensure mixer is ready so Safari/iOS can fade via WebAudio gains.
-          ensureAudioMixer();
+          ensurePlaybackPipeline();
           masterAudio.src = src;
           applyTapeSpeedMode?.();
           masterAudio.playbackRate = state.speed;
