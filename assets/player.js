@@ -227,9 +227,27 @@
   const audioMix = {
     ctx: null,
     ready: false,
-    // Per element nodes
     nodes: new Map(), // el -> { source, gain }
   };
+
+  // iOS/WebKit background playback caveat:
+  // When an <audio> element is routed through WebAudio (createMediaElementSource),
+  // iOS commonly suspends the AudioContext when the page is backgrounded.
+  // This makes playback appear to continue (time advances) but output is silent.
+  // To prioritize background audio on iOS browsers, we avoid the WebAudio mixer there.
+  const _ua = (typeof navigator !== "undefined" && navigator.userAgent) ? navigator.userAgent : "";
+  const isIOS =
+    /iPad|iPhone|iPod/i.test(_ua) ||
+    (typeof navigator !== "undefined" && navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+  function canUseWebAudioMixer() {
+    // Avoid on iOS to prevent "background mute" when AudioContext is suspended.
+    if (isIOS) return false;
+
+    return typeof window !== "undefined" &&
+      (window.AudioContext || window.webkitAudioContext) &&
+      typeof window.MediaElementAudioSourceNode !== "undefined";
+  }
 
   function canUseWebAudioMixer() {
     return typeof window !== "undefined" &&
