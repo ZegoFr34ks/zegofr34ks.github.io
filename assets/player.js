@@ -286,21 +286,115 @@
     try { el.volume = v; } catch {}
   }
 
-  function applyTapeSpeedMode() {
-    // "Tape speed" effect:
-    // - When speed != 1, we disable pitch preservation so pitch follows playbackRate.
-    // - When speed == 1, we keep pitch preservation enabled to avoid Safari/Chromium glitches
-    //   where toggling preservesPitch repeatedly can cause tiny time jumps.
-    const rate = Number(state?.speed ?? 1) || 1;
-    const useTape = rate !== 1;
+  function setPitchPreserve(el, preserve) {
+    if (!el) return;
+    // Different engines expose different names
+    try { if ("preservesPitch" in el) el.preservesPitch = preserve; } catch {}
+    try { if ("mozPreservesPitch" in el) el.mozPreservesPitch = preserve; } catch {}
+    try { if ("webkitPreservesPitch" in el) el.webkitPreservesPitch = preserve; } catch {}
+  }
 
-    [audio, audioPreload].forEach((el) => {
-      if (!el) return;
-      // Prefer toggling to the minimum required state (some browsers are finicky).
-      try { if ("preservesPitch" in el) el.preservesPitch = !useTape; } catch {}
-      try { if ("mozPreservesPitch" in el) el.mozPreservesPitch = !useTape; } catch {}
-      try { if ("webkitPreservesPitch" in el) el.webkitPreservesPitch = !useTape; } catch {}
+  function setTapePitchMode(useTape) {
+    // useTape=true => pitch follows rate => preservePitch=false
+    const preserve = !useTape;
+    [audio, audioPreload].forEach((el) => setPitchPreserve(el, preserve));
+  }
+
+  function applyTapeSpeedMode() {
+    // Keep existing behavior for places that still call this:
+    const rate = Number(state?.speed ?? 1) || 1;
+    setTapePitchMode(rate !== 1);
+  }
+
+  function setDeckPlaybackRate(el, rate) {
+    if (!el) return;
+    const r = Number(rate);
+    if (!Number.isFinite(r) || r <= 0) return;
+    // Setting defaultPlaybackRate reduces periodic resync/stutter on some engines.
+    try { el.defaultPlaybackRate = r; } catch {}
+    try { el.playbackRate = r; } catch {}
+  }
+
+  /** -------------------------
+   *  Smooth "tape speed" ramp
+   *  ------------------------- */
+  const _speedRampToken = new WeakMap(); // el -> number token
+
+  function _easeInOut(t) {
+    // smoothstep
+    return t * t * (3 - 2 * t);
+  }
+
+  function rampDeckPlaybackRate(el, targetRate, rampMs) {
+    if (!el) return;
+
+    const startRate = Number(el.playbackRate) || 1;
+    const endRate = Number(targetRate) || 1;
+
+    // Nothing to do
+    if (Math.abs(endRate - startRate) < 0.0001 || rampMs <= 0) {
+      setDeckPlaybackRate(el, endRate);
+      return Promise.resolve();
+    }
+
+    const myToken = (_speedRampToken.get(el) || 0) + 1;
+    _speedRampToken.set(el, myToken);
+
+    const startAt = performance.now();
+    const dur = Math.max(60, Number(rampMs) || 180);
+
+    return new Promise((resolve) => {
+      const tick = () => {
+        // canceled / superseded
+        if (_speedRampToken.get(el) !== myToken) return resolve();
+
+        const now = performance.now();
+        const t = clamp((now - startAt) / dur, 0, 1);
+        const k = _easeInOut(t);
+        const r = startRate + (endRate - startRate) * k;
+
+        setDeckPlaybackRate(el, r);
+
+        // Keep Media Session position state feeling correct (optional but nice)
+        updatePositionStateThrottled?.();
+
+        if (t < 1) {
+          requestAnimationFrame(tick);
+        } else {
+          setDeckPlaybackRate(el, endRate);
+          resolve();
+        }
+      };
+
+      requestAnimationFrame(tick);
     });
+  }
+
+  async function setSpeedSmooth(nextRate, { rampMs = 200 } = {}) {
+    const target = clamp(Number(nextRate) || 1, 0.5, 2.0);
+
+    // IMPORTANT:
+    // While we are ramping, keep "tape mode" ON if either start/target is != 1,
+    // so pitch follows continuously (no mid-ramp preservePitch flips).
+    const curMaster = Number(masterAudio?.playbackRate) || 1;
+    const curPre = Number(preloadAudio?.playbackRate) || 1;
+    const needsTape = (target !== 1) || (curMaster !== 1) || (curPre !== 1);
+
+    setTapePitchMode(needsTape);
+
+    state.speed = target;
+
+    // Ramp both decks so crossfade / preloading stays consistent
+    await Promise.all([
+      rampDeckPlaybackRate(masterAudio, target, rampMs),
+      rampDeckPlaybackRate(preloadAudio, target, rampMs),
+    ]);
+
+    // If we ended exactly at 1x, re-enable pitch preservation (helps reduce engine quirks)
+    if (target === 1) setTapePitchMode(false);
+
+    renderNowPlayingUI?.();
+    updatePositionState?.();
   }
 
   function setDeckPlaybackRate(el, rate) {
@@ -2275,13 +2369,12 @@ function bindSongsLinksPanel() {
     ];
 
     openSelect("Speed", steps, String(state.speed), (val) => {
-      state.speed = Number(val);
-      applyTapeSpeedMode?.();
-      // Apply speed to both decks (order matters if decks swapped).
-      try { setDeckPlaybackRate(masterAudio, state.speed); } catch {}
-      try { setDeckPlaybackRate(preloadAudio, state.speed); } catch {}
-      renderNowPlayingUI();
-      toast(`Speed: ${state.speed}×`);
+      const next = Number(val);
+
+      // Smooth ramp + correct pitch behavior
+      setSpeedSmooth(next, { rampMs: 220 });
+
+      toast(`Speed: ${Number(next).toFixed(2).replace(/\.00$/, "")}×`);
     });
   });
 
