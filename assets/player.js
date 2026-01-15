@@ -548,6 +548,100 @@
     } catch {}
   }
 
+  /** -------------------------
+   *  Background playback helpers (mobile)
+   *
+   *  Reality check:
+   *  - We can’t override OS/browser power policies, but we can make background playback
+   *    more reliable by (1) using Media Session (already present), (2) keeping the
+   *    AudioContext alive when possible, and (3) requesting a Screen Wake Lock while
+   *    audio is playing (prevents the device from sleeping and cutting audio).
+   *
+   *  This is intentionally lightweight and does NOT change any existing playback logic.
+   *  ------------------------- */
+  const bgPlayback = (() => {
+    const ua = (typeof navigator !== "undefined" && navigator.userAgent) ? navigator.userAgent : "";
+    const isMobile = Boolean(
+      (typeof navigator !== "undefined" && navigator.userAgentData && navigator.userAgentData.mobile) ||
+      /Android|iPhone|iPad|iPod|Mobile/i.test(ua)
+    );
+
+    let wakeLock = null;
+    let wantPlaying = false;
+
+    const canWakeLock = () => {
+      return isMobile &&
+        typeof navigator !== "undefined" &&
+        "wakeLock" in navigator &&
+        typeof navigator.wakeLock?.request === "function";
+    };
+
+    async function requestWakeLock() {
+      if (!canWakeLock()) return;
+      if (!wantPlaying) return;
+      if (document.visibilityState !== "visible") return;
+      if (wakeLock) return;
+
+      try {
+        wakeLock = await navigator.wakeLock.request("screen");
+        wakeLock.addEventListener?.("release", () => { wakeLock = null; });
+      } catch {
+        // Not supported / permission denied / system policy
+      }
+    }
+
+    function releaseWakeLock() {
+      try { wakeLock?.release?.(); } catch {}
+      wakeLock = null;
+    }
+
+    function resumeMixerIfNeeded() {
+      const ctx = audioMix?.ctx;
+      if (!ctx) return;
+      if (ctx.state === "suspended") ctx.resume().catch(() => {});
+    }
+
+    function onReturnToForeground() {
+      if (!isMobile) return;
+      if (!wantPlaying) return;
+
+      requestWakeLock();
+      resumeMixerIfNeeded();
+
+      // If the engine got paused during backgrounding, try to restore.
+      // We only do this if the user intent says “should be playing”.
+      const a = getControlAudio?.();
+      if (a && a.paused) {
+        ensureAudioMixer?.();
+        a.play().catch(() => {});
+        ensurePlayingSoon?.(a);
+      }
+    }
+
+    // Re-acquire wake lock when coming back (wake locks are released when hidden)
+    document.addEventListener("visibilitychange", () => {
+      if (!isMobile) return;
+      if (document.visibilityState === "visible") onReturnToForeground();
+      else releaseWakeLock();
+    });
+
+    // Page lifecycle (Chrome/Android)
+    document.addEventListener?.("freeze", () => releaseWakeLock());
+    document.addEventListener?.("resume", () => onReturnToForeground());
+    window.addEventListener("pageshow", () => onReturnToForeground());
+    window.addEventListener("pagehide", () => releaseWakeLock());
+
+    return {
+      isMobile,
+      setPlaying(v) {
+        wantPlaying = Boolean(v);
+        if (wantPlaying) requestWakeLock();
+        else releaseWakeLock();
+        resumeMixerIfNeeded();
+      }
+    };
+  })();
+
   function updateMediaSessionPlaybackState() {
     if (!mediaSession.supported) return;
     try {
@@ -2428,6 +2522,8 @@ function bindSongsLinksPanel() {
   function updatePlayIconsFromDecks() {
     const playing = (!masterAudio.paused) || (!preloadAudio.paused);
     setPlayIcons(playing);
+    // Mobile background playback: keep wake lock / audio focus in sync with actual playback.
+    bgPlayback?.setPlaying?.(playing);
     updateMediaSessionPlaybackState();
   }
 
@@ -3213,6 +3309,14 @@ Contact: contact.kavzego@gmail.com`;
    *  ------------------------- */
   async function init() {
     applySettingsToRuntime();
+    
+    // Mobile stability: ensure inline media mode is set even if HTML was cached/modified.
+    // (No-op on desktop; safe on all browsers.)
+    [audio, audioPreload].forEach((el) => {
+      if (!el) return;
+      try { el.setAttribute("playsinline", ""); } catch {}
+      try { el.setAttribute("webkit-playsinline", ""); } catch {}
+    });
 
     renderSkeletonList(10);
     try {
