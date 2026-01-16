@@ -341,6 +341,55 @@
     });
   }
 
+
+  // Robust speed+pitch handling (iOS Safari can try to preserve pitch unless explicitly disabled)
+  // We want classic "tape" behavior: speed changes ALSO change pitch.
+  const SPEED_MIN = 0.5;
+  const SPEED_MAX = 4.0;
+
+  function setTapeSpeed(el, rate) {
+    if (!el) return;
+    const r = clamp(Number(rate) || 1, SPEED_MIN, SPEED_MAX);
+
+    // Disable pitch preservation across engines (no time-stretch).
+    // Some iOS builds are finicky: re-assert on the next frame too.
+    const forceNoPreserve = () => {
+      try { el.preservesPitch = false; } catch {}
+      try { el.mozPreservesPitch = false; } catch {}
+      try { el.webkitPreservesPitch = false; } catch {}
+    };
+
+    forceNoPreserve();
+
+    // Setting BOTH helps on Safari (some builds key off defaultPlaybackRate).
+    try { el.defaultPlaybackRate = r; } catch {}
+    try { el.playbackRate = r; } catch {}
+
+    if (IS_IOS) {
+      requestAnimationFrame(() => {
+        forceNoPreserve();
+        try { el.defaultPlaybackRate = r; } catch {}
+        try { el.playbackRate = r; } catch {}
+      });
+    }
+  }
+
+  function applySpeedToDecks(rate = state.speed) {
+    setTapeSpeed(masterAudio, rate);
+    setTapeSpeed(preloadAudio, rate);
+  }
+
+  function wireTapeSpeedGuards() {
+    // Re-assert tape mode + speed after src swaps / metadata loads.
+    // (iOS Safari may silently reset pitch-preservation flags on new sources.)
+    [audio, audioPreload].forEach((el) => {
+      if (!el) return;
+      const reapply = () => setTapeSpeed(el, state.speed);
+      el.addEventListener("loadedmetadata", reapply);
+      el.addEventListener("play", reapply);
+    });
+  }
+
   function getUIAudio() {
     // During crossfade, UI (timeline) should follow the incoming deck (Spotify-like).
     return crossfade?.active ? preloadAudio : masterAudio;
@@ -1639,7 +1688,7 @@ function bindSongsLinksPanel() {
     // Ensure master has correct runtime properties.
     try {
       applyTapeSpeedMode?.();
-      masterAudio.playbackRate = state.speed;
+      setTapeSpeed(masterAudio, state.speed);
       masterAudio.loop = (state.loop === "one");
     } catch {}
 
@@ -1729,7 +1778,7 @@ function bindSongsLinksPanel() {
       incomingEl.pause();
       setDeckGain(incomingEl, 0);
       incomingEl.loop = false;
-      incomingEl.playbackRate = state.speed;
+      setTapeSpeed(incomingEl, state.speed);
     } catch {}
 
     // If preload deck already has the exact source, keep it.
@@ -1812,7 +1861,7 @@ function bindSongsLinksPanel() {
       // Ensure master has the correct runtime properties
       try {
         applyTapeSpeedMode?.();
-        masterAudio.playbackRate = state.speed;
+        setTapeSpeed(masterAudio, state.speed);
         masterAudio.loop = (state.loop === "one");
       } catch {}
 
@@ -1908,7 +1957,7 @@ function bindSongsLinksPanel() {
     // Load into the current master deck
     masterAudio.src = src;
     applyTapeSpeedMode?.();
-    masterAudio.playbackRate = state.speed;
+    setTapeSpeed(masterAudio, state.speed);
     masterAudio.loop = (state.loop === "one");
 
     // Keep preload deck idle when switching manually
@@ -2269,8 +2318,8 @@ function bindSongsLinksPanel() {
       state.speed = Number(val);
       applyTapeSpeedMode?.();
       // Apply speed to both decks (order matters if decks swapped).
-      try { masterAudio.playbackRate = state.speed; } catch {}
-      try { preloadAudio.playbackRate = state.speed; } catch {}
+      try { setTapeSpeed(masterAudio, state.speed); } catch {}
+      try { setTapeSpeed(preloadAudio, state.speed); } catch {}
       renderNowPlayingUI();
       toast(`Speed: ${state.speed}×`);
     });
@@ -2481,7 +2530,7 @@ New features include: Customization, Sorting/Filtering, Queuing, Liking, Crossfa
 Did you know you can swipe a song card to either queue or like them? Swipe -> queue | <- like
 
 
-LP3 Version: 202616010414
+LP3 Version: 202616010436
 
 Created By Azryx (Github source code: https://github.com/ZegoFr34ks/zegofr34ks.github.io)
 
@@ -2563,7 +2612,7 @@ Contact: contact.kavzego@gmail.com`;
           ensurePlaybackPipeline();
           masterAudio.src = src;
           applyTapeSpeedMode?.();
-          masterAudio.playbackRate = state.speed;
+          setTapeSpeed(masterAudio, state.speed);
           masterAudio.loop = (state.loop === "one");
           setDeckGain(masterAudio, 1);
 
@@ -3129,6 +3178,7 @@ Contact: contact.kavzego@gmail.com`;
     }
 
     applyTapeSpeedMode();
+    wireTapeSpeedGuards();
     rebuildPlayList();
     renderList();
     renderNowPlayingUI();
