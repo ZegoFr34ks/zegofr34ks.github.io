@@ -286,6 +286,21 @@
     }
   }
 
+
+  function teardownAudioMixer() {
+    if (!audioMix.ready) return;
+    try {
+      for (const n of audioMix.nodes.values()) {
+        if (n && n.source) { try { n.source.disconnect(); } catch {} }
+        if (n && n.gain) { try { n.gain.disconnect(); } catch {} }
+      }
+    } catch {}
+    try { audioMix.nodes.clear(); } catch {}
+    try { if (audioMix.ctx && audioMix.ctx.state !== "closed" && audioMix.ctx.close) { audioMix.ctx.close().catch(() => {}); } } catch {}
+    audioMix.ctx = null;
+    audioMix.ready = false;
+  }
+
   // -------------------------
   // iOS background-play safety
   // -------------------------
@@ -296,6 +311,10 @@
     return isIPhoneIPadIPod || isIPadOS13Plus;
   })();
 
+  function isSpeedSensitiveMode() {
+    return IS_IOS && Number(state?.speed || 1) !== 1;
+  }
+
   /**
    * On iOS, routing <audio> through WebAudio (MediaElementSource -> AudioContext)
    * is a common reason playback goes silent in the background because iOS may
@@ -304,7 +323,8 @@
    * - Only create the mixer when it's truly needed (crossfade) and we're visible.
    */
   function ensurePlaybackPipeline() {
-    const needsMixer = Boolean(state?.settings?.crossfadeEnabled); // only when user enabled crossfade
+    const speedSensitive = isSpeedSensitiveMode();
+    const needsMixer = Boolean(state?.settings?.crossfadeEnabled) && !speedSensitive;
 
     // If we're on iOS and crossfade is OFF, never create the mixer.
     // This keeps audio on the native media pipeline => best chance to keep playing in background.
@@ -324,7 +344,7 @@
 
   function setDeckGain(el, value) {
     const v = clamp(Number(value) || 0, 0, 1);
-    if (audioMix.ready) {
+    if (audioMix.ready && !isSpeedSensitiveMode()) {
       const n = audioMix.nodes.get(el);
       if (n?.gain) {
         try { n.gain.gain.value = v; } catch {}
@@ -1964,6 +1984,14 @@ function bindSongsLinksPanel() {
     if (!preloadAudio) return;
     // While crossfading, the preload deck is being used as a playback deck.
     if (crossfade.active) return;
+    // iOS Safari: avoid decoding/preloading a second <audio> while using non-1x rates.
+    // This reduces stutter and avoids repeated buffer churn that can momentarily reset playbackRate.
+    if (isSpeedSensitiveMode()) {
+      try { if (preloadAudio.src) preloadAudio.removeAttribute("src"); } catch {}
+      try { preloadAudio.load(); } catch {}
+      return;
+    }
+
 
     const next = resolveNextUp();
 
@@ -2378,6 +2406,25 @@ function bindSongsLinksPanel() {
     openSelect("Speed", steps, String(state.speed), (val) => {
       state.speed = Number(val);
       applyTapeSpeedMode?.();
+      // iOS Safari: playbackRate + pitch behaves incorrectly (and can stutter) when the media element
+      // is routed through WebAudio (MediaElementAudioSourceNode). If the mixer was created earlier
+      // (e.g. because crossfade was enabled), tear it down so native playbackRate works.
+      if (isSpeedSensitiveMode() && audioMix.ready) {
+        const wasPlaying = (!masterAudio.paused) && (!masterAudio.ended);
+        const t = Number(masterAudio.currentTime) || 0;
+        try { masterAudio.pause(); } catch {}
+        try { preloadAudio.pause(); } catch {}
+        teardownAudioMixer();
+        try { masterAudio.currentTime = t; } catch {}
+        if (wasPlaying) {
+          const p = masterAudio.play();
+          if (p && typeof p.catch === "function") p.catch(() => {});
+        }
+        // Also stop decoding the next track while in speed-sensitive mode.
+        try { if (preloadAudio.src) preloadAudio.removeAttribute("src"); } catch {}
+        try { preloadAudio.load(); } catch {}
+      }
+
       // Apply speed to both decks (order matters if decks swapped).
       try { setTapeSpeed(masterAudio, state.speed); } catch {}
       try { setTapeSpeed(preloadAudio, state.speed); } catch {}
@@ -2591,7 +2638,7 @@ New features include: Customization, Sorting/Filtering, Queuing, Liking, Crossfa
 Did you know you can swipe a song card to either queue or like them? Swipe -> queue | <- like
 
 
-LP3 Version: 202616010455
+LP3 Version: 202616010522
 
 Created By Azryx (Github source code: https://github.com/ZegoFr34ks/zegofr34ks.github.io)
 
