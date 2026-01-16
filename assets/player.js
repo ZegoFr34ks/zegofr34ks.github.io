@@ -11,11 +11,14 @@
   const SETTINGS_KEY = "yzk_settings";
   const VERSION_STORAGE_KEY = "yzk_site_version";
 
+  const RE_SPACES = /\s+/g;
+  const RE_NON_WORD = /[^\p{L}\p{N}]/gu;
+
   function normText(s) {
     return String(s || "")
       .toLowerCase()
-      .replace(/\s+/g, "")        // remove spaces
-      .replace(/[^\p{L}\p{N}]/gu, ""); // remove symbols (unicode-safe)
+      .replace(RE_SPACES, "")
+      .replace(RE_NON_WORD, "");
   }
 
   function handleVersionUpdate() {
@@ -74,7 +77,11 @@
   }
 
   function setStorageJSON(key, value) {
-    localStorage.setItem(key, JSON.stringify(value));
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch {
+      // storage might be unavailable (private mode / quota / blocked)
+    }
   }
 
   const DEFAULT_SETTINGS = {
@@ -203,6 +210,7 @@
    *  State
    *  ------------------------- */
   let songs = []; // will be loaded from index.json/meta.json
+  let songsById = new Map();
   const audio = $("#audio");
   const audioPreload = $("#audioPreload");
 
@@ -622,9 +630,6 @@ async function loadSongsLinksMeta() {
   }
 }
 
-function getSongById(id) {
-  return songs.find(s => s.id === id) || null;
-}
 
 function artistMatchesName(entry, name) {
   const target = normText(name);
@@ -646,6 +651,11 @@ function safeUrl(u) {
   // Allow only http(s) to avoid accidental javascript: etc.
   if (/^https?:\/\//i.test(s)) return s;
   return "";
+}
+
+function openExternal(url) {
+  const u = safeUrl(url);
+  if (u) window.open(u, "_blank", "noopener");
 }
 
 function platformIconSvg(platform) {
@@ -809,7 +819,7 @@ function bindArtistsPanel() {
     const plat = e.target.closest("[data-url]");
     if (plat) {
       const url = plat.dataset.url;
-      if (url) window.open(url, "_blank", "noopener");
+      if (url) openExternal(url);
       return;
     }
 
@@ -965,7 +975,7 @@ function bindSongsLinksPanel() {
     const plat = e.target.closest("[data-url]");
     if (plat) {
       const url = plat.dataset.url;
-      if (url) window.open(url, "_blank", "noopener");
+      if (url) openExternal(url);
       return;
     }
   };
@@ -1009,6 +1019,7 @@ function bindSongsLinksPanel() {
     const list = Array.isArray(catalog.songs) ? catalog.songs : [];
 
     songs = list.map(meta => normalizeMetaToSong(meta.id, meta));
+    songsById = new Map(songs.map(s => [s.id, s]));
 
     if (!songs.length) toast("No songs found. Check assets/songs/catalog.json");
   }
@@ -1017,7 +1028,7 @@ function bindSongsLinksPanel() {
    *  Render
    *  ------------------------- */
   function getSongById(id) {
-    return songs.find(s => s.id === id) || null;
+    return songsById.get(id) || null;
   }
 
   function currentSong() {
@@ -1413,18 +1424,11 @@ function bindSongsLinksPanel() {
     sheetCover.src = song.cover;
     sheetTitle.textContent = song.title;
     sheetArtist.textContent = artistsText;
-    if (state.settings?.showDescriptions) {
-      sheetDesc.style.display = "";
-      if (sheetDesc) {
-        if (state.settings?.showDescriptions) {
-          sheetDesc.style.display = "";
-          sheetDesc.textContent = song.description || "—";
-        } else {
-          sheetDesc.style.display = "none";
-        }
-      }
-    } else {
-      sheetDesc.style.display = "none";
+
+    if (sheetDesc) {
+      const showDesc = Boolean(state.settings?.showDescriptions);
+      sheetDesc.style.display = showDesc ? "" : "none";
+      if (showDesc) sheetDesc.textContent = song.description || "—";
     }
 
     miniLike.classList.toggle("like-on", isLiked(song.id));
@@ -2477,7 +2481,7 @@ New features include: Customization, Sorting/Filtering, Queuing, Liking, Crossfa
 Did you know you can swipe a song card to either queue or like them? Swipe -> queue | <- like
 
 
-LP3 Version: 202615010843
+LP3 Version: 202616010414
 
 Created By Azryx (Github source code: https://github.com/ZegoFr34ks/zegofr34ks.github.io)
 
