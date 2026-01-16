@@ -941,6 +941,37 @@ svg{ width:22px; height:22px; fill: currentColor; }
   color: var(--text-soft);
 }
 
+/* Crossfade compatibility warning (Settings) */
+.panel-label .cf-warn{
+  color: var(--red);
+  color: color-mix(in srgb, var(--red) 70%, var(--text-soft));
+  font-weight: 900;
+  letter-spacing: .1px;
+}
+
+/* Locked/disabled settings rows (e.g., Crossfade while Speed != 1×) */
+.panel-row.is-locked{
+  opacity: .55;
+}
+
+.toggle.is-locked{
+  opacity: .55;
+  filter: grayscale(1);
+  box-shadow: none !important;
+}
+
+.toggle.is-locked.on{
+  box-shadow: none !important;
+  border-color: var(--border-1);
+  background: color-mix(in srgb, var(--surface-3) 80%, transparent);
+}
+
+.toggle.is-locked.on::after{
+  transform: translateX(0px);
+  background: color-mix(in srgb, var(--text) 20%, white);
+  box-shadow: none;
+}
+
 /* Toggle switch */
 .toggle{
   width: 46px;

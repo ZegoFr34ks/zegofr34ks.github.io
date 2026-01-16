@@ -143,6 +143,13 @@
   function applySettingsToRuntime() {
     const s = state.settings;
 
+    // Enforce compatibility: Crossfade cannot be enabled while Speed is not 1x.
+    if (!isDefaultSpeed() && s.crossfadeEnabled) {
+      s.crossfadeEnabled = false;
+      saveSettings();
+      try { cancelCrossfade?.(); } catch {}
+    }
+
     // Theme + accent + motion
     applyThemeTokens(s);
     // Default format (single source of truth)
@@ -165,6 +172,9 @@
       if (audioPreload?.src) audioPreload.removeAttribute("src");
       audioPreload?.load?.();
     }
+
+    // If Settings is open, keep crossfade controls synced to the current Speed.
+    syncCrossfadeLockUI();
   }
 
   function applyThemeTokens(settings) {
@@ -314,6 +324,58 @@
   function isSpeedSensitiveMode() {
     return IS_IOS && Number(state?.speed || 1) !== 1;
   }
+
+  function isDefaultSpeed() {
+    return Number(state?.speed || 1) === 1;
+  }
+
+  function crossfadeSpeedLockMessage() {
+    return "Crossfade is unavailable while Speed is not 1x.";
+  }
+
+  function isSettingsPanelOpen() {
+    return Boolean(panel) && !panel.hidden && (panelTitle?.textContent || "") === "Settings";
+  }
+
+  function syncCrossfadeLockUI() {
+    if (!isSettingsPanelOpen()) return;
+
+    const locked = !isDefaultSpeed();
+
+    const row = panelBody?.querySelector?.('[data-lock="crossfadeSpeed"]');
+    const tgl = panelBody?.querySelector?.('[data-setting="crossfadeEnabled"]');
+    const st = panelBody?.querySelector?.('#crossfadeStatus');
+    const sliderRow = panelBody?.querySelector?.('#crossfadeRow');
+    const slider = panelBody?.querySelector?.('#crossfadeSlider');
+
+    if (row) row.classList.toggle('is-locked', locked);
+    if (tgl) {
+      tgl.classList.toggle('is-locked', locked);
+      tgl.setAttribute('aria-disabled', locked ? 'true' : 'false');
+    }
+
+    // Keep the status text helpful when locked.
+    if (st && locked) {
+      st.textContent = 'Unavailable (Speed active)';
+    } else if (st && !locked) {
+      st.textContent = state.settings.crossfadeEnabled ? `On • ${state.settings.crossfadeSeconds}s` : 'Off';
+    }
+
+    // When locked, crossfade controls should be hidden.
+    if (sliderRow) sliderRow.style.display = (!locked && state.settings.crossfadeEnabled) ? '' : 'none';
+    if (slider) slider.style.display = (!locked && state.settings.crossfadeEnabled) ? '' : 'none';
+  }
+
+  function enforceCrossfadeSpeedCompatibility({ announce = false } = {}) {
+    const locked = !isDefaultSpeed();
+    if (locked && state?.settings?.crossfadeEnabled) {
+      try { cancelCrossfade?.(); } catch {}
+      updateSettings({ crossfadeEnabled: false }, { apply: true });
+      if (announce) toast('Crossfade disabled (unavailable while Speed is not 1x).');
+    }
+    syncCrossfadeLockUI();
+  }
+
 
   /**
    * On iOS, routing <audio> through WebAudio (MediaElementSource -> AudioContext)
@@ -2405,6 +2467,11 @@ function bindSongsLinksPanel() {
 
     openSelect("Speed", steps, String(state.speed), (val) => {
       state.speed = Number(val);
+
+      // Speed effect is incompatible with Crossfade:
+      // - If Crossfade is currently enabled, disable it automatically and inform the user.
+      // - While Speed != 1x, Crossfade stays locked in Settings.
+      enforceCrossfadeSpeedCompatibility({ announce: true });
       applyTapeSpeedMode?.();
       // iOS Safari: playbackRate + pitch behaves incorrectly (and can stutter) when the media element
       // is routed through WebAudio (MediaElementAudioSourceNode). If the mixer was created earlier
@@ -2638,7 +2705,7 @@ New features include: Customization, Sorting/Filtering, Queuing, Liking, Crossfa
 Did you know you can swipe a song card to either queue or like them? Swipe -> queue | <- like
 
 
-LP3 Version: 202616010522
+LP3 Version: 202616010626
 
 Created By Azryx (Github source code: https://github.com/ZegoFr34ks/zegofr34ks.github.io)
 
@@ -2844,6 +2911,7 @@ Contact: contact.kavzego@gmail.com`;
 
   function openSettings() {
     const s = state.settings;
+    const speedLocked = !isDefaultSpeed();
 
     openFullPanel("Settings", `
       <div class="settings-section">
@@ -2915,15 +2983,16 @@ Contact: contact.kavzego@gmail.com`;
           <button class="toggle ${s.showUpNext ? "on" : ""}" data-setting="showUpNext" aria-label="Show up next"></button>
         </div>
 
-        <div class="panel-row compact">
+        <div class="panel-row compact ${speedLocked ? "is-locked" : ""}" data-lock="crossfadeSpeed">
           <div class="panel-label">
             <div class="t1">Crossfade</div>
-            <div class="t2" id="crossfadeStatus">${s.crossfadeEnabled ? `On • ${s.crossfadeSeconds}s` : "Off"}</div>
+            <div class="t2" id="crossfadeStatus">${speedLocked ? "Unavailable (Speed active)" : (s.crossfadeEnabled ? `On • ${s.crossfadeSeconds}s` : "Off")}</div>
+            <div class="t2 cf-warn">Crossfade isn't compatible with Speed effect</div>
           </div>
-          <button class="toggle ${s.crossfadeEnabled ? "on" : ""}" data-setting="crossfadeEnabled" aria-label="Crossfade"></button>
+          <button class="toggle ${s.crossfadeEnabled ? "on" : ""} ${speedLocked ? "is-locked" : ""}" data-setting="crossfadeEnabled" aria-label="Crossfade" ${speedLocked ? 'aria-disabled="true"' : ""}></button>
         </div>
 
-        <div class="slider-row" id="crossfadeRow" style="${s.crossfadeEnabled ? "" : "display:none;"}">
+        <div class="slider-row" id="crossfadeRow" style="${(s.crossfadeEnabled && !speedLocked) ? "" : "display:none;"}">
           <div class="panel-label">
             <div class="t1">Crossfade duration</div>
             <div class="t2">3s to 12s</div>
@@ -2933,7 +3002,7 @@ Contact: contact.kavzego@gmail.com`;
 
         <input id="crossfadeSlider" class="seekbar settings-slider"
           type="range" min="3" max="12" step="1" value="${s.crossfadeSeconds}"
-          style="${s.crossfadeEnabled ? "" : "display:none;"}" />
+          style="${(s.crossfadeEnabled && !speedLocked) ? "" : "display:none;"}" />
       </div>
 
       <div class="settings-section">
@@ -2953,6 +3022,21 @@ Contact: contact.kavzego@gmail.com`;
         <button class="panel-reset" data-nav="about" type="button">About this player</button>
       </div>
     `);
+
+    // Crossfade is not compatible with Speed (tape) mode.
+    // When Speed != 1x, we lock the Crossfade control and show a short explanation on tap.
+    const lockRow = panelBody.querySelector('[data-lock="crossfadeSpeed"]');
+    if (lockRow) {
+      lockRow.addEventListener("click", (e) => {
+        if (isDefaultSpeed()) return;
+        e.preventDefault();
+        e.stopPropagation();
+        toast(crossfadeSpeedLockMessage());
+      }, true);
+    }
+
+    syncCrossfadeLockUI();
+
 
     // Ensure the "Default format" pill is always clickable (no delegation edge cases)
     const formatBtn = panelBody.querySelector('[data-action="formatPick"]');
@@ -3028,6 +3112,12 @@ Contact: contact.kavzego@gmail.com`;
       if (tgl) {
         const key = tgl.dataset.setting;
 
+
+        if (key === "crossfadeEnabled" && !isDefaultSpeed()) {
+          toast(crossfadeSpeedLockMessage());
+          return;
+        }
+
         // compute the next value
         let nextValue;
         if (key === "themeMode") {
@@ -3066,6 +3156,9 @@ Contact: contact.kavzego@gmail.com`;
           const st = panelBody.querySelector("#crossfadeStatus");
           if (st) st.textContent = on ? `On • ${s.crossfadeSeconds}s` : "Off";
         }
+
+        // Respect Speed lock UI (greyed-out state)
+        syncCrossfadeLockUI();
 
         // up next instantly hide/show
         updateUpNextUI?.();
