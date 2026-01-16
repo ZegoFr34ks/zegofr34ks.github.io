@@ -252,7 +252,12 @@
 
     try {
       const Ctx = window.AudioContext || window.webkitAudioContext;
-      if (!audioMix.ctx) audioMix.ctx = new Ctx();
+      if (!audioMix.ctx) {
+        // iOS Safari can stutter when the AudioContext runs at 48kHz.
+        // Prefer 44.1kHz when the constructor accepts options.
+        try { audioMix.ctx = new Ctx({ sampleRate: 44100, latencyHint: "interactive" }); }
+        catch { audioMix.ctx = new Ctx(); }
+      }
       // Some browsers start in suspended state until a gesture.
       if (audioMix.ctx.state === "suspended") {
         // resume() is promise-based; we can fire-and-forget here.
@@ -351,26 +356,61 @@
     if (!el) return;
     const r = clamp(Number(rate) || 1, SPEED_MIN, SPEED_MAX);
 
-    // Disable pitch preservation across engines (no time-stretch).
-    // Some iOS builds are finicky: re-assert on the next frame too.
     const forceNoPreserve = () => {
+      // 'false' = do NOT preserve pitch -> pitch changes with playbackRate
+      // Safari uses the prefixed property; newer Safari also supports the unprefixed one.
+      try { el.webkitPreservesPitch = false; } catch {}
       try { el.preservesPitch = false; } catch {}
       try { el.mozPreservesPitch = false; } catch {}
-      try { el.webkitPreservesPitch = false; } catch {}
     };
 
-    forceNoPreserve();
+    const applyRate = () => {
+      // Setting BOTH helps on Safari (some builds key off defaultPlaybackRate).
+      try { el.defaultPlaybackRate = r; } catch {}
+      try { el.playbackRate = r; } catch {}
+    };
 
-    // Setting BOTH helps on Safari (some builds key off defaultPlaybackRate).
-    try { el.defaultPlaybackRate = r; } catch {}
-    try { el.playbackRate = r; } catch {}
+    const wasPlaying = !el.paused && !el.ended;
+    const t = Number(el.currentTime) || 0;
+
+    // iOS Safari sometimes only applies 'no pitch preserve' + rate cleanly when the element is paused.
+    // So we do a very fast pause/apply/resume when needed, but only on iOS.
+    if (IS_IOS && wasPlaying) {
+      try { el.pause(); } catch {}
+    }
+
+    // Apply in both orders (Safari can be finicky depending on decode state).
+    forceNoPreserve();
+    applyRate();
+    forceNoPreserve();
+    applyRate();
+
+    // Verify (best-effort). If Safari re-flipped it, toggle and re-assert.
+    try {
+      const hasPP = ("preservesPitch" in el) || ("webkitPreservesPitch" in el);
+      if (hasPP) {
+        const v = ("preservesPitch" in el) ? el.preservesPitch : el.webkitPreservesPitch;
+        if (v === true) {
+          try { el.webkitPreservesPitch = true; } catch {}
+          try { el.preservesPitch = true; } catch {}
+          forceNoPreserve();
+          applyRate();
+        }
+      }
+    } catch {}
 
     if (IS_IOS) {
       requestAnimationFrame(() => {
         forceNoPreserve();
-        try { el.defaultPlaybackRate = r; } catch {}
-        try { el.playbackRate = r; } catch {}
+        applyRate();
       });
+    }
+
+    if (IS_IOS && wasPlaying) {
+      // Best effort to continue seamlessly.
+      try { el.currentTime = t; } catch {}
+      const p = el.play();
+      if (p && typeof p.catch === "function") p.catch(() => {});
     }
   }
 
@@ -384,9 +424,27 @@
     // (iOS Safari may silently reset pitch-preservation flags on new sources.)
     [audio, audioPreload].forEach((el) => {
       if (!el) return;
-      const reapply = () => setTapeSpeed(el, state.speed);
+      const reapply = () => {
+        // Avoid loops: only reapply if something drifted.
+        try {
+          const desired = clamp(Number(state.speed) || 1, SPEED_MIN, SPEED_MAX);
+          const cur = Number(el.playbackRate) || 1;
+          let pp = null;
+          try {
+            if ("preservesPitch" in el) pp = el.preservesPitch;
+            else if ("webkitPreservesPitch" in el) pp = el.webkitPreservesPitch;
+          } catch {}
+          if (Math.abs(cur - desired) > 1e-3 || pp === true) {
+            setTapeSpeed(el, desired);
+          }
+        } catch {
+          setTapeSpeed(el, state.speed);
+        }
+      };
       el.addEventListener("loadedmetadata", reapply);
       el.addEventListener("play", reapply);
+      el.addEventListener("ratechange", reapply);
+
     });
   }
 
@@ -1626,6 +1684,9 @@ function bindSongsLinksPanel() {
 
   function canCrossfadeNow() {
     const s = state.settings;
+    // iOS Safari + WebAudio (required for crossfade volume control) can become choppy at non-1x playback rates.
+    // Prefer a correct/smooth speed effect over crossfade when rate != 1.
+    if (IS_IOS && Number(state.speed || 1) !== 1) return false;
     return Boolean(s?.crossfadeEnabled) && state.loop !== "one";
   }
 
@@ -2530,7 +2591,7 @@ New features include: Customization, Sorting/Filtering, Queuing, Liking, Crossfa
 Did you know you can swipe a song card to either queue or like them? Swipe -> queue | <- like
 
 
-LP3 Version: 202616010436
+LP3 Version: 202616010455
 
 Created By Azryx (Github source code: https://github.com/ZegoFr34ks/zegofr34ks.github.io)
 
