@@ -391,6 +391,20 @@
             "artists": ["KAMØ"],
             "description": "No description was added.",
             "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "duoblanc",
+            "title": "Blanc de Blanc",
+            "artists": ["KR-T", "f3i"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
+        },
+        {
+            "id": "duofocusrite",
+            "title": "Duo Focusrite",
+            "artists": ["KR-T", "f3i"],
+            "description": "No description was added.",
+            "formats": {"mp3": "v1.mp3", "wav": "v1.wav"}
         }
     ]
 }

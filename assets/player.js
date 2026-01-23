@@ -2705,7 +2705,7 @@ New features include: Customization, Sorting/Filtering, Queuing, Liking, Crossfa
 Did you know you can swipe a song card to either queue or like them? Swipe -> queue | <- like
 
 
-LP3 Version: 202616010626
+LP3 Version: 202623010511
 
 Created By Azryx (Github source code: https://github.com/ZegoFr34ks/zegofr34ks.github.io)
 
