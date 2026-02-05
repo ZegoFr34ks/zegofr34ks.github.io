@@ -2510,7 +2510,7 @@ function bindSongsLinksPanel() {
     renderQueuePanel();
   });
 
-  btnHome.addEventListener("click", () => window.location.href = "index.html");
+  btnHome.addEventListener("click", () => window.location.href = "home.html");
   btnSort.addEventListener("click", () => openSort());
   btnSettings.addEventListener("click", () => openSettings());
 

@@ -1,0 +1,867 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>YZKSTUDIOS</title>
+
+  <style>
+    :root{
+      --bg:#0b0b0f;
+      --bg2:#101018;
+      --panel:#0f0f16cc;
+      --line:#2a2a38;
+      --text:#e8e8f2;
+      --muted:#b7b7c8;
+      --purple:#60519b;
+      --purple2:#7b6bd4;
+      --lite:#bfc0d1;
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
+      --radius: 18px;
+
+      --headerH: 92px; /* JS animates this */
+      --overlayParallax: 0px; /* JS animates this for parallax */
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; margin:0; padding:0; }
+    body{
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(1100px 700px at 20% -10%, rgba(96,81,155,.22), transparent 60%),
+        radial-gradient(1000px 700px at 90% 20%, rgba(123,107,212,.14), transparent 55%),
+        linear-gradient(180deg, var(--bg), #07070a 70%, #06060a);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+
+    a{ color:inherit; text-decoration:none; }
+    .container{ width:min(1200px, 100% - 40px); margin:0 auto; }
+
+    /* ---------- Sticky Header (ALWAYS visible) ---------- */
+    header{
+      position: fixed;
+      top:0;
+      left:0;
+      right:0;
+      z-index:5000;
+      height:var(--headerH);
+      transition: height .18s ease;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: linear-gradient(180deg, rgba(15,15,22,.92), rgba(15,15,22,.62));
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .header-inner{
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      min-width:0;
+    }
+    .brand img{
+      width:46px;
+      height:46px;
+      object-fit:contain;
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,.55));
+      flex:0 0 auto;
+    }
+
+    /* Shiny text */
+    .shiny{
+      font-weight:800;
+      letter-spacing:.10em;
+      text-transform:uppercase;
+      font-size: clamp(16px, 1.45vw, 20px);
+      line-height:1;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+
+      background: linear-gradient(110deg,
+        rgba(255,255,255,.30) 0%,
+        rgba(255,255,255,.95) 18%,
+        rgba(123,107,212,.95) 32%,
+        rgba(255,255,255,.92) 46%,
+        rgba(255,255,255,.28) 68%,
+        rgba(255,255,255,.30) 100%);
+      background-size: 220% 100%;
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      animation: shine 5s linear infinite;
+      text-shadow: 0 0 22px rgba(123,107,212,.12);
+    }
+    @keyframes shine{
+      from{ background-position: 100% 0; }
+      to{ background-position: -85% 0; }
+    }
+
+    nav{
+      display:flex;
+      align-items:center;
+      gap:18px;
+      font-weight:600;
+      letter-spacing:.02em;
+    }
+    nav a{
+      position:relative;
+      padding:10px 10px;
+      border-radius:12px;
+      color:rgba(232,232,242,.92);
+      transition: background .18s ease, transform .18s ease, color .18s ease;
+    }
+    nav a:hover{
+      background: rgba(96,81,155,.14);
+      transform: translateY(-1px);
+      color:#fff;
+    }
+    nav a::after{
+      content:"";
+      position:absolute;
+      left:10px;
+      right:10px;
+      bottom:6px;
+      height:2px;
+      background: linear-gradient(90deg, transparent, rgba(123,107,212,.75), transparent);
+      opacity:0;
+      transform: scaleX(.7);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    nav a:hover::after{ opacity:1; transform: scaleX(1); }
+
+    /* Make room for fixed header */
+    body{ padding-top: var(--headerH); }
+
+    /* ---------- Widget 1: Hero with light rays + BIG centered image ---------- */
+    .hero{
+      position:relative;
+      min-height: calc(100vh - var(--headerH));
+      display:flex;
+      align-items:center;            /* center vertically */
+      justify-content:center;        /* center horizontally */
+      padding: 44px 0 70px;
+      z-index:1;
+      overflow:hidden;
+    }
+
+    .rays{
+      position:absolute;
+      inset: 0 0 -30vh 0;
+      z-index:0;
+      pointer-events:none;
+      overflow:hidden;
+    }
+    .rays::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:50%;
+      transform: translateX(-50%);
+      width:180%;
+      height:120%;
+      background:
+        radial-gradient(900px 600px at 50% 0%, rgba(255,255,255,.10), transparent 60%),
+        conic-gradient(from 180deg at 50% 0%,
+          rgba(123,107,212,.0),
+          rgba(123,107,212,.18),
+          rgba(255,255,255,.10),
+          rgba(96,81,155,.16),
+          rgba(123,107,212,.0));
+      filter: blur(1px);
+      opacity:.9;
+      mask-image: radial-gradient(700px 420px at 50% 0%, #000 50%, transparent 95%);
+      -webkit-mask-image: radial-gradient(700px 420px at 50% 0%, #000 50%, transparent 95%);
+      animation: raysMove 6s ease-in-out infinite alternate;
+    }
+    .rays::after{
+      content:"";
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:260px;
+      background: linear-gradient(180deg, rgba(15,15,22,.82), rgba(15,15,22,0));
+    }
+    @keyframes raysMove{
+      from{ transform: translateX(-50%) translateY(-10px) scale(1); }
+      to{ transform: translateX(-50%) translateY(14px) scale(1.03); }
+    }
+
+    .hero-inner{
+      position:relative;
+      z-index:2;
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .hero-overlay{
+      position:relative;
+      width: min(1100px, 92vw);
+      max-width: 2000px;
+      aspect-ratio: 16/9;
+      pointer-events:none;
+      opacity:.95;
+      filter: drop-shadow(0 22px 75px rgba(35, 8, 51, 0.68));
+      /* Apply parallax effect */
+      transform: translateY(var(--overlayParallax));
+      transition: transform 0.1s ease-out;
+    }
+    .hero-overlay img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+    }
+
+    .hero::after{
+      content:"";
+      position:absolute;
+      inset:auto 0 0 0;
+      height:120px;
+      background: linear-gradient(180deg, transparent, rgba(11,11,15,.75), rgba(11,11,15,1));
+      z-index:1;
+      pointer-events:none;
+    }
+
+    /* ---------- Widget 2 / 3 base ---------- */
+    section{ position:relative; z-index:5; }
+    .widget{ padding: 84px 0; }
+    .widget-dark{
+      background: linear-gradient(180deg, rgba(10,10,14,.0), rgba(10,10,14,.92) 16%, rgba(10,10,14,1));
+      border-top: 1px solid rgba(255,255,255,.06);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .section-title{
+      font-size: clamp(26px, 2.4vw, 40px);
+      letter-spacing:.02em;
+      margin:0 0 12px;
+    }
+    .section-sub{
+      color: var(--muted);
+      margin:0 0 28px;
+      max-width: 78ch;
+      line-height:1.6;
+    }
+
+    .cards-layout{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:18px;
+      align-items:stretch;
+      margin-top:26px;
+    }
+    .stack{
+      display:grid;
+      grid-template-rows: 1fr 1fr;
+      gap:18px;
+    }
+    .card{
+      position:relative;
+      border:1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(16,16,24,.72), rgba(12,12,18,.62));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      cursor:pointer;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+      display:flex;
+      flex-direction:column;
+      min-height: 170px;
+    }
+    .card:hover{
+      transform: translateY(-2px);
+      border-color: rgba(123,107,212,.45);
+      background: linear-gradient(180deg, rgba(20,20,32,.80), rgba(12,12,18,.66));
+    }
+    .card-media{
+      flex:1 1 auto;
+      min-height: 110px;
+      background:
+        radial-gradient(600px 260px at 30% 20%, rgba(96,81,155,.35), transparent 55%),
+        radial-gradient(520px 240px at 85% 40%, rgba(123,107,212,.18), transparent 55%),
+        linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.00));
+      border-bottom:1px solid rgba(255,255,255,.10);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:22px;
+    }
+    .card-media img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      opacity:.9;
+      filter: drop-shadow(0 16px 40px rgba(0,0,0,.55));
+    }
+    .card-footer{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 16px;
+      gap:12px;
+    }
+    .card-footer .label{
+      font-weight:700;
+      letter-spacing:.03em;
+    }
+    .card-footer .hint{
+      color: rgba(232,232,242,.7);
+      font-size: 13px;
+      letter-spacing:.02em;
+    }
+
+    /* ---------- Widget 3: Quick Access ---------- */
+    .quick{
+      background: linear-gradient(180deg, rgba(10,10,14,1), rgba(12,12,18,.92));
+    }
+    .quick-grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+      margin-top:26px;
+    }
+    .quick-item{
+      position:relative;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: linear-gradient(90deg, rgba(20,20,30,.72), rgba(12,12,18,.60));
+      box-shadow: 0 18px 45px rgba(0,0,0,.45);
+      overflow:hidden;
+      cursor:pointer;
+      transition: transform .18s ease, border-color .18s ease;
+      display:flex;
+      align-items:center;
+      gap:14px;
+      padding: 16px 18px;
+      min-height: 74px;
+    }
+    .quick-item:hover{
+      transform: translateX(10px);
+      border-color: rgba(123,107,212,.42);
+    }
+    .quick-item:hover .quick-arrow{ transform: translateX(6px); }
+
+    .quick-diamond{
+      width:44px; height:44px;
+      flex:0 0 auto;
+      display:grid;
+      place-items:center;
+      border-radius: 12px;
+      background: rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .quick-diamond .dia{
+      width:16px; height:16px;
+      background: linear-gradient(135deg, rgba(123,107,212,.95), rgba(255,255,255,.75));
+      transform: rotate(45deg);
+      border-radius: 4px;
+      box-shadow: 0 10px 22px rgba(123,107,212,.22);
+    }
+    .quick-text{ flex:1 1 auto; min-width:0; }
+    .quick-title{ font-weight:800; margin:0; font-size: 16px; }
+    .quick-desc{ margin:4px 0 0; color: rgba(232,232,242,.72); font-size: 13px; line-height:1.35; }
+
+    .quick-arrow{
+      flex:0 0 auto;
+      width:38px; height:38px;
+      display:grid; place-items:center;
+      border-radius: 12px;
+      background: rgba(96,81,155,.14);
+      border:1px solid rgba(123,107,212,.26);
+      transition: transform .18s ease;
+    }
+    .quick-arrow svg{ width:18px; height:18px; opacity:.92; }
+
+    /* ---------- Footer: improved layout + Privacy Policy ---------- */
+    footer{
+      padding: 62px 0 0;
+      background: linear-gradient(180deg, rgba(6,6,10,1), rgba(5,5,8,1));
+      border-top: 1px solid rgba(255,255,255,.06);
+      position:relative;
+      z-index:10;
+    }
+
+    .footer-top{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 22px;
+      align-items:start;
+      padding-bottom: 22px;
+    }
+
+    .tilt-card{
+      width: 100%;
+      border-radius: 22px;
+      border:1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(16,16,24,.78), rgba(10,10,14,.72));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      transform-style: preserve-3d;
+      transition: transform .16s ease;
+      cursor:pointer;
+      max-width: 560px;
+    }
+    .tilt-card:hover{ transform: scale(1.02); }
+    .tilt-media{
+      height: 210px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:
+        radial-gradient(700px 340px at 20% 20%, rgba(96,81,155,.35), transparent 55%),
+        radial-gradient(600px 320px at 90% 50%, rgba(123,107,212,.18), transparent 55%),
+        linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.00));
+      border-bottom:1px solid rgba(255,255,255,.10);
+      padding:18px;
+      cursor: crosshair;
+    }
+    .tilt-media img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      opacity:.95;
+      transform: translateZ(28px);
+      filter: drop-shadow(0 18px 45px rgba(0,0,0,.55));
+    }
+    .tilt-footer{
+      padding:14px 16px;
+      color: rgba(232,232,242,.82);
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      font-size: 13px;
+    }
+
+    #tiltCard {
+      position: relative;
+      overflow: hidden;
+    }
+
+    #sparkCanvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .footer-links{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      align-content:start;
+      padding-top: 6px;
+    }
+    .footer-links a{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      color: rgba(232,232,242,.90);
+      transition: transform .18s ease, background .18s ease, border-color .18s ease;
+      min-height: 42px;
+    }
+    .footer-links a:hover{
+      transform: translateY(-1px);
+      background: rgba(96,81,155,.12);
+      border-color: rgba(123,107,212,.25);
+    }
+    .dot{
+      width:8px; height:8px;
+      border-radius:999px;
+      background: rgba(123,107,212,.85);
+      box-shadow: 0 0 0 4px rgba(123,107,212,.12);
+      flex:0 0 auto;
+    }
+
+    .footer-bottom{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding: 0 0 16px;
+      color: rgba(232,232,242,.55);
+      font-size: 12px;
+    }
+    .footer-bottom .mini{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .footer-bottom .mini a{
+      color: rgba(232,232,242,.70);
+      padding: 6px 8px;
+      border-radius: 10px;
+      border:1px solid transparent;
+      transition: background .18s ease, border-color .18s ease;
+    }
+    .footer-bottom .mini a:hover{
+      background: rgba(255,255,255,.04);
+      border-color: rgba(255,255,255,.08);
+    }
+
+    .rgb-bar{
+      height: 6px;
+      width: 100%;
+      background: linear-gradient(90deg,
+        #ff3b3b, #ffcc00, #3bff8f, #3bb9ff, #9a3bff, #ff3bbf, #ff3b3b);
+      background-size: 200% 100%;
+      animation: rgbFlow 4s linear infinite;
+      opacity: .95;
+    }
+    @keyframes rgbFlow{
+      from{ background-position: 0% 50%; }
+      to{ background-position: 200% 50%; }
+    }
+
+    /* ---------- Responsiveness ---------- */
+    @media (max-width: 860px){
+      nav{ gap:10px; }
+      .cards-layout{ grid-template-columns: 1fr; }
+      .footer-top{ grid-template-columns: 1fr; }
+      .tilt-card{ max-width: 100%; }
+      .footer-links{ grid-template-columns: 1fr; }
+      .footer-bottom{ flex-direction:column; align-items:flex-start; }
+      .footer-bottom .mini{ justify-content:flex-start; }
+      .hero-overlay{ width: min(1000px, 95vw); }
+    }
+    @media (max-width: 520px){
+      .container{ width: calc(100% - 28px); }
+      nav a{ padding:10px 8px; }
+      .brand img{ width:40px; height:40px; }
+      .hero{ padding-bottom: 54px; }
+      .quick-item{ padding: 14px 14px; }
+      .hero-overlay{ width: min(1100px, 98vw); }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ scroll-behavior:auto !important; }
+      .shiny, .rays::before, .rgb-bar{ animation: none !important; }
+      .card, .quick-item, .tilt-card{ transition:none !important; }
+    }
+
+    [id]{ scroll-margin-top: calc(var(--headerH) + 14px); }
+  </style>
+</head>
+
+<body>
+  <!-- HEADER -->
+  <header>
+    <div class="container header-inner">
+      <a class="brand" href="#home" aria-label="Go to Home">
+        <img src="assets/home/logo.png" alt="YZKSTUDIOS Logo" />
+        <div class="shiny" aria-label="YZKSTUDIOS">YZKSTUDIOS</div>
+      </a>
+
+      <nav aria-label="Primary navigation">
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#more">More</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="home">
+    <!-- WIDGET 1: HERO -->
+    <section class="hero" aria-label="Welcome section">
+      <div class="rays" aria-hidden="true"></div>
+
+      <div class="container hero-inner">
+        <div class="hero-overlay" aria-hidden="true">
+          <img src="assets/home/welcome.svg" alt="Welcome banner" />
+        </div>
+      </div>
+    </section>
+
+    <!-- WIDGET 2 -->
+    <section id="about" class="widget widget-dark" aria-label="About section">
+      <div class="container">
+        <h2 class="section-title">About YZKSTUDIOS</h2>
+        <p class="section-sub">
+          YZKSTUDIOS is the creative brand led by ZegoFr34ks.<br><br>
+          Our mission is to craft original media. Be it games, videos, music, or art of all kinds. With one clear purpose: to bring joy and inspiration to people everywhere.<br><br>
+          We believe creativity should be open and welcoming, which is why YZKSTUDIOS is committed to creating content that is freely accessible to everyone, without hiding it behind expensive paywalls.<br><br>
+          We proudly stand beside and support every creator who shares the same heart: using art and entertainment to spread happiness and connection.
+        </p>
+
+        <div class="cards-layout">
+          <div class="stack">
+            <div class="card" role="button" tabindex="0" aria-label="Open card 1" onclick="alert('This content is currently unavailable. Sorry.'); return false;" onkeypress="if(event.key==='Enter'){window.location.href='home.html';}">
+              <div class="card-media">
+                <img src="assets/home/games.gif" alt="game gif by sayphur" onerror="this.style.display='none'" />
+              </div>
+              <div class="card-footer">
+                <div class="label">Games</div>
+                <div class="hint">Click to explore →</div>
+              </div>
+            </div>
+
+            <div class="card" role="button" tabindex="0" aria-label="Open card 2" onclick="window.location.href='player.html';" onkeypress="if(event.key==='Enter'){window.location.href='player.html';}">
+              <div class="card-media">
+                <img src="assets/home/music.gif" alt="music gif by xephoron" onerror="this.style.display='none'" />
+              </div>
+              <div class="card-footer">
+                <div class="label">Music</div>
+                <div class="hint">Click to explore →</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" role="button" tabindex="0" aria-label="Open card 3" style="min-height: 100%;" onclick="alert('This content is currently unavailable. Sorry.'); return false;" onkeypress="if(event.key==='Enter'){window.location.href='home.html';}">
+            <div class="card-media" style="min-height: 260px;">
+              <img src="assets/home/projects.gif" alt="projects gif by vlad.kolokolnikov" onerror="this.style.display='none'" />
+            </div>
+            <div class="card-footer">
+              <div class="label">Projects</div>
+              <div class="hint">Click to explore →</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WIDGET 3 -->
+    <section id="more" class="widget quick" aria-label="Quick access section">
+      <div class="container">
+        <h2 class="section-title">Quick Access</h2>
+        <p class="section-sub">
+          Jump straight to the important pages.
+        </p>
+
+        <div class="quick-grid">
+          <a class="quick-item" href="player.html" aria-label="Go to Player">
+            <div class="quick-diamond"><div class="dia"></div></div>
+            <div class="quick-text">
+              <p class="quick-title">Player</p>
+              <p class="quick-desc">Open the YZK Leaks Player 3.</p>
+            </div>
+            <div class="quick-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M13 5l7 7-7 7-1.4-1.4L16.2 13H4v-2h12.2l-4.6-4.6L13 5z"/></svg>
+            </div>
+          </a>
+
+          <a class="quick-item" href="Gallery.html" aria-label="Go to Gallery">
+            <div class="quick-diamond"><div class="dia"></div></div>
+            <div class="quick-text">
+              <p class="quick-title">Gallery</p>
+              <p class="quick-desc">See some of our work.</p>
+            </div>
+            <div class="quick-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M13 5l7 7-7 7-1.4-1.4L16.2 13H4v-2h12.2l-4.6-4.6L13 5z"/></svg>
+            </div>
+          </a>
+
+          <a class="quick-item" href="Updates.html" aria-label="Go to Updates" onclick="alert('This content is currently unavailable. Sorry.'); return false;" onkeypress="if(event.key==='Enter'){window.location.href='home.html';}">
+            <div class="quick-diamond"><div class="dia"></div></div>
+            <div class="quick-text">
+              <p class="quick-title">Updates</p>
+              <p class="quick-desc">News, changelogs and upcoming drops.</p>
+            </div>
+            <div class="quick-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M13 5l7 7-7 7-1.4-1.4L16.2 13H4v-2h12.2l-4.6-4.6L13 5z"/></svg>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer aria-label="Footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="tilt-card" id="tiltCard" role="button" tabindex="0" aria-label="Footer image card">
+          <div class="tilt-media">
+            <img src="assets/home/yzkstudios.jpg" alt="YZKSTUDIOS" onerror="this.style.display='none'" />
+          </div>
+          <div class="tilt-footer">
+            <span>YZKSTUDIOS</span>
+            <span style="color:rgba(232,232,242,.6)">© <span id="year"></span></span>
+          </div>
+        </div>
+
+        <div class="footer-links" aria-label="Footer links">
+          <a href="contact.html"><span class="dot"></span>Contact Us</a>
+          <a href="privacy.html"><span class="dot"></span>Privacy Policy</a>
+          <a href="tos.html"><span class="dot"></span>Terms Of Service</a>
+          <a href="#about"><span class="dot"></span>About Us</a>
+          <a href="https://github.com/ZegoFr34ks" target="_blank" rel="noreferrer noopener"><span class="dot"></span>Github</a>
+          <a href="#more"><span class="dot"></span>More</a>
+          <a href="#home"><span class="dot"></span>Home</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom" aria-label="Footer bottom row">
+        <div>YZKSTUDIOS © 2026</div>
+        <div class="mini">
+          <a href="privacy.html">Privacy</a>
+          <a href="tos.html">Terms Of Service</a>
+          <a href="contact.html">Contact</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="rgb-bar" aria-hidden="true"></div>
+  </footer>
+
+  <script>
+    (function(){
+      "use strict";
+
+      const root = document.documentElement;
+      const headerMax = 92;
+      const headerMin = 64;
+
+      function setHeaderHeight(){
+        const y = window.scrollY || window.pageYOffset || 0;
+        const t = Math.min(1, y / 260);
+        const h = Math.round(headerMax + (headerMin - headerMax) * t);
+        root.style.setProperty("--headerH", h + "px");
+      }
+
+      function setParallax(){
+        const y = window.scrollY || window.pageYOffset || 0;
+        // Overlay image slightly different speed
+        const overlayOffset = Math.max(-16, Math.min(800, y * 0.35));
+        root.style.setProperty("--overlayParallax", overlayOffset + "px");
+      }
+
+      let raf = 0;
+      function onScroll(){
+        if (raf) return;
+        raf = requestAnimationFrame(() => {
+          raf = 0;
+          setHeaderHeight();
+          setParallax();
+        });
+      }
+      
+      window.addEventListener("scroll", onScroll, { passive:true });
+      window.addEventListener("resize", onScroll);
+      
+      // Initialize on load
+      setHeaderHeight();
+      setParallax();
+
+      /* Footer tilt */
+      const tilt = document.getElementById("tiltCard");
+      function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+      if (tilt){
+        tilt.addEventListener("mousemove", (e) => {
+          const r = tilt.getBoundingClientRect();
+          const px = (e.clientX - r.left) / r.width;
+          const py = (e.clientY - r.top) / r.height;
+          const rotY = clamp((px - 0.5) * 10, -8, 8);
+          const rotX = clamp((0.5 - py) * 10, -8, 8);
+          tilt.style.transform = `perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.03)`;
+        });
+        tilt.addEventListener("mouseleave", () => {
+          tilt.style.transform = "perspective(900px) rotateX(0deg) rotateY(0deg) scale(1)";
+        });
+      }
+
+      /* Spark effect for tilt card */
+      const tiltCard = document.getElementById("tiltCard");
+
+      if (tiltCard) {
+        const canvas = document.createElement("canvas");
+        canvas.id = "sparkCanvas";
+        tiltCard.appendChild(canvas);
+
+        const ctx = canvas.getContext("2d");
+
+        let sparks = [];
+        const sparkCount = 12;
+        const sparkSize = 10;
+        const sparkRadius = 25;
+        const duration = 800;
+        const sparkColor = "#BBBDF6";
+
+        function resizeCanvas() {
+          canvas.width = tiltCard.clientWidth;
+          canvas.height = tiltCard.clientHeight;
+        }
+
+        resizeCanvas();
+        window.addEventListener("resize", resizeCanvas);
+
+        function createSparks(x, y) {
+          const now = performance.now();
+          for (let i = 0; i < sparkCount; i++) {
+            sparks.push({
+              x,
+              y,
+              angle: (Math.PI * 2 * i) / sparkCount,
+              startTime: now
+            });
+          }
+        }
+
+        function animate(time) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          sparks = sparks.filter(spark => {
+            const elapsed = time - spark.startTime;
+            if (elapsed > duration) return false;
+
+            const t = elapsed / duration;
+            const eased = t * (2 - t);
+
+            const dist = eased * sparkRadius;
+            const len = sparkSize * (1 - eased);
+
+            const x1 = spark.x + Math.cos(spark.angle) * dist;
+            const y1 = spark.y + Math.sin(spark.angle) * dist;
+            const x2 = spark.x + Math.cos(spark.angle) * (dist + len);
+            const y2 = spark.y + Math.sin(spark.angle) * (dist + len);
+
+            ctx.strokeStyle = sparkColor;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+
+            return true;
+          });
+
+          requestAnimationFrame(animate);
+        }
+
+        requestAnimationFrame(animate);
+
+        tiltCard.addEventListener("click", e => {
+          const rect = tiltCard.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          createSparks(x, y);
+        });
+      }
+
+      /* A11y for cards */
+      document.querySelectorAll('[role="button"][tabindex="0"]').forEach((el) => {
+        el.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            el.click();
+          }
+        });
+      });
+
+      const year = document.getElementById("year");
+      if (year) year.textContent = String(new Date().getFullYear());
+    })();
+  </script>
+</body>
+</html>
