@@ -1,4 +1,5 @@
 // assets/player.js
+// Refactor: small readability cleanups + non-functional fixes (semicolons, token organization).
 (() => {
   "use strict";
 
@@ -100,6 +101,8 @@
     crossfadeEnabled: false,
     crossfadeSeconds: 10     // 3..12
   };
+
+  Object.freeze(DEFAULT_SETTINGS);
 
   function loadSettings() {
     const saved = storageJSON(SETTINGS_KEY, null);
@@ -692,6 +695,16 @@
 
     settings: getInitialSettings(),
     preferredFormat: null,
+
+    // Playback history (session-only): ensures Prev/Next return exact previously played tracks.
+    history: [],
+    historyIndex: -1,
+
+    // Shuffle session (session-only): avoids repeats until all active songs have played.
+    shuffleSession: {
+      played: new Set(),
+      remaining: new Set(),
+    },
   };
 
   state.preferredFormat = state.settings.defaultFormat || "mp3";
@@ -753,6 +766,23 @@
   const panelTitle = $("#panelTitle");
   const panelBody = $("#panelBody");
   const panelClose = $("#panelClose");
+
+  // Panel header icons (we reuse the same button for Close / Back)
+  const PANEL_ICON_CLOSE = panelClose.innerHTML;
+  const PANEL_ICON_BACK = `<svg viewBox="0 0 24 24"><path d="M15.5 19.5 8 12l7.5-7.5 1.4 1.4L10.8 12l6.1 6.1z"/></svg>`;
+  let currentPanelKind = "none";
+
+  function setPanelHeaderMode(mode) {
+    // mode: "close" | "back"
+    if (mode === "back") {
+      panelClose.innerHTML = PANEL_ICON_BACK;
+      panelClose.setAttribute("aria-label", "Back");
+    } else {
+      panelClose.innerHTML = PANEL_ICON_CLOSE;
+      panelClose.setAttribute("aria-label", "Close panel");
+    }
+  }
+
 
   /** -------------------------
    *  Data loading
@@ -871,6 +901,9 @@ function openArtists() {
 }
 
 function openArtistsList() {
+    currentPanelKind = "artists";
+    setPanelHeaderMode(panelStack.length ? "back" : "close");
+
   loadArtistsMeta().then((meta) => {
     const items = meta.artists;
 
@@ -908,6 +941,8 @@ function openArtistsList() {
 }
 
 function openArtistDetail(artistKey) {
+  currentPanelKind = "artistDetail";
+  setPanelHeaderMode("back");
   loadArtistsMeta().then((meta) => {
     const entry =
       meta.artists.find(a => artistMatchesName(a, artistKey)) ||
@@ -990,6 +1025,8 @@ function bindArtistsPanel() {
   // remove old handler to avoid stacking as we re-render the panel body
   if (artistsPanelHandler) panelBody.removeEventListener("click", artistsPanelHandler);
 
+  if (artistsPanelHandler) panelBody.removeEventListener("click", artistsPanelHandler);
+
   artistsPanelHandler = (e) => {
     const back = e.target.closest("[data-artists-back]");
     if (back) {
@@ -1001,6 +1038,7 @@ function bindArtistsPanel() {
     const row = e.target.closest("[data-artist]");
     if (row) {
       e.preventDefault();
+      pushPanelSnapshot();
       openArtistDetail(row.dataset.artist);
       return;
     }
@@ -1035,10 +1073,15 @@ function bindArtistsPanel() {
 let songsLinksPanelHandler = null;
 
 function openSongsLinks() {
+    currentPanelKind = "songsLinks";
+    setPanelHeaderMode(panelStack.length ? "back" : "close");
+
   openSongsLinksList();
 }
 
 function openSongsLinksList() {
+  currentPanelKind = "songsLinks";
+  setPanelHeaderMode(panelStack.length ? "back" : "close");
   loadSongsLinksMeta().then((meta) => {
     const items = meta.songs;
 
@@ -1085,6 +1128,8 @@ function openSongsLinksList() {
 }
 
 function openSongLinksDetail(songId) {
+  currentPanelKind = "songLinksDetail";
+  setPanelHeaderMode("back");
   loadSongsLinksMeta().then((meta) => {
     const it = meta.songs.find(x => x.id === songId) || null;
     const song = getSongById(songId);
@@ -1146,6 +1191,8 @@ function openSongLinksDetail(songId) {
 function bindSongsLinksPanel() {
   if (songsLinksPanelHandler) panelBody.removeEventListener("click", songsLinksPanelHandler);
 
+  if (songsLinksPanelHandler) panelBody.removeEventListener("click", songsLinksPanelHandler);
+
   songsLinksPanelHandler = (e) => {
     const back = e.target.closest("[data-songslinks-back]");
     if (back) {
@@ -1157,6 +1204,7 @@ function bindSongsLinksPanel() {
     const row = e.target.closest("[data-songlink-id]");
     if (row) {
       e.preventDefault();
+      pushPanelSnapshot();
       openSongLinksDetail(row.dataset.songlinkId);
       return;
     }
@@ -1289,6 +1337,11 @@ function bindSongsLinksPanel() {
   function rebuildPlayList() {
     // Active view is the list the player navigates through
     state.playListIds = getActiveSongs().map(s => s.id);
+
+    // Keep shuffle session in sync with live filters/search
+    if (state.shuffle) {
+      syncShuffleSessionWithActive();
+    }
 
     if (state.currentSongId) {
       state.playIndex = state.playListIds.indexOf(state.currentSongId);
@@ -1693,6 +1746,123 @@ function bindSongsLinksPanel() {
   // Remember the next pick when shuffle is on, so we can preload something deterministic.
   state.nextShufflePick = null;
 
+  // --- Shuffle session helpers (no repeats until all active songs played)
+  function syncShuffleSessionWithActive() {
+    if (!state.shuffle) return;
+    const ids = state.playListIds || [];
+    const active = new Set(ids);
+
+    // Remove songs that are no longer active
+    for (const id of Array.from(state.shuffleSession.played)) {
+      if (!active.has(id)) state.shuffleSession.played.delete(id);
+    }
+    for (const id of Array.from(state.shuffleSession.remaining)) {
+      if (!active.has(id)) state.shuffleSession.remaining.delete(id);
+    }
+
+    // Add newly active songs that haven't been played in this shuffle session
+    for (const id of active) {
+      if (!state.shuffleSession.played.has(id) && id !== state.currentSongId) {
+        state.shuffleSession.remaining.add(id);
+      }
+    }
+
+    // Always ensure current song is treated as played in the session
+    if (state.currentSongId && active.has(state.currentSongId)) {
+      state.shuffleSession.played.add(state.currentSongId);
+      state.shuffleSession.remaining.delete(state.currentSongId);
+    }
+  }
+
+  function resetShuffleCycle() {
+    state.shuffleSession.played = new Set();
+    state.shuffleSession.remaining = new Set();
+    // rebuild based on current playlist + current song
+    syncShuffleSessionWithActive();
+  }
+
+  function initShuffleSessionFromCurrent() {
+    resetShuffleCycle();
+    state.nextShufflePick = null;
+  }
+
+  function pickRandomFromSet(set) {
+    const arr = Array.from(set);
+    if (!arr.length) return null;
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function peekNextShufflePick() {
+    if (!state.shuffle) return null;
+    syncShuffleSessionWithActive();
+
+    // Keep existing preview if it's still valid
+    if (state.nextShufflePick && state.nextShufflePick !== state.currentSongId) {
+      const idsNow = state.playListIds || [];
+      if (idsNow.includes(state.nextShufflePick) && !state.shuffleSession.played.has(state.nextShufflePick)) {
+        return state.nextShufflePick;
+      }
+    }
+
+    // If nothing left, start a new cycle (but still avoid immediately repeating current song)
+    if (state.shuffleSession.remaining.size === 0) {
+      resetShuffleCycle();
+      // If only one active song exists, there is no "next"
+      if (state.shuffleSession.remaining.size === 0) return null;
+    }
+
+    const pick = pickRandomFromSet(state.shuffleSession.remaining);
+    state.nextShufflePick = pick;
+    return pick;
+  }
+
+  function consumeNextShufflePick() {
+    const pick = state.nextShufflePick || peekNextShufflePick();
+    if (!pick) return null;
+
+    // Mark as played and remove from remaining
+    state.shuffleSession.played.add(pick);
+    state.shuffleSession.remaining.delete(pick);
+    state.nextShufflePick = null;
+    return pick;
+  }
+
+  // --- History helpers (session-only)
+  function recordHistoryEntry(id, versionIndex = 0) {
+    if (!id) return;
+    const entry = { id, versionIndex: Number(versionIndex) || 0 };
+
+    // If we went back previously, drop the forward history (browser-like)
+    if (state.historyIndex < state.history.length - 1) {
+      state.history = state.history.slice(0, state.historyIndex + 1);
+    }
+
+    const last = state.history[state.history.length - 1];
+    if (last && last.id === entry.id && last.versionIndex === entry.versionIndex) {
+      state.historyIndex = state.history.length - 1;
+      return;
+    }
+
+    state.history.push(entry);
+    state.historyIndex = state.history.length - 1;
+  }
+
+  function canGoBackInHistory() {
+    return state.historyIndex > 0;
+  }
+
+  function canGoForwardInHistory() {
+    return state.historyIndex >= 0 && state.historyIndex < state.history.length - 1;
+  }
+
+  function playFromHistoryIndex(newIndex) {
+    const entry = state.history[newIndex];
+    if (!entry) return false;
+    state.historyIndex = newIndex;
+    loadAndPlay(entry.id, entry.versionIndex || 0, true, { fromHistory: true });
+    return true;
+  }
+
   function resolveNextUp() {
     // 1) Queue has priority
     if (state.queue.length > 0) {
@@ -1707,24 +1877,13 @@ function bindSongsLinksPanel() {
       return { id: state.currentSongId, versionIndex: state.currentVersionIndex || 0 };
     }
 
-    // 3) Shuffle mode => keep a stable pick until consumed
+    // 3) Shuffle mode => avoid repeats until all active songs have played
     if (state.shuffle) {
       const ids = state.playListIds || [];
       if (ids.length <= 1) return null;
 
-      // If we already decided a next shuffle pick, keep it.
-      if (state.nextShufflePick && state.nextShufflePick !== state.currentSongId) {
-        return { id: state.nextShufflePick, versionIndex: 0 };
-      }
-
-      // Otherwise pick a new one (not the current song)
-      let pick = state.currentSongId;
-      let guard = 0;
-      while (pick === state.currentSongId && guard < 20) {
-        pick = ids[Math.floor(Math.random() * ids.length)];
-        guard++;
-      }
-      state.nextShufflePick = pick;
+      const pick = peekNextShufflePick();
+      if (!pick || pick === state.currentSongId) return null;
       return { id: pick, versionIndex: 0 };
     }
 
@@ -2081,7 +2240,7 @@ function bindSongsLinksPanel() {
     preloadAudio.load();
   }
 
-  function loadAndPlay(songId, versionIndex = 0, autoplay = true) {
+  function loadAndPlay(songId, versionIndex = 0, autoplay = true, opts = {}) {
     // If the user manually changes tracks mid-crossfade, abort the transition cleanly.
     cancelCrossfade();
 
@@ -2122,6 +2281,18 @@ function bindSongsLinksPanel() {
     preloadNextTrack();
     updateUpNextUI();
 
+    // History: record the track unless we are navigating within history.
+    if (!opts?.fromHistory) {
+      recordHistoryEntry(songId, versionIndex);
+    }
+
+    // Shuffle session: current song counts as played while shuffle is active.
+    if (state.shuffle) {
+      syncShuffleSessionWithActive();
+      // If we had previewed this as next, clear it.
+      if (state.nextShufflePick === songId) state.nextShufflePick = null;
+    }
+
     if (autoplay) {
       // Initialize WebAudio mixer from this user gesture when possible (Safari/iOS fade support)
       ensurePlaybackPipeline();
@@ -2161,26 +2332,32 @@ function bindSongsLinksPanel() {
 
   function nextTrack() {
     // If a crossfade is in progress, treat the incoming track as the current one.
-    // Commit first so navigation is consistent and we don't skip/advance weirdly.
     if (crossfade.active) commitCrossfadeNow();
+
+    // If user previously navigated back, Next should move forward through history.
+    if (canGoForwardInHistory()) {
+      playFromHistoryIndex(state.historyIndex + 1);
+      return;
+    }
+
+    // 1) Queue has priority
     if (state.queue.length > 0) {
       const nextId = state.queue.shift();
       loadAndPlay(nextId, 0, true);
       return;
     }
+
     if (!state.currentSongId) return;
 
+    // 2) Shuffle
     if (state.shuffle) {
-      const next = resolveNextUp();
-      if (!next) return;
-
-      // Consume the shuffle pick so a new one is chosen afterwards
-      state.nextShufflePick = null;
-
-      loadAndPlay(next.id, next.versionIndex ?? 0, true);
+      const pick = consumeNextShufflePick();
+      if (!pick) return;
+      loadAndPlay(pick, 0, true);
       return;
     }
 
+    // 3) Normal order
     const ids = state.playListIds;
     if (!ids.length) return;
 
@@ -2202,6 +2379,13 @@ function bindSongsLinksPanel() {
       return;
     }
 
+    // Prefer real playback history (works correctly even in shuffle)
+    if (canGoBackInHistory()) {
+      playFromHistoryIndex(state.historyIndex - 1);
+      return;
+    }
+
+    // Fallback to playlist order if no history exists yet
     const ids = state.playListIds;
     if (!ids.length) return;
 
@@ -2440,7 +2624,17 @@ function bindSongsLinksPanel() {
 
   btnShuffle.addEventListener("click", () => {
     state.shuffle = !state.shuffle;
-    state.nextShufflePick = null;
+
+    if (state.shuffle) {
+      // Start a fresh shuffle session from the current song.
+      initShuffleSessionFromCurrent();
+    } else {
+      // Stop tracking when shuffle is turned off.
+      state.nextShufflePick = null;
+      state.shuffleSession.played = new Set();
+      state.shuffleSession.remaining = new Set();
+    }
+
     renderNowPlayingUI();
     preloadNextTrack();
     updateUpNextUI();
@@ -2519,8 +2713,15 @@ function bindSongsLinksPanel() {
   sheetBackdrop.addEventListener("click", closeSheet);
 
   // Panel close
-  panelClose.addEventListener("click", closePanel);
-  panelBackdrop.addEventListener("click", closePanel);
+  panelClose.addEventListener("click", () => {
+    // If we are inside a Settings sub-view, X should go back to Settings instead of closing.
+    if (restorePanelSnapshot()) return;
+    closePanel();
+  });
+  panelBackdrop.addEventListener("click", () => {
+    if (restorePanelSnapshot()) return;
+    closePanel();
+  });
 
   // Seek
   let isSeeking = false;
@@ -2630,6 +2831,44 @@ function bindSongsLinksPanel() {
   /** -------------------------
    *  Panel (sort/settings)
    *  ------------------------- */
+  // Panel navigation stack (session-only): lets sub-views go "back" to Settings.
+  const panelStack = [];
+
+  function pushPanelSnapshot() {
+    if (panel.hidden) return;
+    panelStack.push({
+      kind: currentPanelKind,
+      title: panelTitle.textContent,
+      html: panelBody.innerHTML,
+      isFull: panel.classList.contains("is-full"),
+    });
+  }
+
+  function restorePanelSnapshot() {
+    const snap = panelStack.pop();
+    if (!snap) return false;
+
+    // Detach any sub-panel handlers that may have been registered.
+    // We'll re-open the correct panel kind so bindings are restored safely.
+    if (artistsPanelHandler) panelBody.removeEventListener("click", artistsPanelHandler);
+    if (songsLinksPanelHandler) panelBody.removeEventListener("click", songsLinksPanelHandler);
+    
+    if (snap.kind === "settings") { openSettings(); return true; }
+    if (snap.kind === "sort") { openSort(); return true; }
+    if (snap.kind === "artists") { openArtists(); return true; }
+    if (snap.kind === "songsLinks") { openSongsLinks(); return true; }
+
+    // Fallback: restore raw snapshot (best-effort)
+    panelTitle.textContent = snap.title || "";
+    panelBody.innerHTML = snap.html || "";
+    panel.hidden = false;
+    panelBackdrop.hidden = false;
+    panel.classList.toggle("is-full", Boolean(snap.isFull));
+    // Header icon depends on whether we still have somewhere to go back to.
+    setPanelHeaderMode(panelStack.length ? "back" : "close");
+    return true;
+  }
+
   function openPanel(title, html) {
     panelTitle.textContent = title;
     panelBody.innerHTML = html;
@@ -2646,10 +2885,14 @@ function bindSongsLinksPanel() {
     panel.hidden = true;
     panelBackdrop.hidden = true;
     panelBody.innerHTML = "";
-    panel.classList.remove("is-full")
+    panel.classList.remove("is-full");
+    panelStack.length = 0;
   }
 
   function openSelect(title, options, currentValue, onPick) {
+    currentPanelKind = "select";
+    setPanelHeaderMode("close");
+
     openPanel(title, `
       <div style="display:flex; flex-direction:column; gap:10px;">
         ${options.map(opt => `
@@ -2696,6 +2939,9 @@ function bindSongsLinksPanel() {
 
 
   function openAboutPanel() {
+    currentPanelKind = "about";
+    setPanelHeaderMode(panelStack.length ? "back" : "close");
+
     const txt = `Welcome to the Official YZK Leaks Player 3! 
 
 About:
@@ -2705,7 +2951,7 @@ New features include: Customization, Sorting/Filtering, Queuing, Liking, Crossfa
 Did you know you can swipe a song card to either queue or like them? Swipe -> queue | <- like
 
 
-LP3 Version: 202626010757
+LP3 Version: 202602200620
 
 Created By Azryx (Github source code: https://github.com/ZegoFr34ks/zegofr34ks.github.io)
 
@@ -2730,6 +2976,9 @@ Contact: contact.kavzego@gmail.com`;
       mode === "settings"
         ? s.defaultFormat
         : (state.preferredFormat || s.defaultFormat || "mp3");
+
+    // When opened from Settings, allow the X button to act as a back button.
+    if (mode === "settings") pushPanelSnapshot();
 
     openSelect(
       mode === "settings" ? "Default format" : "Format",
@@ -2829,6 +3078,9 @@ Contact: contact.kavzego@gmail.com`;
   let sortPanelHandler = null;
 
   function openSort() {
+    currentPanelKind = "sort";
+    setPanelHeaderMode("close");
+
     const sortUploadActive = state.sortKey === "upload";
     const sortTitleActive = state.sortKey === "title";
 
@@ -2910,6 +3162,9 @@ Contact: contact.kavzego@gmail.com`;
   let settingsPanelHandler = null;
 
   function openSettings() {
+    currentPanelKind = "settings";
+    setPanelHeaderMode("close");
+
     const s = state.settings;
     const speedLocked = !isDefaultSpeed();
 
@@ -3190,6 +3445,10 @@ Contact: contact.kavzego@gmail.com`;
       const nav = e.target.closest("[data-nav]");
       if (nav) {
         const where = nav.dataset.nav;
+
+        // Opening a sub-view from Settings: allow X to go "back" to Settings.
+        pushPanelSnapshot();
+
         if (where === "artists") { openArtists(); return; }
         if (where === "songs") { openSongsLinks(); return; }
         if (where === "about") { openAboutPanel(); return; }

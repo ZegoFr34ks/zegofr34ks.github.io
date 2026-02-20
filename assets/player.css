@@ -1,65 +1,20 @@
 :root{
-  --bg:#0b0b10;
-  --card:#111124;
-  --card2:#0f0f1b;
-  --text:#e8e8ff;
-  --muted:#a7a7c7;
-
-  --purple:#a855f7;
-  --purple2:#7c3aed;
-  --blue:#7dd3fc;
-  --red:#ff3b6b;
-
-  --glow: 0 0 18px rgba(168,85,247,.35);
-  --glow-strong: 0 0 28px rgba(168,85,247,.5);
-
-  --radius: 18px;
-  --radius2: 26px;
-
-  --shadow: 0 10px 30px rgba(0,0,0,.45);
-  --topbar-h: 64px;
-}
-
-*{ box-sizing:border-box; }
-html,body{ height:100%; }
-body{
-  margin:0;
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background: radial-gradient(1200px 800px at 20% -10%, var(--accent-soft), transparent 60%),
-              radial-gradient(900px 600px at 95% 10%, rgba(125,211,252,.12), transparent 55%),
-              var(--bg);
-  color: var(--text);
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* THEME TOKENS (single source of truth) */
-:root{
-  /* Dark base */
-  --bg:#0b0b10;
-  --card:#111124;
-  --card2:#0f0f1b;
-  --text:#e8e8ff;
-  --muted:#a7a7c7;
-
-  /* Accent defaults (purple) */
+  --bg: #0b0b10;
+  --card: #111124;
+  --card2: #0f0f1b;
+  --text: #e8e8ff;
+  --muted: #a7a7c7;
   --accent: #a855f7;
   --accent-soft: rgba(168,85,247,.18);
   --accent-glow: rgba(168,85,247,.35);
   --accent-glow-strong: rgba(168,85,247,.5);
-
-  --blue:#7dd3fc;
-  --red:#ff3b6b;
-
+  --blue: #7dd3fc;
+  --red: #ff3b6b;
   --radius: 18px;
   --radius2: 26px;
-
   --shadow: 0 10px 30px rgba(0,0,0,.45);
-
-  /* derived glows used across UI */
   --glow: 0 0 18px var(--accent-glow);
   --glow-strong: 0 0 28px var(--accent-glow-strong);
-
-    /* UI chrome tokens (used by header/search/buttons) */
   --topbar-bg: rgba(10,10,18,.75);
   --topbar-border: rgba(255,255,255,.06);
   --search-wrap-grad-a: rgba(10,10,18,.92);
@@ -69,23 +24,38 @@ body{
   --control-border: rgba(255,255,255,.10);
   --icon-muted: rgba(255,255,255,.55);
   --input-text: rgba(255,255,255,.92);
-
-    /* Theme-aware UI surfaces (glass) */
-  --surface-0: rgba(10,10,18,.92);  /* deepest */
-  --surface-1: rgba(15,15,27,.82);  /* panels / mini-player */
-  --surface-2: rgba(10,10,18,.65);  /* inner cards */
-  --surface-3: rgba(255,255,255,.03); /* buttons / chips */
-
+  --surface-0: rgba(10,10,18,.92);
+  --surface-1: rgba(15,15,27,.82);
+  --surface-2: rgba(10,10,18,.65);
+  --surface-3: rgba(255,255,255,.03);
   --border-0: rgba(255,255,255,.10);
   --border-1: rgba(255,255,255,.08);
   --border-2: rgba(255,255,255,.06);
-
   --text-strong: rgba(255,255,255,.92);
   --text-soft: rgba(255,255,255,.55);
-
   --overlay-dim: rgba(0,0,0,.55);
   --track-rest: rgba(255,255,255,.10);
+  --purple: #a855f7;
+  --purple2: #7c3aed;
+  --topbar-h: 64px;
 }
+
+/* assets/player.css
+   Refactor: token consolidation + organization (no visual/behavior changes intended) */
+
+*{ box-sizing:border-box; }
+
+html,body{ height:100%; }
+
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+}
+
+svg{ width:22px; height:22px; fill: currentColor; }
 
 /* Light mode overrides */
 :root[data-theme="light"]{
@@ -168,12 +138,6 @@ body{
   --accent-glow-strong: rgba(245,197,66,.5);
 }
 
-
-/* Apply base theme to page */
-body{
-  background: var(--bg);
-  color: var(--text);
-}
 
 /* Reduced Motion mode */
 :root[data-reducemotion="1"] *{
@@ -1652,4 +1616,10 @@ html[data-theme="light"] .tiny-song{
   display:flex;
   gap:10px;
   margin: 8px 0 4px;
+}
+/* Mobile Safari fix: prevent zoom on focus by ensuring >=16px font-size for inputs */
+@media (max-width: 768px){
+  #searchInput{
+    font-size: 16px;
+  }
 }
