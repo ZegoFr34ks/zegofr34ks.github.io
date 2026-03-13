@@ -2,3 +2,7 @@
 ZegoFr34ks' Official Personal Website
 
 This is my website I created for fun. I made it public with the hopes of inspiring some and that poeple can simply copy the code and implement it in there own website. If you find bugs and stuff, contact me trough the contact page on my website or leave a comment on github. Feedback is appreciated. Have a wonderfull day :)
+
+WARNING:
+
+This will no longer be set up to date! Check out yzkstudios.com for the up to date version.
